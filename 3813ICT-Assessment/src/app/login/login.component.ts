@@ -22,7 +22,7 @@ export class LoginComponent {
     console.log('Username:', this.username);
     console.log('Password:', this.password);
 
-    // Navigate to the user group screen
-    this.router.navigate(['/user-group-screen']);
+    // Navigate to the user group
+    this.router.navigate(['/user-group']);
   }
 }

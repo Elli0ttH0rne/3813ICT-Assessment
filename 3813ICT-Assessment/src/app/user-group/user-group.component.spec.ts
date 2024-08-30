@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { UserGroupScreenComponent } from './user-group-screen.component';
+import { UserGroupComponent } from './user-group.component';
 
-describe('UserGroupScreenComponent', () => {
-  let component: UserGroupScreenComponent;
-  let fixture: ComponentFixture<UserGroupScreenComponent>;
+describe('UserGroupComponent', () => {
+  let component: UserGroupComponent;
+  let fixture: ComponentFixture<UserGroupComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UserGroupScreenComponent]
+      imports: [UserGroupComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(UserGroupScreenComponent);
+    fixture = TestBed.createComponent(UserGroupComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

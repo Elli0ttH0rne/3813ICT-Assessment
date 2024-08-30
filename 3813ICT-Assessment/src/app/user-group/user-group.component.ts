@@ -2,13 +2,13 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-user-group-screen',
-  templateUrl: './user-group-screen.component.html',
-  styleUrls: ['./user-group-screen.component.css'],
+  selector: 'app-user-group',
+  templateUrl: './user-group.component.html',
+  styleUrls: ['./user-group.component.css'],
   standalone: true,
   imports: [CommonModule]
 })
-export class UserGroupScreenComponent {
+export class UserGroupComponent {
   // Track the open state of each group
   openGroups: { [key: number]: boolean } = {};
 
