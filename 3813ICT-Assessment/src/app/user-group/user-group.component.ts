@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,6 +10,8 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule]
 })
 export class UserGroupComponent {
+  constructor(private router: Router) {}
+
   // Track the open state of each group
   openGroups: { [key: number]: boolean } = {};
 
@@ -39,5 +42,10 @@ export class UserGroupComponent {
   // Toggle the open state of a group
   toggleGroup(index: number): void {
     this.openGroups[index] = !this.openGroups[index];
+  }
+
+  // Navigate to the account component
+  navigateToAccount(): void {
+    this.router.navigate(['/account']);
   }
 }
