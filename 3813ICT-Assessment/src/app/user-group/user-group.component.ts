@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -6,11 +6,11 @@ import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-user-group',
   standalone: true,
-  imports: [CommonModule, RouterModule], // Import CommonModule and RouterModule
+  imports: [CommonModule, RouterModule],
   templateUrl: './user-group.component.html',
   styleUrls: ['./user-group.component.css']
 })
-export class UserGroupComponent {
+export class UserGroupComponent implements OnInit {
   // Data for the groups
   groups = [
     { name: 'Photography', channel: ['Camera Gear', 'Photo Editing', 'Techniques'] },
@@ -33,9 +33,20 @@ export class UserGroupComponent {
   // Track the open state of each group
   openGroups: boolean[] = [];
 
+  // User information
+  username: string = '';
+  securityLevel: string = '';
+
   constructor(private router: Router) {
     // Initialize openGroups with false values
     this.openGroups = new Array(this.groups.length).fill(false);
+  }
+
+  ngOnInit(): void {
+    // Retrieve currentUser information from local storage
+    const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    this.username = storedUser.username;
+    this.securityLevel = storedUser.securityLevel ;
   }
 
   // Get the badge class for a group
