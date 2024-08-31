@@ -1,38 +1,42 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-user-group',
-  templateUrl: './user-group.component.html',
-  styleUrls: ['./user-group.component.css'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule, RouterModule], // Import CommonModule and RouterModule
+  templateUrl: './user-group.component.html',
+  styleUrls: ['./user-group.component.css']
 })
 export class UserGroupComponent {
-  constructor(private router: Router) {}
-
-  // Track the open state of each group
-  openGroups: { [key: number]: boolean } = {};
-
   // Data for the groups
   groups = [
-    { name: 'Group 1', channel: ['Channel 1', 'Channel 2', 'Channel 3'] },
-    { name: 'Group 2', channel: ['Channel 1', 'Channel 2', 'Channel 3'] },
-    { name: 'Group 3', channel: ['Channel 1', 'Channel 2', 'Channel 3'] },
-    { name: 'Group 4', channel: ['Channel 1', 'Channel 2', 'Channel 3'] },
-    { name: 'Group 5', channel: ['Channel 1', 'Channel 2', 'Channel 3'] },
-    { name: 'Group 6', channel: ['Channel 1', 'Channel 2', 'Channel 3'] },
-    { name: 'Group 7', channel: ['Channel 1', 'Channel 2', 'Channel 3'] },
-    { name: 'Group 8', channel: ['Channel 1', 'Channel 2', 'Channel 3'] },
-    { name: 'Group 9', channel: ['Channel 1', 'Channel 2', 'Channel 3'] },
-    { name: 'Group 10', channel: ['Channel 1', 'Channel 2', 'Channel 3'] },
+    { name: 'Photography', channel: ['Camera Gear', 'Photo Editing', 'Techniques'] },
+    { name: 'Cooking', channel: ['Recipes', 'Cooking Tips', 'Kitchen Gadgets'] },
+    { name: 'Gardening', channel: ['Plant Care', 'Garden Design', 'Tools'] },
+    { name: 'Travel', channel: ['Destinations', 'Travel Tips', 'Gear'] },
+    { name: 'Fitness', channel: ['Workouts', 'Nutrition', 'Gear'] },
+    { name: 'Music', channel: ['Instruments', 'Music Theory', 'Recording'] },
+    { name: 'Reading', channel: ['Book Recommendations', 'Genres', 'Authors'] },
+    { name: 'Gaming', channel: ['Game Reviews', 'Tips and Tricks', 'Hardware'] },
+    { name: 'DIY', channel: ['Projects', 'Tools', 'Techniques'] },
+    { name: 'Art', channel: ['Drawing', 'Painting', 'Digital Art'] },
   ];
 
   // Badge classes for each group
   badgeClasses = [
     'bg-primary', 'bg-secondary', 'bg-success', 'bg-danger', 'bg-warning text-dark',
   ];
+
+  // Track the open state of each group
+  openGroups: boolean[] = [];
+
+  constructor(private router: Router) {
+    // Initialize openGroups with false values
+    this.openGroups = new Array(this.groups.length).fill(false);
+  }
 
   // Get the badge class for a group
   getBadgeClass(index: number): string {
@@ -47,5 +51,10 @@ export class UserGroupComponent {
   // Navigate to the account component
   navigateToAccount(): void {
     this.router.navigate(['/account']);
+  }
+
+  // Navigate to the channel component with group and channel names as route parameters
+  navigateToChannel(groupName: string, channelName: string): void {
+    this.router.navigate(['/channel', groupName, channelName]);
   }
 }
