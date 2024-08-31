@@ -4,7 +4,10 @@
       <div class="card shadow-lg">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
           <h1 class="card-title">Channel</h1>
-          <i class="fas fa-user-circle fa-2x" style="cursor: pointer;" (click)="navigateToAccount()"></i>
+          <div class="d-flex align-items-center">
+            <span class="me-2">{{ username }} ({{ securityLevel }})</span>
+            <i class="fas fa-user-circle fa-2x" style="cursor: pointer;" (click)="navigateToAccount()"></i>
+          </div>
         </div>
         <div class="card-body">
           <p><strong>Group:</strong> {{ groupName }}</p>

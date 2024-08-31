@@ -11,8 +11,10 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./account.component.css']
 })
 export class AccountComponent {
-  username: string = 'JohnDoe';
-  email: string = 'john.doe@example.com';
+  // User information
+  username: string = '';
+  securityLevel: string = '';
+  email: string = '';
 
   constructor(private router: Router) {}
 
@@ -50,6 +52,14 @@ export class AccountComponent {
     } else {
       console.log('Account deletion cancelled');
     }
+  }
+
+  ngOnInit(): void {
+    // Retrieve currentUser information from local storage
+    const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    this.username = storedUser.username;
+    this.securityLevel = storedUser.securityLevel ;
+    this.email = storedUser.email;
   }
 
   // Navigate to the account component (if needed)

@@ -14,11 +14,22 @@ export class ChannelComponent {
   groupName: string | null = null;
   channelName: string | null = null;
 
+  // User information
+  username: string = '';
+  securityLevel: string = '';
+
   constructor(private route: ActivatedRoute, private router: Router) {
     this.route.paramMap.subscribe(params => {
       this.groupName = params.get('groupName');
       this.channelName = params.get('channelName');
     });
+  }
+
+  ngOnInit(): void {
+    // Retrieve currentUser information from local storage
+    const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    this.username = storedUser.username;
+    this.securityLevel = storedUser.securityLevel ;
   }
 
   // Navigate back to the user group component
