@@ -25,8 +25,8 @@ export class AccountComponent {
 
   // Handle logout functionality
   logout(): void {
-    // Clear user data from local storage
-    localStorage.removeItem('user');
+    // Clear previous user data from local storage
+    localStorage.removeItem('currentUser');
     
     // Implement additional logout logic here if needed
     console.log('User logged out');

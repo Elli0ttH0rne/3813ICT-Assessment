@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { AuthService } from '../auth.service';
+import { FormsModule } from '@angular/forms'; // Import FormsModule
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -8,27 +9,17 @@ import { RouterModule } from '@angular/router';
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  standalone: true,
-  imports: [FormsModule, CommonModule, RouterModule]
+  imports: [FormsModule, CommonModule, RouterModule], // Include FormsModule
+  standalone: true
 })
 export class LoginComponent {
   username: string = '';
   password: string = '';
 
-  // Example list of valid users
-  validUsers = [
-    { username: 'user1', password: 'user1', email: 'user1@gmail.com', securityLevel: 'user' },
-    { username: 'user2', password: 'user2', email: 'user2@gmail.com', securityLevel: 'user' },
-    { username: 'user3', password: 'user3', email: 'user3@gmail.com', securityLevel: 'user' },
-    { username: 'groupAdmin1', password: 'groupAdmin1', email: 'groupAdmin1@gmail.com',  securityLevel: 'groupAdmin' },
-    { username: 'groupAdmin2', password: 'groupAdmin2', email: 'groupAdmin2@gmail.com',  securityLevel: 'groupAdmin' },
-    { username: 'super', password: '123', email: 'super1@gmail.com',  securityLevel: 'superAdmin' },
-  ];
-
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   handleSubmit() {
-    const currentUser = this.validUsers.find(
+    const currentUser = this.authService.getValidUsers().find(
       u => u.username === this.username && u.password === this.password
     );
 

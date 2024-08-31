@@ -1,29 +1,50 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { AuthService } from '../auth.service';
+import { FormsModule } from '@angular/forms'; // Import FormsModule
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-register',
-  standalone: true,
-  imports: [FormsModule, CommonModule, RouterModule],
   templateUrl: './register.component.html',
-  styleUrl: './register.component.css'
+  styleUrls: ['./register.component.css'],
+  imports: [FormsModule, CommonModule, RouterModule], // Include FormsModule
+  standalone: true
 })
 export class RegisterComponent {
   username: string = '';
   email: string = '';
   password: string = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   handleSubmit() {
-    // Handle login logic here
-    console.log('Username:', this.username);
-    console.log('Password:', this.password);
+    // Check if the username already exists
+    if (this.authService.getValidUsers().some(user => user.username === this.username)) {
+      alert('Username already exists');
+      return;
+    }
 
-    // Navigate to the user group 
+    // Add the new user
+    const newUser = {
+      username: this.username,
+      email: this.email,
+      password: this.password,
+      securityLevel: 'user' // Default security level for new users
+    };
+
+    this.authService.addUser(newUser);
+
+    // Store the new user data in local storage
+    localStorage.setItem('currentUser', JSON.stringify({
+      username: newUser.username,
+      email: newUser.email,
+      securityLevel: newUser.securityLevel,
+      valid: true
+    }));
+
+    // Navigate to the user group
     this.router.navigate(['/user-group']);
   }
 }
