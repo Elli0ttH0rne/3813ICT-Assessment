@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '../auth.service';  // Import AuthService
 
 @Component({
   selector: 'app-account',
@@ -16,7 +17,7 @@ export class AccountComponent {
   roles: string = '';
   email: string = '';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}  // Inject AuthService
 
   // Navigate back to the user group component
   navigateToUserGroup(): void {
@@ -41,11 +42,11 @@ export class AccountComponent {
     const confirmed = window.confirm('Are you sure you want to delete your account? This action cannot be undone.');
 
     if (confirmed) {
-      // Implement your delete account logic here
-      console.log('Account deleted');
-
+      // Call the deleteUser method from AuthService
+      this.authService.deleteUser(this.username);
+      
       // Clear user data from local storage
-      localStorage.removeItem('user');
+      localStorage.removeItem('currentUser');
       
       // Navigate back to the login screen or home page
       this.router.navigate(['/']);
@@ -58,7 +59,7 @@ export class AccountComponent {
     // Retrieve currentUser information from local storage
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.username = storedUser.username;
-    this.roles = storedUser.roles ;
+    this.roles = storedUser.roles;
     this.email = storedUser.email;
   }
 

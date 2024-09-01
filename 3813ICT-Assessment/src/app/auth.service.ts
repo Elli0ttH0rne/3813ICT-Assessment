@@ -83,9 +83,27 @@ export class AuthService {
   }
 
   deleteUser(username: string) {
-    const users = this.getValidUsers().filter(user => user.username !== username);
-    localStorage.setItem('validUsers', JSON.stringify(users));
-  }
+    // Retrieve the current list of users from local storage
+    const users = this.getValidUsers();
+  
+    // Check if the users array is empty or does not contain the username
+    if (users.length === 0) {
+      console.warn('No users available to delete.');
+      return;
+    }
+  
+    // Filter out the user with the specified username
+    const updatedUsers = users.filter(user => user.username !== username);
+  
+    // Check if the user was found and deleted
+    if (users.length === updatedUsers.length) {
+      console.warn(`User with username "${username}" not found.`);
+      return;
+    }
+  
+    // Save the updated list back to local storage
+    localStorage.setItem('validUsers', JSON.stringify(updatedUsers));
+  }  
 
   // Public method to get all groups
   getAllGroups() {
