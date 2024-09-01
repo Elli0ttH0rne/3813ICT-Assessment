@@ -13,7 +13,7 @@ import { RouterModule } from '@angular/router';
 export class AccountComponent {
   // User information
   username: string = '';
-  securityLevel: string = '';
+  roles: string = '';
   email: string = '';
 
   constructor(private router: Router) {}
@@ -58,7 +58,7 @@ export class AccountComponent {
     // Retrieve currentUser information from local storage
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.username = storedUser.username;
-    this.securityLevel = storedUser.securityLevel ;
+    this.roles = storedUser.roles ;
     this.email = storedUser.email;
   }
 

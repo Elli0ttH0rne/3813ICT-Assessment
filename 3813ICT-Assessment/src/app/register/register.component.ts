@@ -4,6 +4,7 @@ import { AuthService } from '../auth.service';
 import { FormsModule } from '@angular/forms'; // Import FormsModule
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { group } from 'node:console';
 
 @Component({
   selector: 'app-register',
@@ -31,7 +32,8 @@ export class RegisterComponent {
       username: this.username,
       email: this.email,
       password: this.password,
-      securityLevel: 'user' // Default security level for new users
+      roles: ['user'],
+      groups: []
     };
 
     this.authService.addUser(newUser);
@@ -40,7 +42,7 @@ export class RegisterComponent {
     localStorage.setItem('currentUser', JSON.stringify({
       username: newUser.username,
       email: newUser.email,
-      securityLevel: newUser.securityLevel,
+      roles: newUser.roles,
       valid: true
     }));
 

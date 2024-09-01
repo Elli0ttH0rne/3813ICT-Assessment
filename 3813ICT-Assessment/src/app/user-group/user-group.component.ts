@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { AuthService } from '../auth.service'; // Adjust the path as necessary
 
 @Component({
   selector: 'app-user-group',
@@ -11,19 +12,10 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./user-group.component.css']
 })
 export class UserGroupComponent implements OnInit {
-  // Data for the groups
-  groups = [
-    { name: 'Photography', channel: ['Camera Gear', 'Photo Editing', 'Techniques'] },
-    { name: 'Cooking', channel: ['Recipes', 'Cooking Tips', 'Kitchen Gadgets'] },
-    { name: 'Gardening', channel: ['Plant Care', 'Garden Design', 'Tools'] },
-    { name: 'Travel', channel: ['Destinations', 'Travel Tips', 'Gear'] },
-    { name: 'Fitness', channel: ['Workouts', 'Nutrition', 'Gear'] },
-    { name: 'Music', channel: ['Instruments', 'Music Theory', 'Recording'] },
-    { name: 'Reading', channel: ['Book Recommendations', 'Genres', 'Authors'] },
-    { name: 'Gaming', channel: ['Game Reviews', 'Tips and Tricks', 'Hardware'] },
-    { name: 'DIY', channel: ['Projects', 'Tools', 'Techniques'] },
-    { name: 'Art', channel: ['Drawing', 'Painting', 'Digital Art'] },
-  ];
+  // Groups data for the current user
+  groups: string[] = [];
+  // Channels data for the current user's groups
+  channels: { [group: string]: string[] } = {};
 
   // Badge classes for each group
   badgeClasses = [
@@ -35,9 +27,9 @@ export class UserGroupComponent implements OnInit {
 
   // User information
   username: string = '';
-  securityLevel: string = '';
+  roles: string[] = [];
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private authService: AuthService) {
     // Initialize openGroups with false values
     this.openGroups = new Array(this.groups.length).fill(false);
   }
@@ -46,7 +38,24 @@ export class UserGroupComponent implements OnInit {
     // Retrieve currentUser information from local storage
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.username = storedUser.username;
-    this.securityLevel = storedUser.securityLevel ;
+    this.roles = storedUser.roles;
+    this.groups = storedUser.groups;
+
+    // Initialize openGroups after groups are loaded
+    this.openGroups = new Array(this.groups.length).fill(false);
+
+    // Check if the user is a superAdmin
+    if (this.roles.includes('superAdmin')) {
+      // Fetch all channels for all groups
+      this.authService.getAllGroups().forEach(group => {
+        this.channels[group.name] = group.channel;
+      });
+    } else {
+      // Fetch channels for the user's groups
+      this.groups.forEach(group => {
+        this.channels[group] = this.authService.getUserGroupChannels([group]);
+      });
+    }
   }
 
   // Get the badge class for a group

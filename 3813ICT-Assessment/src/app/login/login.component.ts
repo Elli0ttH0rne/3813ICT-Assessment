@@ -22,18 +22,19 @@ export class LoginComponent {
     const currentUser = this.authService.getValidUsers().find(
       u => u.username === this.username && u.password === this.password
     );
-
+  
     if (currentUser) {
       console.log('Login successful');
       
-      // Store user data including security level in local storage
+      // Store user data in local storage
       localStorage.setItem('currentUser', JSON.stringify({
         username: currentUser.username,
         email: currentUser.email,
-        securityLevel: currentUser.securityLevel,
+        roles: currentUser.roles,
+        groups: currentUser.groups,
         valid: true
       }));
-
+  
       // Navigate to the user group
       this.router.navigate(['/user-group']);
     } else {
@@ -41,4 +42,5 @@ export class LoginComponent {
       alert('Invalid username or password');
     }
   }
+  
 }

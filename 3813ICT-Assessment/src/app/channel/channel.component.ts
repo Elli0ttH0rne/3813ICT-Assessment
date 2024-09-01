@@ -16,7 +16,7 @@ export class ChannelComponent {
 
   // User information
   username: string = '';
-  securityLevel: string = '';
+  roles: string = '';
 
   constructor(private route: ActivatedRoute, private router: Router) {
     this.route.paramMap.subscribe(params => {
@@ -29,7 +29,7 @@ export class ChannelComponent {
     // Retrieve currentUser information from local storage
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.username = storedUser.username;
-    this.securityLevel = storedUser.securityLevel ;
+    this.roles = storedUser.roles ;
   }
 
   // Navigate back to the user group component
