@@ -21,7 +21,7 @@ export class AuthService {
     },
     { 
       username: 'user3', 
-      password: 'user3@gmail.com', 
+      password: 'user3', 
       email: 'user3@gmail.com', 
       roles: ['user'], 
       groups: [] 
@@ -87,18 +87,14 @@ export class AuthService {
     localStorage.setItem('validUsers', JSON.stringify(users));
   }
 
-  getUserGroupChannels(userGroups: string[]): string[] {
-    const channels: string[] = [];
-    userGroups.forEach(group => {
-      const groupData = this.groups.find(g => g.name === group);
-      if (groupData) {
-        channels.push(...groupData.channel);
-      }
-    });
-    return channels;
-  }
   // Public method to get all groups
   getAllGroups() {
     return this.groups;
+  }
+
+  // Method to get channels for a specific group
+  getGroupChannels(groupName: string): string[] {
+    const group = this.groups.find(g => g.name === groupName);
+    return group ? group.channel : [];
   }
 }
