@@ -24,7 +24,7 @@ export class AuthService {
       password: 'user3', 
       email: 'user3@gmail.com', 
       roles: ['user'], 
-      groups: [] 
+      groups: ['Gaming', 'Reading'] 
     },
     { 
       username: 'groupAdmin1', 
