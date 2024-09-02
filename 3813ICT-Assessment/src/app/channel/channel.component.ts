@@ -1,3 +1,4 @@
+// channel.component.ts
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -44,8 +45,9 @@ export class ChannelComponent implements OnInit {
     this.isSuperAdmin = this.roles.includes('superAdmin'); 
 
     if (this.groupName) {
+      // Fetch users and admins including super admins
       this.usersInGroup = this.authService.getUsersInGroup(this.groupName);
-      this.groupAdmins = this.authService.getGroupAdmins(this.groupName);
+      this.groupAdmins = this.authService.getGroupAdmins(this.groupName).concat(this.authService.getSuperAdmins());
       this.groupCreator = this.authService.getGroupCreator(this.groupName);
 
       // Check if the current user is the group creator or a super admin
@@ -66,10 +68,9 @@ export class ChannelComponent implements OnInit {
   // Method to delete the channel
   deleteChannel(): void {
     // Show confirmation dialog
-    const confirmed = window.confirm('Are you sure you want to delete your account? This action cannot be undone.');
+    const confirmed = window.confirm('Are you sure you want to delete this channel? This action cannot be undone.');
 
     if(confirmed) {
-
       if (this.groupName && this.channelName) {
         const success = this.authService.deleteChannel(this.groupName, this.channelName, this.username, this.isSuperAdmin);
         if (success) {
