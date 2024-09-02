@@ -109,6 +109,12 @@ export class ChannelComponent implements OnInit {
 
   // Method to remove a user from the group
   kickUserFromGroup(username: string): void {
+    // Check if the user attempting to kick is the same as the user being kicked
+    if (username === this.username) {
+      alert('You cannot remove yourself from the group.');
+      return;
+    }
+
     const confirmed = window.confirm('Are you sure you want to remove this user from the group?');
     if (confirmed) {
       const success = this.authService.kickUserFromGroup(username, this.groupName);
@@ -121,6 +127,7 @@ export class ChannelComponent implements OnInit {
       }
     }
   }
+
 
   // Method to promote a user to group admin
   promoteToGroupAdmin(username: string): void {

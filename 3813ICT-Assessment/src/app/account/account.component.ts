@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -11,12 +11,12 @@ import { AuthService } from '../auth.service';
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.css']
 })
-export class AccountComponent {
+export class AccountComponent implements OnInit {
   // User information
   username: string = '';
-  roles: string[] = []; // Fixed type to array of strings
+  roles: string[] = [];
   email: string = '';
-  userId: string = ''; // Added userId for tracking
+  userId: string = '';
 
   constructor(private router: Router, private authService: AuthService) {}
 
@@ -31,6 +31,12 @@ export class AccountComponent {
 
   // Handle delete account functionality
   deleteAccount(): void {
+    // Check if the user is a groupAdmin or superAdmin
+    if (this.isGroupAdminOrSuperAdmin()) {
+      alert('Group Admins and Super Admins cannot delete their accounts.');
+      return;
+    }
+
     // Show confirmation dialog
     const confirmed = window.confirm('Are you sure you want to delete your account? This action cannot be undone.');
 
@@ -61,7 +67,7 @@ export class AccountComponent {
   ngOnInit(): void {
     // Retrieve currentUser information from local storage
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    this.username = storedUser.username;
+    this.username = storedUser.username || '';
     this.roles = storedUser.roles || [];
     this.email = storedUser.email || '';
     this.userId = storedUser.userId || '';
