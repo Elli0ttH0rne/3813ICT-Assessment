@@ -39,6 +39,11 @@ export class RegisterComponent {
       groups: []
     };
 
+    if(this.username == '' || this.email == '' || this.password == ''){
+      alert('Please fill in all fields');
+      return;
+    }
+
     this.authService.addUser(newUser);
 
     // Store the new user data in local storage

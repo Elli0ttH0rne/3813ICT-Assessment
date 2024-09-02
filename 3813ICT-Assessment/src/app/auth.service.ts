@@ -734,8 +734,13 @@ export class AuthService {
     return JSON.parse(localStorage.getItem('allGroups') || '[]');
   }
 
-  
+  getRequestCount(): number {
+    // Implement logic to return the actual count of requests
+    // This is just a placeholder
+    const count = this.getGroupJoinRequests().length + this.getReportedUsers().length;
 
+    return count; // Example count
+  }
 
   //******************************Data Removal Methods******************************
   deleteChannel(groupName: string, channelName: string, currentUsername: string, isSuperAdmin: boolean): boolean {

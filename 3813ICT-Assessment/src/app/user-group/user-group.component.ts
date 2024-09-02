@@ -27,7 +27,8 @@ export class UserGroupComponent implements OnInit {
   showCreateGroup: boolean = false; 
   showCreateChannelForGroup: string | null = null; 
   newChannelName: string = ''; 
-  newChannelDescription: string = ''; //
+  newChannelDescription: string = '';
+  requestCount: number = 0; // New property for request count
 
   constructor(private router: Router, private authService: AuthService) {}
 
@@ -36,6 +37,11 @@ export class UserGroupComponent implements OnInit {
     this.userID = storedUser.userId;
     this.username = storedUser.username;
     this.roles = storedUser.roles;
+
+    // Fetch request count
+    if (this.isGroupAdminOrSuperAdmin()) {
+      this.updateRequestCount();
+    }
 
     if (this.roles.includes('superAdmin')) {
       const allGroups = this.authService.getAllGroups();
@@ -64,7 +70,6 @@ export class UserGroupComponent implements OnInit {
     return this.roles.includes('user') || this.roles.includes('groupAdmin');
   }
   
-
   isSuperAdmin(): boolean {
     return this.roles.includes('superAdmin');
   }
@@ -203,5 +208,12 @@ export class UserGroupComponent implements OnInit {
 
   navigateToAllGroups(): void {
     this.router.navigate(['/all-group-list']);
+  }
+
+  // Fetch the number of requests for the badge
+  private updateRequestCount(): void {
+    if (this.isGroupAdminOrSuperAdmin()) {
+      this.requestCount = this.authService.getRequestCount();
+    }
   }
 }

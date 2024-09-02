@@ -23,6 +23,7 @@ export class ChannelComponent implements OnInit {
   usersInGroup: { userId: string; username: string }[] = [];
   groupAdmins: { username: string; role: string }[] = [];
   groupCreator: string = '';
+  requestCount: number = 0;
 
   // Flags to check user permissions
   isCreator: boolean = false;
@@ -36,11 +37,6 @@ export class ChannelComponent implements OnInit {
     });
   }
 
-  // Method to check if the user is a groupAdmin or superAdmin
-  isGroupAdminOrSuperAdmin(): boolean {
-    return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
-  }
-
   ngOnInit(): void {
     // Retrieve currentUser information from local storage
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -48,6 +44,11 @@ export class ChannelComponent implements OnInit {
     this.roles = storedUser.roles || []; 
 
     this.isSuperAdmin = this.roles.includes('superAdmin'); 
+
+    // Fetch request count
+    if (this.isGroupAdminOrSuperAdmin()) {
+      this.updateRequestCount();
+    }
 
     if (this.groupName) {
       // Fetch users and admins including super admins
@@ -59,6 +60,13 @@ export class ChannelComponent implements OnInit {
       this.isCreator = this.username === this.groupCreator || this.isSuperAdmin;
     }
   }
+
+  // Method to check if the user is a groupAdmin or superAdmin
+  isGroupAdminOrSuperAdmin(): boolean {
+    return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
+  }
+
+  
 
   // Navigate back to the user group component
   navigateToUserGroup(): void {
@@ -141,6 +149,13 @@ export class ChannelComponent implements OnInit {
       } else {
         alert('Failed to promote user.');
       }
+    }
+  }
+
+  // Fetch the number of requests for the badge
+  private updateRequestCount(): void {
+    if (this.isGroupAdminOrSuperAdmin()) {
+      this.requestCount = this.authService.getRequestCount();
     }
   }
 }

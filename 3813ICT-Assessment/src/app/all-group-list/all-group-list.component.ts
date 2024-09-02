@@ -17,6 +17,7 @@ export class AllGroupListComponent implements OnInit {
   username: string = '';
   roles: string[] = [];
   joinRequests: { [groupName: string]: boolean } = {};
+  requestCount: number = 0;
 
   constructor(private router: Router, private authService: AuthService) {}
 
@@ -25,14 +26,21 @@ export class AllGroupListComponent implements OnInit {
     this.loadUserGroups();
 
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    this.userId = storedUser.userId || ''; // Ensure default value
+    this.userId = storedUser.userId || '';
     this.username = storedUser.username || '';
     this.roles = storedUser.roles || [];
+
+    if (this.isGroupAdminOrSuperAdmin()) {
+      this.requestCount = this.authService.getRequestCount(); 
+    }
   }
+  
 
   private loadGroups(): void {
     this.groups = this.authService.getAllGroups();
   }
+
+  
 
   private loadUserGroups(): void {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -50,6 +58,7 @@ export class AllGroupListComponent implements OnInit {
   isGroupAdminOrSuperAdmin(): boolean {
     return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
   }
+  
 
   isUserInGroup(groupName: string): boolean {
     return this.userGroups.includes(groupName);
@@ -65,6 +74,13 @@ export class AllGroupListComponent implements OnInit {
       console.log(`Request to join ${groupName} sent successfully by ${this.username}`);
     } else {
       console.error(`Failed to send request to join ${groupName}.`);
+    }
+  }
+
+  // Fetch the number of requests for the badge
+  private updateRequestCount(): void {
+    if (this.isGroupAdminOrSuperAdmin()) {
+      this.requestCount = this.authService.getRequestCount();
     }
   }
 

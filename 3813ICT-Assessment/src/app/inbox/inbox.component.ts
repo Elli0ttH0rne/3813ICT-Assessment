@@ -18,6 +18,7 @@ export class InboxComponent implements OnInit {
   joinRequests: any[] = []; // Store join requests
   reportedUsers: any[] = []; // Store reported users
   promotionRequests: any[] = []; // Store promotion requests
+  requestCount: number = 0; // New property for request count
 
   constructor(private router: Router, private authService: AuthService) {}
 
@@ -28,6 +29,7 @@ export class InboxComponent implements OnInit {
 
     if (this.isGroupAdminOrSuperAdmin()) {
       this.loadJoinRequests();
+      this.updateRequestCount();
     }
     
     if (this.isSuperAdmin()) {
@@ -115,5 +117,11 @@ export class InboxComponent implements OnInit {
 
   navigateToUserGroup(): void {
     this.router.navigate(['/user-group']);
+  }
+  // Fetch the number of requests for the badge
+  private updateRequestCount(): void {
+    if (this.isGroupAdminOrSuperAdmin()) {
+      this.requestCount = this.authService.getRequestCount();
+    }
   }
 }

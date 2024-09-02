@@ -46,3 +46,14 @@
 .fa-user-circle {
   font-size: 2.5rem; /* Increase icon size */
 }
+
+.badge-notification {
+  position: absolute;
+  top: -10px; /* Adjust as needed */
+  right: -15px; /* Adjust as needed */
+  background-color: red; /* Change to desired color */
+  color: white; /* Text color */
+  font-size: 1.25rem; /* Adjust font size */
+  padding: 0.25em 0.5em;
+  border-radius: 50%;
+}

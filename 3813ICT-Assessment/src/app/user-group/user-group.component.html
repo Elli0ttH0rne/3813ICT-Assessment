@@ -7,15 +7,17 @@
           <div class="d-flex align-items-center">
             <span class="me-2">{{ username }}</span>
             <ng-container *ngIf="isGroupAdminOrSuperAdmin()">
-              <i class="fas fa-inbox fa-2x me-2" style="cursor: pointer;" (click)="navigateToInbox()"></i>
-            </ng-container>
+              <div class="position-relative">
+                <i class="fas fa-inbox fa-2x me-2" style="cursor: pointer;" (click)="navigateToInbox()"></i>
+                <span class="badge badge-notification" *ngIf="requestCount > 0">{{ requestCount }}</span>
+              </div>
+            </ng-container>            
             <i class="fas fa-user-circle fa-2x me-2" style="cursor: pointer;" (click)="navigateToAccount()"></i>
           </div>
         </div>
         <div class="card-body">
           <!-- Button to show the create group form -->
           <button *ngIf="canCreateGroup()" class="btn btn-success mb-3" (click)="showCreateGroupForm()">Create New Group</button>
-
           <!-- Form to create a new group, visible when showCreateGroup is true -->
           <div *ngIf="showCreateGroup" class="mb-3">
             <div class="mb-3">
