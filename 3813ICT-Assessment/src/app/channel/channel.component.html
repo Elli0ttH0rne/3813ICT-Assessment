@@ -1,4 +1,3 @@
-<!-- channel.component.html -->
 <div class="container mt-5">
   <div class="row justify-content-center">
     <div class="col-md-8">
@@ -17,22 +16,41 @@
           <p><strong>Group:</strong> {{ groupName }}</p>
           <p><strong>Channel:</strong> {{ channelName }}</p>
 
-          <h3>Users in Group</h3>
-          <ul>
-            <li *ngFor="let user of usersInGroup">
-              {{ user.username }}
-            </li>
-          </ul>
+          <!-- Toggle Button -->
+          <button class="btn btn-info mb-3" (click)="toggleUserLists()">
+            {{ showUserLists ? 'Hide' : 'Show' }} User Lists
+          </button>
 
-          <h3>Group Admins</h3>
-          <ul>
-            <li *ngFor="let admin of groupAdmins">
-              {{ admin.username }} - {{ admin.role }}
-            </li>
-          </ul>
+          <!-- Users in Group -->
+          <div *ngIf="showUserLists">
+            <h3>Users in Group</h3>
+            <ul class="list-group mb-3">
+              <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let user of usersInGroup">
+                {{ user.username }}
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                  Dropdown button
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <li><a class="dropdown-item">Report User to Admins</a></li>
+                    <li *ngIf="isCreator || isSuperAdmin"><a class="dropdown-item">Remove user from Group</a></li>
+                    <li *ngIf="isCreator"><a class="dropdown-item">Ban user from group and report to Super Admin</a></li>
+                    <li *ngIf="isSuperAdmin"><a class="dropdown-item">Delete User</a></li>
+                    <li *ngIf="isSuperAdmin"><a class="dropdown-item">Promote to Group Admin</a></li>
+                    <li *ngIf="isSuperAdmin"><a class="dropdown-item">Promote to Super Admin</a></li>
+                </div>
+              </li>
+            </ul>
 
-          <h3>Group Creator</h3>
-          <p>{{ groupCreator }}</p>
+            <h3>Group Admins</h3>
+            <ul class="list-group mb-3">
+              <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let admin of groupAdmins">
+                {{ admin.username }} - {{ admin.role }}
+              </li>
+            </ul>
+
+            <h3>Group Creator</h3>
+            <p>{{ groupCreator }}</p>
+          </div>
 
           <!-- Conditional Delete Button -->
           <div *ngIf="isCreator">

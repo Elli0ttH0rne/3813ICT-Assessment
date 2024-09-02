@@ -1,4 +1,3 @@
-// channel.component.ts
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -27,7 +26,8 @@ export class ChannelComponent implements OnInit {
 
   // Flags to check user permissions
   isCreator: boolean = false;
-  isSuperAdmin: boolean = false; 
+  isSuperAdmin: boolean = false;
+  showUserLists: boolean = false;  // New property to control the visibility of user lists
 
   constructor(private route: ActivatedRoute, private router: Router, private authService: AuthService) {
     this.route.paramMap.subscribe(params => {
@@ -36,10 +36,10 @@ export class ChannelComponent implements OnInit {
     });
   }
 
-    // Method to check if the user is a groupAdmin or superAdmin
-    isGroupAdminOrSuperAdmin(): boolean {
-      return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
-    }
+  // Method to check if the user is a groupAdmin or superAdmin
+  isGroupAdminOrSuperAdmin(): boolean {
+    return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
+  }
 
   ngOnInit(): void {
     // Retrieve currentUser information from local storage
@@ -70,6 +70,7 @@ export class ChannelComponent implements OnInit {
     this.router.navigate(['/account']);
   }
 
+  // Navigate to the inbox component
   navigateToInbox(): void {
     this.router.navigate(['/inbox']);
   }
@@ -79,17 +80,22 @@ export class ChannelComponent implements OnInit {
     // Show confirmation dialog
     const confirmed = window.confirm('Are you sure you want to delete this channel? This action cannot be undone.');
 
-    if(confirmed) {
+    if (confirmed) {
       if (this.groupName && this.channelName) {
         const success = this.authService.deleteChannel(this.groupName, this.channelName, this.username, this.isSuperAdmin);
         if (success) {
-            alert('Channel deleted successfully.');
-            // Navigate or refresh as needed
-            this.navigateToUserGroup();
+          alert('Channel deleted successfully.');
+          // Navigate or refresh as needed
+          this.navigateToUserGroup();
         } else {
-            alert('Failed to delete channel.');
+          alert('Failed to delete channel.');
         }
       }
     }
+  }
+
+  // Method to toggle the visibility of user lists
+  toggleUserLists(): void {
+    this.showUserLists = !this.showUserLists;
   }
 }
