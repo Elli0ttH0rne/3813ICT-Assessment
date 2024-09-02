@@ -40,6 +40,10 @@
                     <span class="badge" [ngClass]="getBadgeClass(i)">{{ group }}</span>
                   </div>
                 </div>
+                <!-- Button to leave group, visible to users and group admins but not to the creator -->
+                <ng-container *ngIf="isUserOrGroupAdmin() && !isGroupCreator(group)">
+                  <button class="btn btn-warning btn-sm ms-2 me-3" (click)="leaveGroup(group)">Leave Group</button>
+                </ng-container>
               </div>
               <ul *ngIf="openGroups[i]" class="list-group mt-2">
                 <!-- List of channels -->
@@ -67,21 +71,24 @@
                       [(ngModel)]="newChannelDescription" 
                       [ngModelOptions]="{standalone: true}"></textarea>
                   </div>
-                  <button class="btn btn-primary" (click)="createChannel(group)">Create</button>
+                  <button class="btn btn-primary mb-3" (click)="createChannel(group)">Create</button>
                   <button class="btn btn-secondary" (click)="cancelCreateChannel()">Cancel</button>
                 </div>
                 <!-- Add Channel button, moved inside the channel tab -->
-                <div class="mt-3" *ngIf="canCreateChannel(group)">
+                <div class="mt-4" *ngIf="isGroupCreator(group)">
                   <button class="btn btn-info mb-3" (click)="showCreateChannelForm(group)">Add Channel</button>
                 </div>
               </ul>
-              <div class="mt-3 d-flex justify-content-end">
-                <button *ngIf="canDeleteGroup(group)" class="btn btn-danger btn-sm ms-3" (click)="deleteGroup(group)">Delete Group</button>
-              </div>
+              <!-- Button to delete the group, now positioned after the channel list -->
+              <ng-container *ngIf="canDeleteGroup(group)">
+                <div class="d-flex justify-content-end mt-3">
+                  <button class="btn btn-danger btn-sm ms-2" (click)="deleteGroup(group)">Delete Group</button>
+                </div>
+              </ng-container>
             </li>
           </ul>
           <!-- Plus icon to navigate to all groups list, only visible to groupAdmin or user -->
-          <ng-container *ngIf="canShowAllGroupIcon()">
+          <ng-container *ngIf="isUserOrGroupAdmin()">
             <i class="fas fa-plus fa-2x" style="cursor: pointer;" (click)="navigateToAllGroups()"></i>
           </ng-container>
         </div>

@@ -324,9 +324,11 @@ export class AuthService {
     },
   ];
 
-    // Adding request structures
-    private defaultGroupJoinRequests = [];
-    private defaultReportRequests = [];
+
+
+  private defaultGroupJoinRequests = [];
+  private defaultReportRequests = [];
+
   
   constructor() {
     this.initializeUsers();
@@ -360,6 +362,7 @@ export class AuthService {
   private saveReportRequests(requests: any[]) {
     localStorage.setItem('reportRequests', JSON.stringify(requests));
   }
+
 
   // Handle group join requests
   requestToJoinGroup(username: string, groupName: string): boolean {
@@ -413,7 +416,29 @@ export class AuthService {
     }
   
     return true;
-}
+  }
+
+  leaveGroup(username: string, groupName: string): boolean {
+    const users = this.getValidUsers();
+    const user = users.find(u => u.username === username);
+  
+    if (!user) {
+      console.warn(`User with username "${username}" not found.`);
+      return false;
+    }
+  
+    const groupIndex = user.groups.indexOf(groupName);
+    if (groupIndex === -1) {
+      console.warn(`Group "${groupName}" not found in user's groups.`);
+      return false;
+    }
+  
+    user.groups.splice(groupIndex, 1);
+    this.saveValidUsers(users);
+    console.log(`User ${username} removed from group ${groupName}`);
+    return true;
+  }
+
 
   // Method to remove pending requests for the user
   removePendingRequests(username: string): boolean {
@@ -445,6 +470,9 @@ export class AuthService {
   
     return true;
   }
+
+
+
 
   // Handle report requests
   getReportedUsers(): any[] {
@@ -625,6 +653,7 @@ export class AuthService {
     this.saveGroupsToLocalStorage(groups);
     return true;
   }
+
   createGroup(groupName: string, creatorUsername: string, isSuperAdmin: boolean): boolean {
     const groups = this.getGroupsFromLocalStorage();
     

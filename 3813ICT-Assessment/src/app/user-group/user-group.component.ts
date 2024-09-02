@@ -60,11 +60,10 @@ export class UserGroupComponent implements OnInit {
     return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
   }
 
-  // Method to check if the plus icon should be displayed
-  canShowAllGroupIcon(): boolean {
-    return this.roles.includes('groupAdmin') || this.roles.includes('user');
+  isUserOrGroupAdmin(): boolean {
+    return this.roles.includes('user') || this.roles.includes('groupAdmin');
   }
-
+  
 
   isSuperAdmin(): boolean {
     return this.roles.includes('superAdmin');
@@ -86,7 +85,7 @@ export class UserGroupComponent implements OnInit {
     return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
   }
 
-  canCreateChannel(group: string): boolean {
+  isGroupCreator(group: string): boolean {
     return this.username === this.groupCreators[group];
   }
 
@@ -167,6 +166,20 @@ export class UserGroupComponent implements OnInit {
       }
     } else {
       alert('Please enter both channel name and description.');
+    }
+  }
+  
+  leaveGroup(groupName: string): void {
+    const confirmed = window.confirm(`Are you sure you want to leave the group "${groupName}"?`);
+    if (confirmed) {
+      const success = this.authService.leaveGroup(this.username, groupName);
+      if (success) {
+        alert(`You have left the group "${groupName}".`);
+        this.groups = this.groups.filter(g => g !== groupName);
+        delete this.channels[groupName];
+      } else {
+        alert('Failed to leave group.');
+      }
     }
   }
 
