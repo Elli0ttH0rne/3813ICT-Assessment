@@ -12,19 +12,21 @@
         <div class="card-body">
           <ul class="list-group">
             <li class="list-group-item" *ngFor="let group of groups; let i = index">
-              <div (click)="toggleGroup(i)" style="cursor: pointer;">
-                <span class="badge" [ngClass]="getBadgeClass(i)">{{ group }}</span>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex flex-column flex-grow-1" (click)="toggleGroup(i)" style="cursor: pointer;">
+                  <span class="badge" [ngClass]="getBadgeClass(i)">{{ group }}</span>
+                </div>
               </div>
               <ul *ngIf="openGroups[i]" class="list-group mt-2">
                 <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let channel of channels[group]">
-                  <!-- Display the channel name -->
-                  <div>
+                  <div class="flex-grow-1">
                     <strong>{{ channel.name }}</strong>
                     <p class="mb-0 text-muted">{{ channel.description }}</p>
                   </div>
                   <button class="btn btn-primary btn-sm" (click)="navigateToChannel(group, channel.name)">Join Channel</button>
                 </li>
               </ul>
+              <button *ngIf="canDeleteGroup(group)" class="btn btn-danger btn-sm ms-3" (click)="deleteGroup(group)">Delete Group</button>
             </li>
           </ul>
         </div>

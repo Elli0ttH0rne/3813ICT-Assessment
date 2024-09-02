@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
-import { FormsModule } from '@angular/forms'; // Import FormsModule
+import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -9,7 +9,7 @@ import { RouterModule } from '@angular/router';
   selector: 'app-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
-  imports: [FormsModule, CommonModule, RouterModule], // Include FormsModule
+  imports: [FormsModule, CommonModule, RouterModule], 
   standalone: true
 })
 export class RegisterComponent {

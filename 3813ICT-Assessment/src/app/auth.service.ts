@@ -425,6 +425,35 @@ export class AuthService {
     // Save the updated group information
     this.groups = this.groups.map(g => g.name === groupName ? group : g);
     return true;
-}
+  }
+  deleteGroup(groupName: string, currentUsername: string, isSuperAdmin: boolean): boolean {
+    // Find the group
+    const groupIndex = this.groups.findIndex(g => g.name === groupName);
+    if (groupIndex === -1) {
+      console.warn('Group not found.');
+      return false;
+    }
 
+    const group = this.groups[groupIndex];
+    const creatorUsername = this.getGroupCreator(groupName);
+
+    // Check if the current user is either the group creator or a super admin
+    if (currentUsername !== creatorUsername && !isSuperAdmin) {
+      console.warn('Only the group creator or a super admin can delete the group.');
+      return false;
+    }
+
+    // Remove the group
+    this.groups.splice(groupIndex, 1);
+
+    // Update users' group lists
+    const users = this.getValidUsers();
+    const updatedUsers = users.map(user => ({
+      ...user,
+      groups: user.groups.filter(group => group !== groupName)
+    }));
+
+    localStorage.setItem('validUsers', JSON.stringify(updatedUsers));
+    return true;
+  }
 }

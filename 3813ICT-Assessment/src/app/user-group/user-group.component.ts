@@ -14,7 +14,6 @@ import { AuthService } from '../auth.service';
 export class UserGroupComponent implements OnInit {
   // Groups data for the current user
   groups: string[] = [];
-  // Channels data for the current user's groups
   channels: { [group: string]: { name: string; description: string; }[] } = {};
 
   // Badge classes for each group
@@ -22,13 +21,16 @@ export class UserGroupComponent implements OnInit {
     'bg-primary', 'bg-secondary', 'bg-success', 'bg-danger', 'bg-warning text-dark',
   ];
 
-  // Track the open state of each group
+  // Track the open state of each group tab
   openGroups: boolean[] = [];
 
   // User information
   userID: string = ''; // Add userID
   username: string = '';
   roles: string[] = [];
+
+  // Track the group creator
+  groupCreators: { [group: string]: string } = {};
 
   constructor(private router: Router, private authService: AuthService) {}
 
@@ -49,6 +51,7 @@ export class UserGroupComponent implements OnInit {
       this.groups = allGroups.map(group => group.name);
       this.groups.forEach(group => {
         this.channels[group] = this.authService.getGroupChannels(group);
+        this.groupCreators[group] = this.authService.getGroupCreator(group);
       });
 
     } else {
@@ -59,6 +62,7 @@ export class UserGroupComponent implements OnInit {
       // Fetch channels for the user's groups
       this.groups.forEach(group => {
         this.channels[group] = this.authService.getGroupChannels(group);
+        this.groupCreators[group] = this.authService.getGroupCreator(group);
       });
     }
   }
@@ -71,6 +75,31 @@ export class UserGroupComponent implements OnInit {
   // Toggle the open state of a group
   toggleGroup(index: number): void {
     this.openGroups[index] = !this.openGroups[index];
+  }
+
+  // Check if the current user can delete the group
+  canDeleteGroup(group: string): boolean {
+    return this.username === this.groupCreators[group] || this.roles.includes('superAdmin');
+  }
+
+  // Method to delete the group
+  deleteGroup(group: string): void {
+
+    // Show confirmation dialog
+    const confirmed = window.confirm('Are you sure you want to delete this group? This action cannot be undone.');
+
+    if (confirmed) {
+      const success = this.authService.deleteGroup(group, this.username, this.roles.includes('superAdmin'));
+    if (success) {
+      alert('Group deleted successfully.');
+      // Update the groups and channels after deletion
+      this.groups = this.groups.filter(g => g !== group);
+      delete this.channels[group];
+      // Navigate or refresh as needed
+    } else {
+      alert('Failed to delete group.');
+    }
+    }
   }
 
   // Navigate to the account component

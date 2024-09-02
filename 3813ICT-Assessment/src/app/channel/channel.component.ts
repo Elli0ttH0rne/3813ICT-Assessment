@@ -17,7 +17,7 @@ export class ChannelComponent implements OnInit {
 
   // User information
   username: string = '';
-  roles: string[] = []; // Changed to an array of roles
+  roles: string[] = [];
 
   // Group and user information
   usersInGroup: { userId: string; username: string }[] = [];
@@ -26,7 +26,7 @@ export class ChannelComponent implements OnInit {
 
   // Flags to check user permissions
   isCreator: boolean = false;
-  isSuperAdmin: boolean = false; // Added property
+  isSuperAdmin: boolean = false; 
 
   constructor(private route: ActivatedRoute, private router: Router, private authService: AuthService) {
     this.route.paramMap.subscribe(params => {
@@ -39,9 +39,9 @@ export class ChannelComponent implements OnInit {
     // Retrieve currentUser information from local storage
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.username = storedUser.username || '';
-    this.roles = storedUser.roles || []; // Set as array
+    this.roles = storedUser.roles || []; 
 
-    this.isSuperAdmin = this.roles.includes('superAdmin'); // Check if user is a super admin
+    this.isSuperAdmin = this.roles.includes('superAdmin'); 
 
     if (this.groupName) {
       this.usersInGroup = this.authService.getUsersInGroup(this.groupName);
@@ -65,7 +65,12 @@ export class ChannelComponent implements OnInit {
 
   // Method to delete the channel
   deleteChannel(): void {
-    if (this.groupName && this.channelName) {
+    // Show confirmation dialog
+    const confirmed = window.confirm('Are you sure you want to delete your account? This action cannot be undone.');
+
+    if(confirmed) {
+
+      if (this.groupName && this.channelName) {
         const success = this.authService.deleteChannel(this.groupName, this.channelName, this.username, this.isSuperAdmin);
         if (success) {
             alert('Channel deleted successfully.');
@@ -74,6 +79,7 @@ export class ChannelComponent implements OnInit {
         } else {
             alert('Failed to delete channel.');
         }
+      }
     }
   }
 }

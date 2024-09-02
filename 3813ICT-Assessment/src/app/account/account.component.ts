@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../auth.service';  // Import AuthService
+import { AuthService } from '../auth.service'; 
 
 @Component({
   selector: 'app-account',
@@ -17,7 +17,7 @@ export class AccountComponent {
   roles: string = '';
   email: string = '';
 
-  constructor(private router: Router, private authService: AuthService) {}  // Inject AuthService
+  constructor(private router: Router, private authService: AuthService) {}
 
   // Navigate back to the user group component
   navigateToUserGroup(): void {
@@ -28,10 +28,7 @@ export class AccountComponent {
   logout(): void {
     // Clear previous user data from local storage
     localStorage.removeItem('currentUser');
-    
-    // Implement additional logout logic here if needed
     console.log('User logged out');
-    
     // Navigate back to the login screen or home page
     this.router.navigate(['/']);
   }
