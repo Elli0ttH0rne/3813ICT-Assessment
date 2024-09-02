@@ -735,7 +735,26 @@ export class AuthService {
     return true;
   }
 
-
+  kickUserFromGroup(username: string, groupName: string,){
+    const users = this.getValidUsers();
+    const user = users.find(u => u.username === username);
+  
+    if (!user) {
+      console.warn(`User with username "${username}" not found.`);
+      return false;
+    }
+  
+    const groupIndex = user.groups.indexOf(groupName);
+    if (groupIndex === -1) {
+      console.warn(`Group "${groupName}" not found in user's groups.`);
+      return false;
+    }
+  
+    user.groups.splice(groupIndex, 1);
+    this.saveValidUsers(users);
+    console.log(`User ${username} removed from group ${groupName}`);
+    return true;
+  }
 
 
   //******************************Other Methods******************************

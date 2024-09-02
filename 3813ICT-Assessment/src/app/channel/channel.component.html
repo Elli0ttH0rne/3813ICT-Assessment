@@ -20,7 +20,6 @@
           <button class="btn btn-info mb-3" (click)="toggleUserLists()">
             {{ showUserLists ? 'Hide' : 'Show' }} User Lists
           </button>
-
           <!-- Users in Group -->
           <div *ngIf="showUserLists">
             <h3>Users in Group</h3>
@@ -32,7 +31,7 @@
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                     <li><a class="dropdown-item">Report User to Admins</a></li>
-                    <li *ngIf="isCreator || isSuperAdmin"><a class="dropdown-item">Remove user from Group</a></li>
+                    <li *ngIf="isCreator || isSuperAdmin"><a class="dropdown-item" (click)="kickUserFromGroup(user.username)">Remove user from Group</a></li>
                     <li *ngIf="isCreator"><a class="dropdown-item">Ban user from group and report to Super Admin</a></li>
                     <li *ngIf="isSuperAdmin"><a class="dropdown-item">Delete User</a></li>
                     <li *ngIf="isSuperAdmin"><a class="dropdown-item">Promote to Group Admin</a></li>

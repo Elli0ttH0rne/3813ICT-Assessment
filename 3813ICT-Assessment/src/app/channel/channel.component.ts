@@ -93,9 +93,24 @@ export class ChannelComponent implements OnInit {
       }
     }
   }
-
+  
   // Method to toggle the visibility of user lists
   toggleUserLists(): void {
     this.showUserLists = !this.showUserLists;
+  }
+
+  // Method to remove a user from the group
+  kickUserFromGroup(username: string): void {
+    const confirmed = window.confirm('Are you sure you want to remove this user from the group?');
+    if (confirmed) {
+      const success = this.authService.kickUserFromGroup(username, this.groupName);
+      if (success) {
+        alert('User removed successfully.');
+        // Update user list after removal
+        this.usersInGroup = this.authService.getUsersInGroup(this.groupName);
+      } else {
+        alert('Failed to remove user.');
+      }
+    }
   }
 }
