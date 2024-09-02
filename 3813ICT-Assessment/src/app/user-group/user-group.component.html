@@ -89,10 +89,10 @@
               </ng-container>
             </li>
           </ul>
-          <!-- Plus icon to navigate to all groups list, only visible to groupAdmin or user -->
-          <ng-container *ngIf="isUserOrGroupAdmin()">
-            <i class="fas fa-plus fa-2x" style="cursor: pointer;" (click)="navigateToAllGroups()"></i>
-          </ng-container>
+            <!-- Plus icon to navigate to all groups list, only visible to groupAdmin or user but not superAdmin -->
+            <ng-container *ngIf="isUserOrGroupAdmin() && !isSuperAdmin()">
+              <i class="fas fa-plus fa-2x" style="cursor: pointer;" (click)="navigateToAllGroups()"></i>
+            </ng-container>
         </div>
       </div>
     </div>

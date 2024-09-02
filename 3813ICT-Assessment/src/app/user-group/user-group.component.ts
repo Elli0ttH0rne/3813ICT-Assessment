@@ -40,7 +40,7 @@ export class UserGroupComponent implements OnInit {
 
     // Fetch request count
     if (this.isGroupAdminOrSuperAdmin()) {
-      this.updateRequestCount();
+      this.requestCount = this.authService.getRequestCount(); 
     }
 
     if (this.roles.includes('superAdmin')) {
@@ -61,7 +61,10 @@ export class UserGroupComponent implements OnInit {
     }
   }
 
-  // Method to check if the user is a groupAdmin or superAdmin
+
+  
+
+  //******************************Checks******************************
   isGroupAdminOrSuperAdmin(): boolean {
     return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
   }
@@ -72,14 +75,6 @@ export class UserGroupComponent implements OnInit {
   
   isSuperAdmin(): boolean {
     return this.roles.includes('superAdmin');
-  }
-
-  getBadgeClass(index: number): string {
-    return this.badgeClasses[index % this.badgeClasses.length];
-  }
-
-  toggleGroup(index: number): void {
-    this.openGroups[index] = !this.openGroups[index];
   }
 
   canDeleteGroup(group: string): boolean {
@@ -94,6 +89,30 @@ export class UserGroupComponent implements OnInit {
     return this.username === this.groupCreators[group];
   }
 
+
+
+
+  //******************************UI Methods******************************
+  getBadgeClass(index: number): string {
+    return this.badgeClasses[index % this.badgeClasses.length];
+  }
+
+  toggleGroup(index: number): void {
+    this.openGroups[index] = !this.openGroups[index];
+  }
+
+  showCreateGroupForm(): void {
+    this.showCreateGroup = true;
+  }
+
+  showCreateChannelForm(group: string): void {
+    this.showCreateChannelForGroup = group;
+  }
+
+
+  
+
+  //******************************Group/Channel Methods******************************
   deleteGroup(group: string): void {
     const confirmed = window.confirm('Are you sure you want to delete this group? This action cannot be undone.');
     if (confirmed) {
@@ -102,14 +121,11 @@ export class UserGroupComponent implements OnInit {
         alert('Group deleted successfully.');
         this.groups = this.groups.filter(g => g !== group);
         delete this.channels[group];
+        this.authService.removePendingRequestsByGroup(group);
       } else {
         alert('Failed to delete group.');
       }
     }
-  }
-
-  showCreateGroupForm(): void {
-    this.showCreateGroup = true;
   }
 
   createGroup(): void {
@@ -142,10 +158,6 @@ export class UserGroupComponent implements OnInit {
   cancelCreateGroup(): void {
     this.showCreateGroup = false;
     this.newGroupName = '';
-  }
-
-  showCreateChannelForm(group: string): void {
-    this.showCreateChannelForGroup = group;
   }
 
   createChannel(group: string): void {
@@ -195,13 +207,16 @@ export class UserGroupComponent implements OnInit {
     }
   }
   
-
   cancelCreateChannel(): void {
     this.showCreateChannelForGroup = null;
     this.newChannelName = '';
     this.newChannelDescription = '';
   }
 
+
+
+
+  //******************************Component Navigation******************************
   navigateToAccount(): void {
     this.router.navigate(['/account']);
   }
@@ -212,16 +227,9 @@ export class UserGroupComponent implements OnInit {
 
   navigateToChannel(groupName: string, channelName: string): void {
     this.router.navigate(['/channel', groupName, channelName]);
-  }7
+  }
 
   navigateToAllGroups(): void {
     this.router.navigate(['/all-group-list']);
-  }
-
-  // Fetch the number of requests for the badge
-  private updateRequestCount(): void {
-    if (this.isGroupAdminOrSuperAdmin()) {
-      this.requestCount = this.authService.getRequestCount();
-    }
   }
 }

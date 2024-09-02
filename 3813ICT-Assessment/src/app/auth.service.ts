@@ -171,7 +171,7 @@ export class AuthService {
       username: 'groupAdmin1', 
       password: 'groupAdmin1', 
       email: 'groupAdmin1@gmail.com', 
-      roles: ['groupAdmin'], 
+      roles: ['user','groupAdmin'], 
       groups: ['Photography','Cooking', 'Gardening', 'Travel', 'Fitness',  'Music', 'Reading', 'Gaming', 'DIY', 'Art'] 
     },
     { 
@@ -179,7 +179,7 @@ export class AuthService {
       username: 'groupAdmin2', 
       password: 'groupAdmin2', 
       email: 'groupAdmin2@gmail.com', 
-      roles: ['groupAdmin'], 
+      roles: ['user','groupAdmin'], 
       groups: ['Photography','Cooking', 'Gardening', 'Travel', 'Fitness',  'Music', 'Reading', 'Gaming', 'DIY', 'Art'] 
     },
     { 
@@ -187,7 +187,7 @@ export class AuthService {
       username: 'super', 
       password: '123', 
       email: 'super1@gmail.com', 
-      roles: ['superAdmin'], 
+      roles: ['user','groupAdmin','superAdmin'], 
       groups: [] 
     },
   ];
@@ -490,8 +490,19 @@ export class AuthService {
     return true;
   }
 
+  removePendingRequestsByGroup(groupName: string): boolean {
+    // Retrieve the current list of group join requests
+    const requests = this.getGroupJoinRequests();
 
+    // Filter out requests made for the specified group
+    const updatedRequests = requests.filter(req => req.groupName !== groupName);
 
+    // Save the updated list of requests back to local storage
+    this.saveGroupJoinRequests(updatedRequests);
+
+    console.log(`Removed pending requests for group: ${groupName}`);
+    return true;
+  }
 
   //******************************Data Creation Methods******************************
   createGroup(groupName: string, creatorUsername: string, isSuperAdmin: boolean): boolean {
@@ -792,22 +803,25 @@ export class AuthService {
     return true;
   }
 
-  deleteUser(username: string) {
+  deleteUser(username: string): boolean {
     const users = this.getValidUsers();
     if (users.length === 0) {
       console.warn('No users available to delete.');
-      return;
+      return false;
     }
-
+  
     const updatedUsers = users.filter(user => user.username !== username);
-
+  
     if (users.length === updatedUsers.length) {
       console.warn(`User with username "${username}" not found.`);
-      return;
+      return false;
     }
-
+  
+    // Save the updated user list
     localStorage.setItem('validUsers', JSON.stringify(updatedUsers));
+    return true;
   }
+  
 
   leaveGroup(username: string, groupName: string): boolean {
     const users = this.getValidUsers();

@@ -47,7 +47,7 @@ export class ChannelComponent implements OnInit {
 
     // Fetch request count
     if (this.isGroupAdminOrSuperAdmin()) {
-      this.updateRequestCount();
+      this.requestCount = this.authService.getRequestCount(); 
     }
 
     if (this.groupName) {
@@ -61,53 +61,15 @@ export class ChannelComponent implements OnInit {
     }
   }
 
-  // Method to check if the user is a groupAdmin or superAdmin
+  //******************************Checks******************************
   isGroupAdminOrSuperAdmin(): boolean {
     return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
   }
 
+
+
   
-
-  // Navigate back to the user group component
-  navigateToUserGroup(): void {
-    this.router.navigate(['/user-group']);
-  }
-
-  // Navigate to the account component
-  navigateToAccount(): void {
-    this.router.navigate(['/account']);
-  }
-
-  // Navigate to the inbox component
-  navigateToInbox(): void {
-    this.router.navigate(['/inbox']);
-  }
-
-  // Method to delete the channel
-  deleteChannel(): void {
-    // Show confirmation dialog
-    const confirmed = window.confirm('Are you sure you want to delete this channel? This action cannot be undone.');
-
-    if (confirmed) {
-      if (this.groupName && this.channelName) {
-        const success = this.authService.deleteChannel(this.groupName, this.channelName, this.username, this.isSuperAdmin);
-        if (success) {
-          alert('Channel deleted successfully.');
-          // Navigate or refresh as needed
-          this.navigateToUserGroup();
-        } else {
-          alert('Failed to delete channel.');
-        }
-      }
-    }
-  }
-  
-  // Method to toggle the visibility of user lists
-  toggleUserLists(): void {
-    this.showUserLists = !this.showUserLists;
-  }
-
-  // Method to remove a user from the group
+  //**************************Drop Down Menu Functions**************************
   kickUserFromGroup(username: string): void {
     // Check if the user attempting to kick is the same as the user being kicked
     if (username === this.username) {
@@ -128,9 +90,21 @@ export class ChannelComponent implements OnInit {
     }
   }
 
+  deleteUsersAccount(username: string): void {
+    const confirmed = window.confirm('Are you sure you want to delete this user account?');
+    if (confirmed) {
+      const success = this.authService.deleteUser(username);
+      if (success) {
+        alert('User account deleted successfully.');
+        // Update user list after removal
+        this.usersInGroup = this.authService.getUsersInGroup(this.groupName);
+      } else {
+        alert('Failed to delete user account.');
+      }
+    }
+  }
 
-  // Method to promote a user to group admin
-  promoteToGroupAdmin(username: string): void {
+   promoteToGroupAdmin(username: string): void {
     const confirmed = window.confirm('Are you sure you want to promote this user to Group Admin?');
     if (confirmed) {
       const success = this.authService.promoteToGroupAdmin(username);
@@ -144,7 +118,6 @@ export class ChannelComponent implements OnInit {
     }
   }
 
-  // Method to promote a user to super admin
   promoteToSuperAdmin(username: string): void {
     const confirmed = window.confirm('Are you sure you want to promote this user to Super Admin?');
     if (confirmed) {
@@ -159,10 +132,44 @@ export class ChannelComponent implements OnInit {
     }
   }
 
-  // Fetch the number of requests for the badge
-  private updateRequestCount(): void {
-    if (this.isGroupAdminOrSuperAdmin()) {
-      this.requestCount = this.authService.getRequestCount();
+
+
+
+  //******************************Button Methods******************************
+  deleteChannel(): void {
+    // Show confirmation dialog
+    const confirmed = window.confirm('Are you sure you want to delete this channel? This action cannot be undone.');
+
+    if (confirmed) {
+      if (this.groupName && this.channelName) {
+        const success = this.authService.deleteChannel(this.groupName, this.channelName, this.username, this.isSuperAdmin);
+        if (success) {
+          alert('Channel deleted successfully.');
+          // Navigate or refresh as needed
+          this.navigateToUserGroup();
+        } else {
+          alert('Failed to delete channel.');
+        }
+      }
     }
+  }
+  toggleUserLists(): void {
+    this.showUserLists = !this.showUserLists;
+  }
+
+  
+
+  
+  //******************************Component Navigation******************************
+  navigateToUserGroup(): void {
+    this.router.navigate(['/user-group']);
+  }
+
+  navigateToAccount(): void {
+    this.router.navigate(['/account']);
+  }
+
+  navigateToInbox(): void {
+    this.router.navigate(['/inbox']);
   }
 }

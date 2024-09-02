@@ -35,33 +35,26 @@ export class AllGroupListComponent implements OnInit {
     }
   }
   
+  //******************************Checks******************************
+  isGroupAdminOrSuperAdmin(): boolean {
+    return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
+  }
 
+  isUserInGroup(groupName: string): boolean {
+    return this.userGroups.includes(groupName);
+  }
+  
+
+
+
+  //******************************Group List Methods******************************
   private loadGroups(): void {
     this.groups = this.authService.getAllGroups();
   }
 
-  
-
   private loadUserGroups(): void {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.userGroups = currentUser.groups || [];
-  }
-
-  navigateToAccount(): void {
-    this.router.navigate(['/account']);
-  }
-
-  navigateToInbox(): void {
-    this.router.navigate(['/inbox']);
-  }
-
-  isGroupAdminOrSuperAdmin(): boolean {
-    return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
-  }
-  
-
-  isUserInGroup(groupName: string): boolean {
-    return this.userGroups.includes(groupName);
   }
 
   requestToJoin(groupName: string): void {
@@ -77,11 +70,16 @@ export class AllGroupListComponent implements OnInit {
     }
   }
 
-  // Fetch the number of requests for the badge
-  private updateRequestCount(): void {
-    if (this.isGroupAdminOrSuperAdmin()) {
-      this.requestCount = this.authService.getRequestCount();
-    }
+
+
+
+  //******************************Component Navigation******************************
+  navigateToAccount(): void {
+    this.router.navigate(['/account']);
+  }
+
+  navigateToInbox(): void {
+    this.router.navigate(['/inbox']);
   }
 
   navigateToUserGroup(): void {

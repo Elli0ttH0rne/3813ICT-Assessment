@@ -17,10 +17,32 @@ export class AccountComponent implements OnInit {
   roles: string[] = [];
   email: string = '';
   userId: string = '';
+  requestCount: number = 0;
 
   constructor(private router: Router, private authService: AuthService) {}
 
-  // Handle logout functionality
+  ngOnInit(): void {
+    // Retrieve currentUser information from local storage
+    const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    this.username = storedUser.username || '';
+    this.roles = storedUser.roles || [];
+    this.email = storedUser.email || '';
+    this.userId = storedUser.userId || '';
+
+    if (this.isGroupAdminOrSuperAdmin()) {
+      this.requestCount = this.authService.getRequestCount(); 
+    }
+  }
+  //******************************Checks******************************
+  // Method to check if the user is a groupAdmin or superAdmin
+  isGroupAdminOrSuperAdmin(): boolean {
+    return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
+  }
+
+
+
+
+  //******************************Button Methods******************************
   logout(): void {
     // Clear previous user data from local storage
     localStorage.removeItem('currentUser');
@@ -28,8 +50,6 @@ export class AccountComponent implements OnInit {
     // Navigate back to the login screen or home page
     this.router.navigate(['/']);
   }
-
-  // Handle delete account functionality
   deleteAccount(): void {
     // Check if the user is a groupAdmin or superAdmin
     if (this.isGroupAdminOrSuperAdmin()) {
@@ -59,30 +79,16 @@ export class AccountComponent implements OnInit {
     }
   }
 
-  // Method to check if the user is a groupAdmin or superAdmin
-  isGroupAdminOrSuperAdmin(): boolean {
-    return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
-  }
 
-  ngOnInit(): void {
-    // Retrieve currentUser information from local storage
-    const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    this.username = storedUser.username || '';
-    this.roles = storedUser.roles || [];
-    this.email = storedUser.email || '';
-    this.userId = storedUser.userId || '';
-  }
 
-  // Navigate to the account component (if needed)
+  
+  //******************************Component Navigation******************************
   navigateToAccount(): void {
     this.router.navigate(['/account']);
   }
-  
   navigateToInbox(): void {
     this.router.navigate(['/inbox']);
   }
-  
-  // Navigate back to the user group component
   navigateToUserGroup(): void {
     this.router.navigate(['/user-group']);
   }

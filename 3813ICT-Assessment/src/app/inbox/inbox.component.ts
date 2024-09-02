@@ -29,7 +29,7 @@ export class InboxComponent implements OnInit {
 
     if (this.isGroupAdminOrSuperAdmin()) {
       this.loadJoinRequests();
-      this.updateRequestCount();
+      this.requestCount = this.authService.getRequestCount(); 
     }
     
     if (this.isSuperAdmin()) {
@@ -37,6 +37,7 @@ export class InboxComponent implements OnInit {
     }
   }
 
+  //******************************Checks******************************
   isGroupAdminOrSuperAdmin(): boolean {
     return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
   }
@@ -45,16 +46,10 @@ export class InboxComponent implements OnInit {
     return this.roles.includes('superAdmin');
   }
 
-  setActiveTab(tab: string): void {
-    this.activeTab = tab;
 
-    if (tab === 'joinRequests' && this.isGroupAdminOrSuperAdmin()) {
-      this.loadJoinRequests();
-    } else if (tab === 'reportedUsers' && this.isSuperAdmin()) {
-      this.loadReportedUsers();
-    }
-  }
+  
 
+  //******************************Loading Methods******************************
   loadJoinRequests(): void {
     this.joinRequests = this.authService.getJoinRequests();
   }
@@ -63,6 +58,10 @@ export class InboxComponent implements OnInit {
     this.reportedUsers = this.authService.getReportedUsers();
   }
 
+
+
+
+  //******************************Request Methods******************************
   approveRequest(request: any): void {
     if (!request.username) {
       console.error('Username is undefined');
@@ -107,6 +106,25 @@ export class InboxComponent implements OnInit {
 
   }
 
+
+
+
+  //******************************UI Methods******************************
+  setActiveTab(tab: string): void {
+    this.activeTab = tab;
+
+    if (tab === 'joinRequests' && this.isGroupAdminOrSuperAdmin()) {
+      this.loadJoinRequests();
+    } else if (tab === 'reportedUsers' && this.isSuperAdmin()) {
+      this.loadReportedUsers();
+    }
+  }
+
+
+
+  //******************************Component Navigation******************************
+
+
   navigateToAccount(): void {
     this.router.navigate(['/account']);
   }
@@ -117,11 +135,5 @@ export class InboxComponent implements OnInit {
 
   navigateToUserGroup(): void {
     this.router.navigate(['/user-group']);
-  }
-  // Fetch the number of requests for the badge
-  private updateRequestCount(): void {
-    if (this.isGroupAdminOrSuperAdmin()) {
-      this.requestCount = this.authService.getRequestCount();
-    }
   }
 }
