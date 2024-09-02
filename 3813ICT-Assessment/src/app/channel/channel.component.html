@@ -12,7 +12,23 @@
         <div class="card-body">
           <p><strong>Group:</strong> {{ groupName }}</p>
           <p><strong>Channel:</strong> {{ channelName }}</p>
-          <!-- Add more content here as needed -->
+
+          <h3>Users in Group</h3>
+          <ul>
+            <li *ngFor="let user of usersInGroup">
+              {{ user.username }}
+            </li>
+          </ul>
+
+          <h3>Group Admins</h3>
+          <ul>
+            <li *ngFor="let admin of groupAdmins">
+              {{ admin.username }} - {{ admin.role }}
+            </li>
+          </ul>
+
+          <h3>Group Creator</h3>
+          <p>{{ groupCreator }}</p>
         </div>
         <div class="card-footer d-flex justify-content-start">
           <i class="fas fa-arrow-left fa-2x" style="cursor: pointer;" (click)="navigateToUserGroup()"></i>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
@@ -6,8 +6,16 @@ import { RouterOutlet } from '@angular/router';
   standalone: true,
   imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = '3813ICT-Assessment';
+
+  ngOnInit(): void {
+    this.clearLocalStorage();
+  }
+
+  private clearLocalStorage(): void {
+    localStorage.clear(); // Clear all items in local storage
+  }
 }

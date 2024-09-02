@@ -4,7 +4,6 @@ import { AuthService } from '../auth.service';
 import { FormsModule } from '@angular/forms'; // Import FormsModule
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { group } from 'node:console';
 
 @Component({
   selector: 'app-register',
@@ -27,8 +26,12 @@ export class RegisterComponent {
       return;
     }
 
+    // Generate a unique userId
+    const newUserId = this.generateUserId();
+
     // Add the new user
     const newUser = {
+      userId: newUserId,
       username: this.username,
       email: this.email,
       password: this.password,
@@ -40,6 +43,7 @@ export class RegisterComponent {
 
     // Store the new user data in local storage
     localStorage.setItem('currentUser', JSON.stringify({
+      userId: newUser.userId,
       username: newUser.username,
       email: newUser.email,
       roles: newUser.roles,
@@ -48,5 +52,14 @@ export class RegisterComponent {
 
     // Navigate to the user group
     this.router.navigate(['/user-group']);
+  }
+
+  // Generate a unique userId (e.g., 'u007')
+  private generateUserId(): string {
+    const users = this.authService.getValidUsers();
+    const lastUserId = users.length ? users[users.length - 1].userId : 'u000';
+    const lastIdNumber = parseInt(lastUserId.substring(1));
+    const newUserId = 'u' + (lastIdNumber + 1).toString().padStart(3, '0');
+    return newUserId;
   }
 }

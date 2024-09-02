@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../auth.service'; // Adjust the path as necessary
+import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-user-group',
@@ -15,7 +15,7 @@ export class UserGroupComponent implements OnInit {
   // Groups data for the current user
   groups: string[] = [];
   // Channels data for the current user's groups
-  channels: { [group: string]: string[] } = {};
+  channels: { [group: string]: { name: string; description: string; }[] } = {};
 
   // Badge classes for each group
   badgeClasses = [
@@ -26,6 +26,7 @@ export class UserGroupComponent implements OnInit {
   openGroups: boolean[] = [];
 
   // User information
+  userID: string = ''; // Add userID
   username: string = '';
   roles: string[] = [];
 
@@ -34,6 +35,7 @@ export class UserGroupComponent implements OnInit {
   ngOnInit(): void {
     // Retrieve currentUser information from local storage
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    this.userID = storedUser.userId; // Retrieve userID
     this.username = storedUser.username;
     this.roles = storedUser.roles;
 

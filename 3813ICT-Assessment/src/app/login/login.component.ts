@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
-import { FormsModule } from '@angular/forms'; // Import FormsModule
+import { FormsModule } from '@angular/forms'; 
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -9,7 +9,7 @@ import { RouterModule } from '@angular/router';
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  imports: [FormsModule, CommonModule, RouterModule], // Include FormsModule
+  imports: [FormsModule, CommonModule, RouterModule],
   standalone: true
 })
 export class LoginComponent {
@@ -28,6 +28,7 @@ export class LoginComponent {
       
       // Store user data in local storage
       localStorage.setItem('currentUser', JSON.stringify({
+        userID: currentUser.userId,  // Ensure userID is stored
         username: currentUser.username,
         email: currentUser.email,
         roles: currentUser.roles,
@@ -42,5 +43,4 @@ export class LoginComponent {
       alert('Invalid username or password');
     }
   }
-  
 }

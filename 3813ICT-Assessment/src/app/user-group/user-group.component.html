@@ -17,8 +17,12 @@
               </div>
               <ul *ngIf="openGroups[i]" class="list-group mt-2">
                 <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let channel of channels[group]">
-                  {{ channel }}
-                  <button class="btn btn-primary btn-sm" (click)="navigateToChannel(group, channel)">Join Channel</button>
+                  <!-- Display the channel name -->
+                  <div>
+                    <strong>{{ channel.name }}</strong>
+                    <p class="mb-0 text-muted">{{ channel.description }}</p>
+                  </div>
+                  <button class="btn btn-primary btn-sm" (click)="navigateToChannel(group, channel.name)">Join Channel</button>
                 </li>
               </ul>
             </li>
