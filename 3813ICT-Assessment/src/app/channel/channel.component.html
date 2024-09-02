@@ -29,6 +29,11 @@
 
           <h3>Group Creator</h3>
           <p>{{ groupCreator }}</p>
+
+          <!-- Conditional Delete Button -->
+          <div *ngIf="isCreator">
+            <button class="btn btn-danger" (click)="deleteChannel()">Delete Channel</button>
+          </div>
         </div>
         <div class="card-footer d-flex justify-content-start">
           <i class="fas fa-arrow-left fa-2x" style="cursor: pointer;" (click)="navigateToUserGroup()"></i>

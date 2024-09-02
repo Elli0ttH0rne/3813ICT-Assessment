@@ -171,7 +171,7 @@ export class AuthService {
       password: 'groupAdmin1', 
       email: 'groupAdmin1@gmail.com', 
       roles: ['groupAdmin'], 
-      groups: ['Music', 'Reading', 'Gaming', 'DIY', 'Art'] 
+      groups: ['Photography','Cooking', 'Gardening', 'Travel', 'Fitness',  'Music', 'Reading', 'Gaming', 'DIY', 'Art'] 
     },
     { 
       userId: 'u022',
@@ -179,7 +179,7 @@ export class AuthService {
       password: 'groupAdmin2', 
       email: 'groupAdmin2@gmail.com', 
       roles: ['groupAdmin'], 
-      groups: ['Music', 'Reading', 'Gaming', 'DIY', 'Art'] 
+      groups: ['Photography','Cooking', 'Gardening', 'Travel', 'Fitness',  'Music', 'Reading', 'Gaming', 'DIY', 'Art'] 
     },
     { 
       userId: 'u023',
@@ -268,7 +268,7 @@ export class AuthService {
         { userId: 'u021', username: 'groupAdmin1', role: 'admin' },
         { userId: 'u022', username: 'groupAdmin2', role: 'creator' }
       ],
-      creatorId: 'u021'
+      creatorId: 'u022'
     },
     { 
       name: 'Reading', 
@@ -281,7 +281,7 @@ export class AuthService {
         { userId: 'u021', username: 'groupAdmin1', role: 'admin' },
         { userId: 'u022', username: 'groupAdmin2', role: 'creator' }
       ],
-      creatorId: 'u021'
+      creatorId: 'u022'
     },
     { 
       name: 'Gaming', 
@@ -294,7 +294,7 @@ export class AuthService {
         { userId: 'u021', username: 'groupAdmin1', role: 'admin' },
         { userId: 'u022', username: 'groupAdmin2', role: 'creator' }
       ],
-      creatorId: 'u021'
+      creatorId: 'u022'
     },
     { 
       name: 'DIY', 
@@ -307,7 +307,7 @@ export class AuthService {
         { userId: 'u021', username: 'groupAdmin1', role: 'admin' },
         { userId: 'u022', username: 'groupAdmin2', role: 'creator' }
       ],
-      creatorId: 'u021'
+      creatorId: 'u022'
     },
     { 
       name: 'Art', 
@@ -320,7 +320,7 @@ export class AuthService {
         { userId: 'u021', username: 'groupAdmin1', role: 'admin' },
         { userId: 'u022', username: 'groupAdmin2', role: 'creator' }
       ],
-      creatorId: 'u021'
+      creatorId: 'u022'
     },
   ];
 
@@ -401,4 +401,30 @@ export class AuthService {
     }
     return '';
   }
+  deleteChannel(groupName: string, channelName: string, currentUsername: string, isSuperAdmin: boolean): boolean {
+    const group = this.groups.find(g => g.name === groupName);
+    if (!group) {
+        console.warn('Group not found.');
+        return false;
+    }
+
+    const creatorUsername = this.getGroupCreator(groupName);
+    // Allow deletion if the user is the group creator or a super admin
+    if (currentUsername !== creatorUsername && !isSuperAdmin) {
+        console.warn('Only the group creator or a super admin can delete channels.');
+        return false;
+    }
+
+    const channelIndex = group.channels.findIndex(c => c.name === channelName);
+    if (channelIndex === -1) {
+        console.warn('Channel not found.');
+        return false;
+    }
+
+    group.channels.splice(channelIndex, 1);
+    // Save the updated group information
+    this.groups = this.groups.map(g => g.name === groupName ? group : g);
+    return true;
+}
+
 }
