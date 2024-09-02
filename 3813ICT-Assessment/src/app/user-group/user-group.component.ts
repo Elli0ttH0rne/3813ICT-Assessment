@@ -179,14 +179,22 @@ export class UserGroupComponent implements OnInit {
     if (confirmed) {
       const success = this.authService.leaveGroup(this.username, groupName);
       if (success) {
-        alert(`You have left the group "${groupName}".`);
+        // Remove the group from the local groups array and delete related channels
         this.groups = this.groups.filter(g => g !== groupName);
         delete this.channels[groupName];
+  
+        // Update local storage to reflect the removed group
+        const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        storedUser.groups = this.groups; // Update the groups array in local storage
+        localStorage.setItem('currentUser', JSON.stringify(storedUser));
+  
+        alert(`You have left the group "${groupName}".`);
       } else {
         alert('Failed to leave group.');
       }
     }
   }
+  
 
   cancelCreateChannel(): void {
     this.showCreateChannelForGroup = null;
@@ -204,7 +212,7 @@ export class UserGroupComponent implements OnInit {
 
   navigateToChannel(groupName: string, channelName: string): void {
     this.router.navigate(['/channel', groupName, channelName]);
-  }
+  }7
 
   navigateToAllGroups(): void {
     this.router.navigate(['/all-group-list']);
