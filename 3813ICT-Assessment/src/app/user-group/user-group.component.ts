@@ -60,6 +60,16 @@ export class UserGroupComponent implements OnInit {
     return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
   }
 
+  // Method to check if the plus icon should be displayed
+  canShowAllGroupIcon(): boolean {
+    return this.roles.includes('groupAdmin') || this.roles.includes('user');
+  }
+
+
+  isSuperAdmin(): boolean {
+    return this.roles.includes('superAdmin');
+  }
+
   getBadgeClass(index: number): string {
     return this.badgeClasses[index % this.badgeClasses.length];
   }
@@ -179,5 +189,9 @@ export class UserGroupComponent implements OnInit {
 
   navigateToChannel(groupName: string, channelName: string): void {
     this.router.navigate(['/channel', groupName, channelName]);
+  }
+
+  navigateToAllGroups(): void {
+    this.router.navigate(['/all-group-list']);
   }
 }
