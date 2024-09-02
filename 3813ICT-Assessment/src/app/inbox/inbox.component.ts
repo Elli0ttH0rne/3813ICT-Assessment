@@ -15,6 +15,8 @@ export class InboxComponent implements OnInit {
   username: string = '';
   roles: string[] = [];
   activeTab: string = 'joinRequests'; // Default active tab
+  joinRequests: any[] = []; // Store join requests
+  reportedUsers: any[] = []; // Store reported users
 
   constructor(private router: Router, private authService: AuthService) {}
 
@@ -22,6 +24,14 @@ export class InboxComponent implements OnInit {
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.username = storedUser.username;
     this.roles = storedUser.roles;
+
+    if (this.isGroupAdminOrSuperAdmin()) {
+      this.loadJoinRequests();
+    }
+    
+    if (this.isSuperAdmin()) {
+      this.loadReportedUsers();
+    }
   }
 
   isGroupAdminOrSuperAdmin(): boolean {
@@ -34,6 +44,48 @@ export class InboxComponent implements OnInit {
 
   setActiveTab(tab: string): void {
     this.activeTab = tab;
+
+    if (tab === 'joinRequests' && this.isGroupAdminOrSuperAdmin()) {
+      this.loadJoinRequests();
+    } else if (tab === 'reportedUsers' && this.isSuperAdmin()) {
+      this.loadReportedUsers();
+    }
+  }
+
+  loadJoinRequests(): void {
+    this.joinRequests = this.authService.getJoinRequests();
+  }
+
+  loadReportedUsers(): void {
+    this.reportedUsers = this.authService.getReportedUsers();
+  }
+
+  approveRequest(request: any): void {
+    if (!request.username) {
+      console.error('Username is undefined');
+      return;
+    }
+    const success = this.authService.approveJoinRequest(request.username, request.groupName);
+    if (success) {
+      this.joinRequests = this.joinRequests.filter(req => req !== request);
+      console.log(`Approved request from ${request.username}`);
+    } else {
+      console.error(`Failed to approve request from ${request.username}`);
+    }
+  }
+
+  denyRequest(request: any): void {
+    if (!request.username) {
+      console.error('username is undefined');
+      return;
+    }
+    const success = this.authService.rejectJoinRequest(request.username, request.groupName);
+    if (success) {
+      this.joinRequests = this.joinRequests.filter(req => req !== request);
+      console.log(`Denied request from ${request.username}`);
+    } else {
+      console.error(`Failed to deny request from ${request.username}`);
+    }
   }
 
   navigateToAccount(): void {

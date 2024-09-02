@@ -323,9 +323,143 @@ export class AuthService {
       creatorId: 'u022'
     },
   ];
+
+    // Adding request structures
+    private defaultGroupJoinRequests = [];
+    private defaultReportRequests = [];
+  
   constructor() {
     this.initializeUsers();
     this.initializeGroups();
+    this.initializeRequests();
+  }
+
+  private initializeRequests() {
+    const groupJoinRequests = localStorage.getItem('groupJoinRequests');
+    if (!groupJoinRequests) {
+      localStorage.setItem('groupJoinRequests', JSON.stringify(this.defaultGroupJoinRequests));
+    }
+    const reportRequests = localStorage.getItem('reportRequests');
+    if (!reportRequests) {
+      localStorage.setItem('reportRequests', JSON.stringify(this.defaultReportRequests));
+    }
+  }
+
+  private getGroupJoinRequests() {
+    return JSON.parse(localStorage.getItem('groupJoinRequests') || '[]');
+  }
+
+  private saveGroupJoinRequests(requests: any[]) {
+    localStorage.setItem('groupJoinRequests', JSON.stringify(requests));
+  }
+
+  private getReportRequests() {
+    return JSON.parse(localStorage.getItem('reportRequests') || '[]');
+  }
+
+  private saveReportRequests(requests: any[]) {
+    localStorage.setItem('reportRequests', JSON.stringify(requests));
+  }
+
+  // Handle group join requests
+  requestToJoinGroup(username: string, groupName: string): boolean {
+    const requests = this.getGroupJoinRequests();
+    if (requests.some(req => req.groupName === groupName)) {
+      console.warn('Request already exists.');
+      return false;
+    }
+
+    requests.push({ username, groupName, status: 'pending' });
+    this.saveGroupJoinRequests(requests);
+    return true;
+  }
+
+  getJoinRequests(): any[] {
+    return this.getGroupJoinRequests();
+  }
+  
+  approveJoinRequest(username: string, groupName: string): boolean {
+    // Retrieve the join requests from local storage
+    const requests = this.getGroupJoinRequests();
+    
+    // Find the index of the request to be approved
+    const requestIndex = requests.findIndex(req => req.username === username && req.groupName === groupName);
+  
+    if (requestIndex === -1) {
+      console.warn('Join request not found.');
+      return false;
+    }
+  
+    // Remove the approved request from the list
+    requests.splice(requestIndex, 1);
+    this.saveGroupJoinRequests(requests); // Save the updated requests back to local storage
+  
+    // Add the user to the group
+    const users = this.getValidUsers();
+    const user = users.find(u => u.username === username);
+    
+    if (user) {
+      // Add the group to the user's group list if they aren't already a member
+      if (!user.groups.includes(groupName)) {
+        user.groups.push(groupName);
+        this.saveValidUsers(users);
+        console.log(`User ${user.username} added to group ${groupName}`);
+      } else {
+        console.warn(`User ${user.username} is already a member of group ${groupName}`);
+      }
+    } else {
+      console.error(`User with ${username} not found`);
+      return false;
+    }
+  
+    return true;
+}
+
+  rejectJoinRequest(username: string, groupName: string): boolean {
+    const requests = this.getGroupJoinRequests();
+    const requestIndex = requests.findIndex(req => req.username === username && req.groupName === groupName);
+  
+    if (requestIndex === -1) {
+      console.warn('Join request not found.');
+      return false;
+    }
+  
+    // Reject the join request
+    requests.splice(requestIndex, 1);
+    this.saveGroupJoinRequests(requests);
+  
+    return true;
+  }
+
+  // Handle report requests
+  getReportedUsers(): any[] {
+    return this.getReportRequests();
+  }
+
+  createReportRequest(reporterId: string, reportedUserId: string, reporterUsername: string, reportedUsername: string, reason: string): boolean {
+    const requests = this.getReportRequests();
+    requests.push({ reporterId, reportedUserId, reporterUsername, reportedUsername, reason, status: 'pending' });
+    this.saveReportRequests(requests);
+    return true;
+  }
+
+  resolveReportRequest(reporterId: string, reportedUserId: string): boolean {
+    const requests = this.getReportRequests();
+    const requestIndex = requests.findIndex(req => req.reporterId === reporterId && req.reportedUserId === reportedUserId);
+
+    if (requestIndex === -1) {
+      console.warn('Report request not found.');
+      return false;
+    }
+
+    requests[requestIndex].status = 'resolved';
+    this.saveReportRequests(requests);
+    return true;
+  }
+
+  // Helper to save valid users
+  private saveValidUsers(users: any[]) {
+    localStorage.setItem('validUsers', JSON.stringify(users));
   }
 
   private initializeUsers() {
@@ -397,7 +531,6 @@ export class AuthService {
     return this.getGroupsFromLocalStorage();
   }
   
-
   getGroupChannels(groupName: string): { name: string, description: string }[] {
     const groups = this.getGroupsFromLocalStorage();
     const group = groups.find(g => g.name === groupName);
@@ -467,27 +600,16 @@ export class AuthService {
     const group = groups[groupIndex];
     const creatorUsername = this.getGroupCreator(groupName);
 
-    // Check if the current user is either the group creator or a super admin
+    // Allow deletion if the user is the group creator or a super admin
     if (currentUsername !== creatorUsername && !isSuperAdmin) {
-      console.warn('Only the group creator or a super admin can delete the group.');
+      console.warn('Only the group creator or a super admin can delete groups.');
       return false;
     }
 
-    // Remove the group
     groups.splice(groupIndex, 1);
-
-    // Update users' group lists
-    const users = this.getValidUsers();
-    const updatedUsers = users.map(user => ({
-      ...user,
-      groups: user.groups.filter(group => group !== groupName)
-    }));
-
-    localStorage.setItem('validUsers', JSON.stringify(updatedUsers));
     this.saveGroupsToLocalStorage(groups);
     return true;
   }
-
   createGroup(groupName: string, creatorUsername: string, isSuperAdmin: boolean): boolean {
     const groups = this.getGroupsFromLocalStorage();
     

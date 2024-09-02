@@ -116,8 +116,6 @@ export class UserGroupComponent implements OnInit {
       const success = this.authService.createGroup(this.newGroupName, this.username, isSuperAdmin);
   
       if (success) {
-        alert('Group created successfully.');
-  
         // Update the groups array directly
         this.groups.push(this.newGroupName);
         this.channels[this.newGroupName] = []; // Initialize channels for the new group
@@ -160,7 +158,6 @@ export class UserGroupComponent implements OnInit {
       );
   
       if (success) {
-        alert('Channel created successfully.');
         this.channels[group].push({ name: this.newChannelName, description: this.newChannelDescription });
         this.showCreateChannelForGroup = null;
         this.newChannelName = '';
