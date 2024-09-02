@@ -6,6 +6,9 @@
           <h1 class="card-title">Account Details</h1>
           <div class="d-flex align-items-center">
             <span class="me-2">{{ username }}</span>
+            <ng-container *ngIf="isGroupAdminOrSuperAdmin()">
+              <i class="fas fa-inbox fa-2x me-2" style="cursor: pointer;" (click)="navigateToInbox()"></i>
+            </ng-container>
             <i class="fas fa-user-circle fa-2x" style="cursor: pointer;" (click)="navigateToAccount()"></i>
           </div>
         </div>

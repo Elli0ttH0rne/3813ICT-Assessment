@@ -36,6 +36,11 @@ export class ChannelComponent implements OnInit {
     });
   }
 
+    // Method to check if the user is a groupAdmin or superAdmin
+    isGroupAdminOrSuperAdmin(): boolean {
+      return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
+    }
+
   ngOnInit(): void {
     // Retrieve currentUser information from local storage
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -63,6 +68,10 @@ export class ChannelComponent implements OnInit {
   // Navigate to the account component
   navigateToAccount(): void {
     this.router.navigate(['/account']);
+  }
+
+  navigateToInbox(): void {
+    this.router.navigate(['/inbox']);
   }
 
   // Method to delete the channel

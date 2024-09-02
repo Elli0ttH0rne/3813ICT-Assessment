@@ -6,6 +6,7 @@ import { UserGroupComponent } from './app/user-group/user-group.component';
 import { RegisterComponent } from './app/register/register.component';
 import { AccountComponent } from './app/account/account.component'; 
 import { ChannelComponent } from './app/channel/channel.component';
+import { InboxComponent } from './app/inbox/inbox.component';
 
 bootstrapApplication(AppComponent, {
   providers: [
@@ -15,6 +16,7 @@ bootstrapApplication(AppComponent, {
       { path: 'register', component: RegisterComponent },
       { path: 'account', component: AccountComponent },
       { path: 'channel/:groupName/:channelName', component: ChannelComponent },
+      { path: 'inbox', component: InboxComponent },
     ])
   ]
 });

@@ -6,6 +6,9 @@
           <h1 class="card-title">Your Groups</h1>
           <div class="d-flex align-items-center">
             <span class="me-2">{{ username }}</span>
+            <ng-container *ngIf="isGroupAdminOrSuperAdmin()">
+              <i class="fas fa-inbox fa-2x me-2" style="cursor: pointer;" (click)="navigateToInbox()"></i>
+            </ng-container>
             <i class="fas fa-user-circle fa-2x" style="cursor: pointer;" (click)="navigateToAccount()"></i>
           </div>
         </div>
@@ -68,9 +71,8 @@
                   <button class="btn btn-info mb-3" (click)="showCreateChannelForm(group)">Add Channel</button>
                 </div>
               </ul>
-              <!-- Buttons to delete the group, placed outside the channel list but still under the group item -->
-              <div class="mt-3">
-                <button *ngIf="canDeleteGroup(group)" class="btn btn-danger btn-sm" (click)="deleteGroup(group)">Delete Group</button>
+              <div class="mt-3 d-flex justify-content-end">
+                <button *ngIf="canDeleteGroup(group)" class="btn btn-danger btn-sm ms-3" (click)="deleteGroup(group)">Delete Group</button>
               </div>
             </li>
           </ul>

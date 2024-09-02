@@ -55,6 +55,11 @@ export class UserGroupComponent implements OnInit {
     }
   }
 
+  // Method to check if the user is a groupAdmin or superAdmin
+  isGroupAdminOrSuperAdmin(): boolean {
+    return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
+  }
+
   getBadgeClass(index: number): string {
     return this.badgeClasses[index % this.badgeClasses.length];
   }
@@ -121,8 +126,6 @@ export class UserGroupComponent implements OnInit {
       alert('Please enter a group name.');
     }
   }
-  
-  
 
   cancelCreateGroup(): void {
     this.showCreateGroup = false;
@@ -159,7 +162,7 @@ export class UserGroupComponent implements OnInit {
       alert('Please enter both channel name and description.');
     }
   }
-  
+
   cancelCreateChannel(): void {
     this.showCreateChannelForGroup = null;
     this.newChannelName = '';
@@ -168,6 +171,10 @@ export class UserGroupComponent implements OnInit {
 
   navigateToAccount(): void {
     this.router.navigate(['/account']);
+  }
+
+  navigateToInbox(): void {
+    this.router.navigate(['/inbox']);
   }
 
   navigateToChannel(groupName: string, channelName: string): void {
