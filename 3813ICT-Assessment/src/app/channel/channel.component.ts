@@ -113,4 +113,34 @@ export class ChannelComponent implements OnInit {
       }
     }
   }
+
+  // Method to promote a user to group admin
+  promoteToGroupAdmin(username: string): void {
+    const confirmed = window.confirm('Are you sure you want to promote this user to Group Admin?');
+    if (confirmed) {
+      const success = this.authService.promoteToGroupAdmin(username);
+      if (success) {
+        alert('User promoted to Group Admin successfully.');
+        // Update group admins and user list after promotion
+        this.groupAdmins = this.authService.getGroupAdmins(this.groupName).concat(this.authService.getSuperAdmins());
+      } else {
+        alert('Failed to promote user.');
+      }
+    }
+  }
+
+  // Method to promote a user to super admin
+  promoteToSuperAdmin(username: string): void {
+    const confirmed = window.confirm('Are you sure you want to promote this user to Super Admin?');
+    if (confirmed) {
+      const success = this.authService.promoteToSuperAdmin(username);
+      if (success) {
+        alert('User promoted to Super Admin successfully.');
+        // Update group admins and user list after promotion
+        this.groupAdmins = this.authService.getGroupAdmins(this.groupName).concat(this.authService.getSuperAdmins());
+      } else {
+        alert('Failed to promote user.');
+      }
+    }
+  }
 }

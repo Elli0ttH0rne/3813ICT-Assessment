@@ -34,8 +34,8 @@
                     <li *ngIf="isCreator || isSuperAdmin"><a class="dropdown-item" (click)="kickUserFromGroup(user.username)">Remove user from Group</a></li>
                     <li *ngIf="isCreator"><a class="dropdown-item">Ban user from group and report to Super Admin</a></li>
                     <li *ngIf="isSuperAdmin"><a class="dropdown-item">Delete User</a></li>
-                    <li *ngIf="isSuperAdmin"><a class="dropdown-item">Promote to Group Admin</a></li>
-                    <li *ngIf="isSuperAdmin"><a class="dropdown-item">Promote to Super Admin</a></li>
+                    <li *ngIf="isSuperAdmin"><a class="dropdown-item" (click)="promoteToGroupAdmin(user.username)">Promote to Group Admin</a></li>
+                    <li *ngIf="isSuperAdmin"><a class="dropdown-item" (click)="promoteToSuperAdmin(user.username)">Promote to Super Admin</a></li>
                 </div>
               </li>
             </ul>
