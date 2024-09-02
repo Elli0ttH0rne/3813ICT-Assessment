@@ -31,6 +31,14 @@
                 Reported Users
               </a>
             </li>
+            <li class="nav-item" *ngIf="isSuperAdmin()">
+              <a 
+                class="nav-link" 
+                [class.active]="activeTab === 'promotionRequests'" 
+                (click)="setActiveTab('promotionRequests')">
+                User Promotion Requests
+              </a>
+            </li>
           </ul>
 
           <!-- Tab Content -->
@@ -54,8 +62,22 @@
               <li *ngFor="let reportedUser of reportedUsers" class="list-group-item d-flex justify-content-between align-items-center">
                 <span>{{ reportedUser.username }} has been reported for {{ reportedUser.reason }}</span>
                 <div>
-                  //<button class="btn btn-warning btn-sm me-2" >Warn</button>
-                  <button class="btn btn-danger btn-sm">Ban</button>
+                  <button class="btn btn-danger btn-sm" (click)="banReportedUser(reportedUsers)">Approve</button>
+                  <button class="btn btn-success btn-sm me-2" (click)="removeReportedUser(reportedUsers)">Deny</button>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <div *ngIf="activeTab === 'promotionRequests'">
+            <p>Here you can view and manage user promotion requests.</p>
+            <!-- Content for managing promotion requests goes here -->
+            <ul class="list-group">
+              <li *ngFor="let promotionRequest of promotionRequests" class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ promotionRequest.username }} is requesting promotion to {{ promotionRequest.newRole }}</span>
+                <div>
+                  <button class="btn btn-success btn-sm me-2" (click)="approvePromotionRequest(promotionRequest)">Approve</button>
+                  <button class="btn btn-danger btn-sm" (click)="denyPromotionRequest(promotionRequest)">Deny</button>
                 </div>
               </li>
             </ul>

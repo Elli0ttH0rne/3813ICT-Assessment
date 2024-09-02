@@ -4,6 +4,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class AuthService {
+  //******************************Hard Coded Data******************************
   private defaultUsers = [
     { 
       userId: 'u001',
@@ -190,7 +191,6 @@ export class AuthService {
       groups: [] 
     },
   ];
-
   private defaultGroups = [
     { 
       name: 'Photography', 
@@ -324,12 +324,12 @@ export class AuthService {
     },
   ];
 
-
-
   private defaultGroupJoinRequests = [];
   private defaultReportRequests = [];
 
-  
+
+
+  //******************************Initilising Methods******************************
   constructor() {
     this.initializeUsers();
     this.initializeGroups();
@@ -347,24 +347,28 @@ export class AuthService {
     }
   }
 
-  private getGroupJoinRequests() {
-    return JSON.parse(localStorage.getItem('groupJoinRequests') || '[]');
+  private initializeUsers() {
+    const validUsers = localStorage.getItem('validUsers');
+    if (!validUsers) {
+      localStorage.setItem('validUsers', JSON.stringify(this.defaultUsers));
+    }
   }
 
+  private initializeGroups() {
+    const allGroups = localStorage.getItem('allGroups');
+    if (!allGroups) {
+      localStorage.setItem('allGroups', JSON.stringify(this.defaultGroups));
+    }
+  }
+
+
+
+
+  //******************************Join Group Request Methods******************************
   private saveGroupJoinRequests(requests: any[]) {
     localStorage.setItem('groupJoinRequests', JSON.stringify(requests));
   }
 
-  private getReportRequests() {
-    return JSON.parse(localStorage.getItem('reportRequests') || '[]');
-  }
-
-  private saveReportRequests(requests: any[]) {
-    localStorage.setItem('reportRequests', JSON.stringify(requests));
-  }
-
-
-  // Handle group join requests
   requestToJoinGroup(username: string, groupName: string): boolean {
     const requests = this.getGroupJoinRequests();
     if (requests.some(req => req.groupName === groupName)) {
@@ -380,7 +384,11 @@ export class AuthService {
   getJoinRequests(): any[] {
     return this.getGroupJoinRequests();
   }
-  
+
+  private getGroupJoinRequests() {
+    return JSON.parse(localStorage.getItem('groupJoinRequests') || '[]');
+  }
+
   approveJoinRequest(username: string, groupName: string): boolean {
     // Retrieve the join requests from local storage
     const requests = this.getGroupJoinRequests();
@@ -418,43 +426,6 @@ export class AuthService {
     return true;
   }
 
-  leaveGroup(username: string, groupName: string): boolean {
-    const users = this.getValidUsers();
-    const user = users.find(u => u.username === username);
-  
-    if (!user) {
-      console.warn(`User with username "${username}" not found.`);
-      return false;
-    }
-  
-    const groupIndex = user.groups.indexOf(groupName);
-    if (groupIndex === -1) {
-      console.warn(`Group "${groupName}" not found in user's groups.`);
-      return false;
-    }
-  
-    user.groups.splice(groupIndex, 1);
-    this.saveValidUsers(users);
-    console.log(`User ${username} removed from group ${groupName}`);
-    return true;
-  }
-
-
-  // Method to remove pending requests for the user
-  removePendingRequests(username: string): boolean {
-    // Retrieve the current list of group join requests
-    const requests = this.getGroupJoinRequests();
-
-    // Filter out requests made by the specified username
-    const updatedRequests = requests.filter(req => req.username !== username);
-
-    // Save the updated list of requests back to local storage
-    this.saveGroupJoinRequests(updatedRequests);
-
-    console.log(`Removed pending requests for username: ${username}`);
-    return true;
-  }
-
   rejectJoinRequest(username: string, groupName: string): boolean {
     const requests = this.getGroupJoinRequests();
     const requestIndex = requests.findIndex(req => req.username === username && req.groupName === groupName);
@@ -471,12 +442,9 @@ export class AuthService {
     return true;
   }
 
-
-
-
-  // Handle report requests
+  //******************************Reported User Request Methods ******************************
   getReportedUsers(): any[] {
-    return this.getReportRequests();
+    return JSON.parse(localStorage.getItem('reportRequests') || '[]');
   }
 
   createReportRequest(reporterId: string, reportedUserId: string, reporterUsername: string, reportedUsername: string, reason: string): boolean {
@@ -500,160 +468,32 @@ export class AuthService {
     return true;
   }
 
-  // Helper to save valid users
-  private saveValidUsers(users: any[]) {
-    localStorage.setItem('validUsers', JSON.stringify(users));
+  private saveReportRequests(requests: any[]) {
+    localStorage.setItem('reportRequests', JSON.stringify(requests));
   }
 
-  private initializeUsers() {
-    const validUsers = localStorage.getItem('validUsers');
-    if (!validUsers) {
-      localStorage.setItem('validUsers', JSON.stringify(this.defaultUsers));
-    }
+  private getReportRequests() {
+    return JSON.parse(localStorage.getItem('reportRequests') || '[]');
   }
 
-  private initializeGroups() {
-    const allGroups = localStorage.getItem('allGroups');
-    if (!allGroups) {
-      localStorage.setItem('allGroups', JSON.stringify(this.defaultGroups));
-    }
-  }
+  removePendingRequests(username: string): boolean {
+    // Retrieve the current list of group join requests
+    const requests = this.getGroupJoinRequests();
 
-  private getGroupsFromLocalStorage() {
-    return JSON.parse(localStorage.getItem('allGroups') || '[]');
-  }
+    // Filter out requests made by the specified username
+    const updatedRequests = requests.filter(req => req.username !== username);
 
-  private saveGroupsToLocalStorage(groups: any[]) {
-    localStorage.setItem('allGroups', JSON.stringify(groups));
-  }
+    // Save the updated list of requests back to local storage
+    this.saveGroupJoinRequests(updatedRequests);
 
-  getValidUsers() {
-    return JSON.parse(localStorage.getItem('validUsers') || '[]');
-  }
-
-  addUser(user: { 
-    userId: string,
-    username: string, 
-    password: string, 
-    email: string, 
-    roles: string[], 
-    groups: string[] 
-  }) {
-    const users = this.getValidUsers();
-    users.push(user);
-    localStorage.setItem('validUsers', JSON.stringify(users));
-  }
-
-  deleteUser(username: string) {
-    const users = this.getValidUsers();
-    if (users.length === 0) {
-      console.warn('No users available to delete.');
-      return;
-    }
-
-    const updatedUsers = users.filter(user => user.username !== username);
-
-    if (users.length === updatedUsers.length) {
-      console.warn(`User with username "${username}" not found.`);
-      return;
-    }
-
-    localStorage.setItem('validUsers', JSON.stringify(updatedUsers));
-  }
-
-  getGroupsForUser(userId: string) {
-    const users = this.getValidUsers();
-    const user = users.find(user => user.userId === userId);
-    if (user) {
-      return user.groups;
-    }
-    return [];
-  }
-  
-  getAllGroups() {
-    return this.getGroupsFromLocalStorage();
-  }
-  
-  getGroupChannels(groupName: string): { name: string, description: string }[] {
-    const groups = this.getGroupsFromLocalStorage();
-    const group = groups.find(g => g.name === groupName);
-    return group ? group.channels : [];
-  }
-
-  getUsersInGroup(groupName: string): { userId: string; username: string }[] {
-    const users = this.getValidUsers();
-    return users.filter(user => user.groups.includes(groupName))
-                .map(user => ({ userId: user.userId, username: user.username }));
-  }
-
-  getGroupAdmins(groupName: string): { username: string; role: string }[] {
-    const groups = this.getGroupsFromLocalStorage();
-    const group = groups.find(g => g.name === groupName);
-    if (group) {
-      return group.admins.map(admin => ({ username: admin.username, role: admin.role }));
-    }
-    return [];
-  }
-
-  getGroupCreator(groupName: string): string {
-    const groups = this.getGroupsFromLocalStorage();
-    const group = groups.find(g => g.name === groupName);
-    if (group) {
-      const creator = this.getValidUsers().find(user => user.userId === group.creatorId);
-      return creator ? creator.username : '';
-    }
-    return '';
-  }
-
-  deleteChannel(groupName: string, channelName: string, currentUsername: string, isSuperAdmin: boolean): boolean {
-    const groups = this.getGroupsFromLocalStorage();
-    const group = groups.find(g => g.name === groupName);
-    if (!group) {
-        console.warn('Group not found.');
-        return false;
-    }
-
-    const creatorUsername = this.getGroupCreator(groupName);
-    // Allow deletion if the user is the group creator or a super admin
-    if (currentUsername !== creatorUsername && !isSuperAdmin) {
-        console.warn('Only the group creator or a super admin can delete channels.');
-        return false;
-    }
-
-    const channelIndex = group.channels.findIndex(c => c.name === channelName);
-    if (channelIndex === -1) {
-        console.warn('Channel not found.');
-        return false;
-    }
-
-    group.channels.splice(channelIndex, 1);
-    // Save the updated group information
-    this.saveGroupsToLocalStorage(groups);
+    console.log(`Removed pending requests for username: ${username}`);
     return true;
   }
 
-  deleteGroup(groupName: string, currentUsername: string, isSuperAdmin: boolean): boolean {
-    const groups = this.getGroupsFromLocalStorage();
-    const groupIndex = groups.findIndex(g => g.name === groupName);
-    if (groupIndex === -1) {
-      console.warn('Group not found.');
-      return false;
-    }
 
-    const group = groups[groupIndex];
-    const creatorUsername = this.getGroupCreator(groupName);
 
-    // Allow deletion if the user is the group creator or a super admin
-    if (currentUsername !== creatorUsername && !isSuperAdmin) {
-      console.warn('Only the group creator or a super admin can delete groups.');
-      return false;
-    }
 
-    groups.splice(groupIndex, 1);
-    this.saveGroupsToLocalStorage(groups);
-    return true;
-  }
-
+  //******************************Data Creation Methods******************************
   createGroup(groupName: string, creatorUsername: string, isSuperAdmin: boolean): boolean {
     const groups = this.getGroupsFromLocalStorage();
     
@@ -727,11 +567,183 @@ export class AuthService {
     return true;
   }
 
+  addUser(user: { 
+    userId: string,
+    username: string, 
+    password: string, 
+    email: string, 
+    roles: string[], 
+    groups: string[] 
+  }) {
+    const users = this.getValidUsers();
+    users.push(user);
+    localStorage.setItem('validUsers', JSON.stringify(users));
+  }
+
+  private saveValidUsers(users: any[]) {
+    localStorage.setItem('validUsers', JSON.stringify(users));
+  }
+
+  private saveGroupsToLocalStorage(groups: any[]) {
+    localStorage.setItem('allGroups', JSON.stringify(groups));
+  }
+
+
+
+
+  //******************************Data Retrieveal Methods******************************
+  getGroupsForUser(userId: string) {
+    const users = this.getValidUsers();
+    const user = users.find(user => user.userId === userId);
+    if (user) {
+      return user.groups;
+    }
+    return [];
+  }
+
+  getAllGroups() {
+    return this.getGroupsFromLocalStorage();
+  }
+
+  getGroupChannels(groupName: string): { name: string, description: string }[] {
+    const groups = this.getGroupsFromLocalStorage();
+    const group = groups.find(g => g.name === groupName);
+    return group ? group.channels : [];
+  }
+
+  getUsersInGroup(groupName: string): { userId: string; username: string }[] {
+    const users = this.getValidUsers();
+    return users.filter(user => user.groups.includes(groupName))
+                .map(user => ({ userId: user.userId, username: user.username }));
+  }
+
+  getGroupAdmins(groupName: string): { username: string; role: string }[] {
+    const groups = this.getGroupsFromLocalStorage();
+    const group = groups.find(g => g.name === groupName);
+    if (group) {
+      return group.admins.map(admin => ({ username: admin.username, role: admin.role }));
+    }
+    return [];
+  }
+
+  getGroupCreator(groupName: string): string {
+    const groups = this.getGroupsFromLocalStorage();
+    const group = groups.find(g => g.name === groupName);
+    if (group) {
+      const creator = this.getValidUsers().find(user => user.userId === group.creatorId);
+      return creator ? creator.username : '';
+    }
+    return '';
+  }
+
+  getValidUsers() {
+    return JSON.parse(localStorage.getItem('validUsers') || '[]');
+  }
+
+  private getGroupsFromLocalStorage() {
+    return JSON.parse(localStorage.getItem('allGroups') || '[]');
+  }
+
+  
+
+
+  //******************************Data Removal Methods******************************
+  deleteChannel(groupName: string, channelName: string, currentUsername: string, isSuperAdmin: boolean): boolean {
+    const groups = this.getGroupsFromLocalStorage();
+    const group = groups.find(g => g.name === groupName);
+    if (!group) {
+        console.warn('Group not found.');
+        return false;
+    }
+
+    const creatorUsername = this.getGroupCreator(groupName);
+    // Allow deletion if the user is the group creator or a super admin
+    if (currentUsername !== creatorUsername && !isSuperAdmin) {
+        console.warn('Only the group creator or a super admin can delete channels.');
+        return false;
+    }
+
+    const channelIndex = group.channels.findIndex(c => c.name === channelName);
+    if (channelIndex === -1) {
+        console.warn('Channel not found.');
+        return false;
+    }
+
+    group.channels.splice(channelIndex, 1);
+    // Save the updated group information
+    this.saveGroupsToLocalStorage(groups);
+    return true;
+  }
+
+  deleteGroup(groupName: string, currentUsername: string, isSuperAdmin: boolean): boolean {
+    const groups = this.getGroupsFromLocalStorage();
+    const groupIndex = groups.findIndex(g => g.name === groupName);
+    if (groupIndex === -1) {
+      console.warn('Group not found.');
+      return false;
+    }
+
+    const group = groups[groupIndex];
+    const creatorUsername = this.getGroupCreator(groupName);
+
+    // Allow deletion if the user is the group creator or a super admin
+    if (currentUsername !== creatorUsername && !isSuperAdmin) {
+      console.warn('Only the group creator or a super admin can delete groups.');
+      return false;
+    }
+
+    groups.splice(groupIndex, 1);
+    this.saveGroupsToLocalStorage(groups);
+    return true;
+  }
+
+  deleteUser(username: string) {
+    const users = this.getValidUsers();
+    if (users.length === 0) {
+      console.warn('No users available to delete.');
+      return;
+    }
+
+    const updatedUsers = users.filter(user => user.username !== username);
+
+    if (users.length === updatedUsers.length) {
+      console.warn(`User with username "${username}" not found.`);
+      return;
+    }
+
+    localStorage.setItem('validUsers', JSON.stringify(updatedUsers));
+  }
+
+  leaveGroup(username: string, groupName: string): boolean {
+    const users = this.getValidUsers();
+    const user = users.find(u => u.username === username);
+  
+    if (!user) {
+      console.warn(`User with username "${username}" not found.`);
+      return false;
+    }
+  
+    const groupIndex = user.groups.indexOf(groupName);
+    if (groupIndex === -1) {
+      console.warn(`Group "${groupName}" not found in user's groups.`);
+      return false;
+    }
+  
+    user.groups.splice(groupIndex, 1);
+    this.saveValidUsers(users);
+    console.log(`User ${username} removed from group ${groupName}`);
+    return true;
+  }
+
+
+
+
+  //******************************Other Methods******************************
   getSuperAdmins(): { username: string; role: string }[] {
     const users = this.getValidUsers(); // Fetch the list of valid users
     return users
       .filter(user => user.roles.includes('superAdmin')) // Filter users with the 'superAdmin' role
       .map(user => ({ username: user.username, role: 'superAdmin' })); // Map to the desired format
   }
-  
+
 }

@@ -17,6 +17,7 @@ export class InboxComponent implements OnInit {
   activeTab: string = 'joinRequests'; // Default active tab
   joinRequests: any[] = []; // Store join requests
   reportedUsers: any[] = []; // Store reported users
+  promotionRequests: any[] = []; // Store promotion requests
 
   constructor(private router: Router, private authService: AuthService) {}
 
@@ -86,6 +87,22 @@ export class InboxComponent implements OnInit {
     } else {
       console.error(`Failed to deny request from ${request.username}`);
     }
+  }
+
+  banReportedUser(user: any): void {
+    
+  }
+
+  removeReportedUser(user: any): void {
+
+  }
+
+  approvePromotionRequest(request: any): void {
+
+  }
+
+  denyPromotionRequest(request: any): void {
+
   }
 
   navigateToAccount(): void {
