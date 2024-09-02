@@ -415,6 +415,21 @@ export class AuthService {
     return true;
 }
 
+  // Method to remove pending requests for the user
+  removePendingRequests(username: string): boolean {
+    // Retrieve the current list of group join requests
+    const requests = this.getGroupJoinRequests();
+
+    // Filter out requests made by the specified username
+    const updatedRequests = requests.filter(req => req.username !== username);
+
+    // Save the updated list of requests back to local storage
+    this.saveGroupJoinRequests(updatedRequests);
+
+    console.log(`Removed pending requests for username: ${username}`);
+    return true;
+  }
+
   rejectJoinRequest(username: string, groupName: string): boolean {
     const requests = this.getGroupJoinRequests();
     const requestIndex = requests.findIndex(req => req.username === username && req.groupName === groupName);
