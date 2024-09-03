@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth/auth.service';
 import { FormsModule } from '@angular/forms';
 import { RequestsService } from '../services/requests/requests.service';
+import { GroupsService } from '../services/groups/groups.service';
 
 
 @Component({
@@ -35,7 +36,8 @@ export class UserGroupComponent implements OnInit {
   constructor(
     private router: Router, 
     private authService: AuthService,
-    private requestsService: RequestsService 
+    private requestsService: RequestsService,
+    private groupsService: GroupsService
   ) {}
 
   ngOnInit(): void {
@@ -46,23 +48,23 @@ export class UserGroupComponent implements OnInit {
 
     // Fetch request count
     if (this.isGroupAdminOrSuperAdmin()) {
-      this.requestCount = this.authService.getRequestCount(); 
+      this.requestCount = this.requestsService.getRequestCount(); 
     }
 
     if (this.roles.includes('superAdmin')) {
-      const allGroups = this.authService.getAllGroups();
+      const allGroups = this.groupsService.getAllGroups();
       localStorage.setItem('allGroups', JSON.stringify(allGroups));
       this.groups = allGroups.map(group => group.name);
       this.groups.forEach(group => {
-        this.channels[group] = this.authService.getGroupChannels(group);
-        this.groupCreators[group] = this.authService.getGroupCreator(group);
+        this.channels[group] = this.groupsService.getGroupChannels(group);
+        this.groupCreators[group] = this.groupsService.getGroupCreator(group);
       });
     } else {
       this.groups = storedUser.groups;
       this.openGroups = new Array(this.groups.length).fill(false);
       this.groups.forEach(group => {
-        this.channels[group] = this.authService.getGroupChannels(group);
-        this.groupCreators[group] = this.authService.getGroupCreator(group);
+        this.channels[group] = this.groupsService.getGroupChannels(group);
+        this.groupCreators[group] = this.groupsService.getGroupCreator(group);
       });
     }
   }
@@ -122,7 +124,7 @@ export class UserGroupComponent implements OnInit {
   deleteGroup(group: string): void {
     const confirmed = window.confirm('Are you sure you want to delete this group? This action cannot be undone.');
     if (confirmed) {
-      const success = this.authService.deleteGroup(group, this.username, this.roles.includes('superAdmin'));
+      const success = this.groupsService.deleteGroup(group, this.username, this.roles.includes('superAdmin'));
       if (success) {
         alert('Group deleted successfully.');
         this.groups = this.groups.filter(g => g !== group);
@@ -138,14 +140,14 @@ export class UserGroupComponent implements OnInit {
     if (this.newGroupName.trim()) {
       const isSuperAdmin = this.roles.includes('superAdmin');
       
-      // Create the group using the `authService`
-      const success = this.authService.createGroup(this.newGroupName, this.username, isSuperAdmin);
+      // Create the group using the `groupsService` and check if it was successful
+      const success = this.groupsService.createGroup(this.newGroupName, this.username, isSuperAdmin);
   
       if (success) {
         // Update the groups array directly
         this.groups.push(this.newGroupName);
-        this.channels[this.newGroupName] = []; // Initialize channels for the new group
-        this.groupCreators[this.newGroupName] = this.username; // Set the creator of the new group
+        this.channels[this.newGroupName] = [];
+        this.groupCreators[this.newGroupName] = this.username; 
   
         // Reset the form and hide it
         this.showCreateGroup = false;
@@ -171,7 +173,7 @@ export class UserGroupComponent implements OnInit {
       const currentUsername = this.username;
       const isSuperAdmin = this.roles.includes('superAdmin');
   
-      const success = this.authService.createChannel(
+      const success = this.groupsService.createChannel(
         group, 
         this.newChannelName, 
         this.newChannelDescription, 
@@ -195,7 +197,7 @@ export class UserGroupComponent implements OnInit {
   leaveGroup(groupName: string): void {
     const confirmed = window.confirm(`Are you sure you want to leave the group "${groupName}"?`);
     if (confirmed) {
-      const success = this.authService.leaveGroup(this.username, groupName);
+      const success = this.groupsService.leaveGroup(this.username, groupName);
       if (success) {
         // Remove the group from the local groups array and delete related channels
         this.groups = this.groups.filter(g => g !== groupName);

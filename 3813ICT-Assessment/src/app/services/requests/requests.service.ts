@@ -103,7 +103,6 @@ export class RequestsService {
     return true;
   }
 
-  //******************************Reported User Request Methods ******************************
   getReportedUsers(): any[] {
     return JSON.parse(localStorage.getItem('reportRequests') || '[]');
   }
@@ -163,5 +162,13 @@ export class RequestsService {
 
     console.log(`Removed pending requests for group: ${groupName}`);
     return true;
+  }
+  
+  //******************************UI Methods******************************
+  getRequestCount(): number {
+    // Implement logic to return the actual count of requests
+    const count = this.getGroupJoinRequests().length + this.getReportedUsers().length;
+
+    return count; // Example count
   }
 }

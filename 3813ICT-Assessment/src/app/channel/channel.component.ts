@@ -3,6 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth/auth.service';
+import { RequestsService } from '../services/requests/requests.service';
+import { GroupsService } from '../services/groups/groups.service';
+import { UsersService } from '../services/users/users.service';
+
 
 @Component({
   selector: 'app-channel',
@@ -30,7 +34,14 @@ export class ChannelComponent implements OnInit {
   isSuperAdmin: boolean = false;
   showUserLists: boolean = false;  // New property to control the visibility of user lists
 
-  constructor(private route: ActivatedRoute, private router: Router, private authService: AuthService) {
+  constructor(
+    private route: ActivatedRoute, 
+    private router: Router, 
+    private authService: AuthService,
+    private requestsService: RequestsService, 
+    private groupsService: GroupsService,
+    private usersService: UsersService,
+  ) {
     this.route.paramMap.subscribe(params => {
       this.groupName = params.get('groupName');
       this.channelName = params.get('channelName');
@@ -47,14 +58,14 @@ export class ChannelComponent implements OnInit {
 
     // Fetch request count
     if (this.isGroupAdminOrSuperAdmin()) {
-      this.requestCount = this.authService.getRequestCount(); 
+      this.requestCount = this.requestsService.getRequestCount(); 
     }
 
     if (this.groupName) {
       // Fetch users and admins including super admins
-      this.usersInGroup = this.authService.getUsersInGroup(this.groupName);
-      this.groupAdmins = this.authService.getGroupAdmins(this.groupName).concat(this.authService.getSuperAdmins());
-      this.groupCreator = this.authService.getGroupCreator(this.groupName);
+      this.usersInGroup = this.groupsService.getUsersInGroup(this.groupName);
+      this.groupAdmins = this.groupsService.getGroupAdmins(this.groupName).concat(this.authService.getSuperAdmins());
+      this.groupCreator = this.groupsService.getGroupCreator(this.groupName);
 
       // Check if the current user is the group creator or a super admin
       this.isCreator = this.username === this.groupCreator || this.isSuperAdmin;
@@ -79,11 +90,11 @@ export class ChannelComponent implements OnInit {
 
     const confirmed = window.confirm('Are you sure you want to remove this user from the group?');
     if (confirmed) {
-      const success = this.authService.kickUserFromGroup(username, this.groupName);
+      const success = this.groupsService.kickUserFromGroup(username, this.groupName);
       if (success) {
         alert('User removed successfully.');
         // Update user list after removal
-        this.usersInGroup = this.authService.getUsersInGroup(this.groupName);
+        this.usersInGroup = this.groupsService.getUsersInGroup(this.groupName);
       } else {
         alert('Failed to remove user.');
       }
@@ -93,11 +104,11 @@ export class ChannelComponent implements OnInit {
   deleteUsersAccount(username: string): void {
     const confirmed = window.confirm('Are you sure you want to delete this user account?');
     if (confirmed) {
-      const success = this.authService.deleteUser(username);
+      const success = this.usersService.deleteUser(username);
       if (success) {
         alert('User account deleted successfully.');
         // Update user list after removal
-        this.usersInGroup = this.authService.getUsersInGroup(this.groupName);
+        this.usersInGroup = this.groupsService.getUsersInGroup(this.groupName);
       } else {
         alert('Failed to delete user account.');
       }
@@ -111,7 +122,7 @@ export class ChannelComponent implements OnInit {
       if (success) {
         alert('User promoted to Group Admin successfully.');
         // Update group admins and user list after promotion
-        this.groupAdmins = this.authService.getGroupAdmins(this.groupName).concat(this.authService.getSuperAdmins());
+        this.groupAdmins = this.groupsService.getGroupAdmins(this.groupName).concat(this.authService.getSuperAdmins());
       } else {
         alert('Failed to promote user.');
       }
@@ -125,7 +136,7 @@ export class ChannelComponent implements OnInit {
       if (success) {
         alert('User promoted to Super Admin successfully.');
         // Update group admins and user list after promotion
-        this.groupAdmins = this.authService.getGroupAdmins(this.groupName).concat(this.authService.getSuperAdmins());
+        this.groupAdmins = this.groupsService.getGroupAdmins(this.groupName).concat(this.authService.getSuperAdmins());
       } else {
         alert('Failed to promote user.');
       }
@@ -142,7 +153,7 @@ export class ChannelComponent implements OnInit {
 
     if (confirmed) {
       if (this.groupName && this.channelName) {
-        const success = this.authService.deleteChannel(this.groupName, this.channelName, this.username, this.isSuperAdmin);
+        const success = this.groupsService.deleteChannel(this.groupName, this.channelName, this.username, this.isSuperAdmin);
         if (success) {
           alert('Channel deleted successfully.');
           // Navigate or refresh as needed

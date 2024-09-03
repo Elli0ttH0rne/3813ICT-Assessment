@@ -222,4 +222,24 @@ export class UsersService {
     users.push(user);
     localStorage.setItem('validUsers', JSON.stringify(users));
   }
+
+  deleteUser(username: string): boolean {
+    const users = this.getValidUsers();
+    if (users.length === 0) {
+      console.warn('No users available to delete.');
+      return false;
+    }
+  
+    const updatedUsers = users.filter(user => user.username !== username);
+  
+    if (users.length === updatedUsers.length) {
+      console.warn(`User with username "${username}" not found.`);
+      return false;
+    }
+  
+    // Save the updated user list
+    localStorage.setItem('validUsers', JSON.stringify(updatedUsers));
+    return true;
+  }
+  
 }

@@ -2,9 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../services/auth/auth.service';
 import { RequestsService } from '../services/requests/requests.service';
-
+import { UsersService } from '../services/users/users.service';
 
 @Component({
   selector: 'app-account',
@@ -23,8 +22,8 @@ export class AccountComponent implements OnInit {
 
   constructor(
     private router: Router, 
-    private authService: AuthService,
     private requestsService: RequestsService, 
+    private usersService: UsersService,
   ) {}
 
   ngOnInit(): void {
@@ -36,7 +35,7 @@ export class AccountComponent implements OnInit {
     this.userId = storedUser.userId || '';
 
     if (this.isGroupAdminOrSuperAdmin()) {
-      this.requestCount = this.authService.getRequestCount(); 
+      this.requestCount = this.requestsService.getRequestCount(); 
     }
   }
   //******************************Checks******************************
@@ -68,7 +67,7 @@ export class AccountComponent implements OnInit {
 
     if (confirmed) {
       // Call the deleteUser method from AuthService
-      this.authService.deleteUser(this.username);
+      this.usersService.deleteUser(this.username);
 
       // Remove any pending requests for the user
       if (this.username) {

@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../services/auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { RequestsService } from '../services/requests/requests.service';
+import { GroupsService } from '../services/groups/groups.service';
+
 
 
 @Component({
@@ -23,8 +24,8 @@ export class AllGroupListComponent implements OnInit {
 
   constructor(
     private router: Router, 
-    private authService: AuthService,
-    private requestsService: RequestsService
+    private requestsService: RequestsService,
+    private groupsService: GroupsService
   ) {}
 
   ngOnInit(): void {
@@ -37,7 +38,7 @@ export class AllGroupListComponent implements OnInit {
     this.roles = storedUser.roles || [];
 
     if (this.isGroupAdminOrSuperAdmin()) {
-      this.requestCount = this.authService.getRequestCount(); 
+      this.requestCount = this.requestsService.getRequestCount(); 
     }
   }
   
@@ -55,7 +56,7 @@ export class AllGroupListComponent implements OnInit {
 
   //******************************Group List Methods******************************
   private loadGroups(): void {
-    this.groups = this.authService.getAllGroups();
+    this.groups = this.groupsService.getAllGroups();
   }
 
   private loadUserGroups(): void {
