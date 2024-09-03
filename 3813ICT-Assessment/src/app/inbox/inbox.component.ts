@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../services/auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { RequestsService } from '../services/requests/requests.service';
+
 
 @Component({
   selector: 'app-inbox',
@@ -20,7 +22,11 @@ export class InboxComponent implements OnInit {
   promotionRequests: any[] = []; // Store promotion requests
   requestCount: number = 0; // New property for request count
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(
+    private router: Router, 
+    private authService: AuthService,
+    private requestsService: RequestsService 
+  ) {}
 
   ngOnInit(): void {
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -51,11 +57,11 @@ export class InboxComponent implements OnInit {
 
   //******************************Loading Methods******************************
   loadJoinRequests(): void {
-    this.joinRequests = this.authService.getJoinRequests();
+    this.joinRequests = this.requestsService.getGroupJoinRequests();
   }
 
   loadReportedUsers(): void {
-    this.reportedUsers = this.authService.getReportedUsers();
+    this.reportedUsers = this.requestsService.getReportedUsers();
   }
 
 
@@ -67,7 +73,7 @@ export class InboxComponent implements OnInit {
       console.error('Username is undefined');
       return;
     }
-    const success = this.authService.approveJoinRequest(request.username, request.groupName);
+    const success = this.requestsService.approveJoinRequest(request.username, request.groupName);
     if (success) {
       this.joinRequests = this.joinRequests.filter(req => req !== request);
       console.log(`Approved request from ${request.username}`);
@@ -81,7 +87,7 @@ export class InboxComponent implements OnInit {
       console.error('username is undefined');
       return;
     }
-    const success = this.authService.rejectJoinRequest(request.username, request.groupName);
+    const success = this.requestsService.rejectJoinRequest(request.username, request.groupName);
     if (success) {
       this.joinRequests = this.joinRequests.filter(req => req !== request);
       console.log(`Denied request from ${request.username}`);

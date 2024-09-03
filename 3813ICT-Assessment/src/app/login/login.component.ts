@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../auth.service';
 import { FormsModule } from '@angular/forms'; 
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { UsersService } from '../services/users/users.service';
+
 
 @Component({
   selector: 'app-login',
@@ -16,10 +17,13 @@ export class LoginComponent {
   username: string = '';
   password: string = '';
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(
+    private router: Router, 
+    private usersService: UsersService,
+  ) {}
 
   handleSubmit() {
-    const currentUser = this.authService.getValidUsers().find(
+    const currentUser = this.usersService.getValidUsers().find(
       u => u.username === this.username && u.password === this.password
     );
   

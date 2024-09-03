@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../services/auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { RequestsService } from '../services/requests/requests.service';
+
 
 @Component({
   selector: 'app-all-group-list',
@@ -19,7 +21,11 @@ export class AllGroupListComponent implements OnInit {
   joinRequests: { [groupName: string]: boolean } = {};
   requestCount: number = 0;
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(
+    private router: Router, 
+    private authService: AuthService,
+    private requestsService: RequestsService
+  ) {}
 
   ngOnInit(): void {
     this.loadGroups();
@@ -62,7 +68,7 @@ export class AllGroupListComponent implements OnInit {
 
     this.joinRequests[groupName] = true;
 
-    const success = this.authService.requestToJoinGroup(this.username, groupName);
+    const success = this.requestsService.requestToJoinGroup(this.username, groupName);
     if (success) {
       console.log(`Request to join ${groupName} sent successfully by ${this.username}`);
     } else {

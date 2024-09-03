@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../auth.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { UsersService } from '../services/users/users.service';
+
 
 @Component({
   selector: 'app-register',
@@ -17,11 +18,14 @@ export class RegisterComponent {
   email: string = '';
   password: string = '';
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(
+    private router: Router,
+    private usersService: UsersService,
+   ) {}
 
   handleSubmit() {
     // Check if the username already exists
-    if (this.authService.getValidUsers().some(user => user.username === this.username)) {
+    if (this.usersService.getValidUsers().some(user => user.username === this.username)) {
       alert('Username already exists');
       return;
     }
@@ -44,7 +48,7 @@ export class RegisterComponent {
       return;
     }
 
-    this.authService.addUser(newUser);
+    this.usersService.addUser(newUser);
 
     // Store the new user data in local storage
     localStorage.setItem('currentUser', JSON.stringify({
@@ -61,7 +65,7 @@ export class RegisterComponent {
 
   // Generate a unique userId (e.g., 'u007')
   private generateUserId(): string {
-    const users = this.authService.getValidUsers();
+    const users = this.usersService.getValidUsers();
     const lastUserId = users.length ? users[users.length - 1].userId : 'u000';
     const lastIdNumber = parseInt(lastUserId.substring(1));
     const newUserId = 'u' + (lastIdNumber + 1).toString().padStart(3, '0');

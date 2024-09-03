@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../services/auth/auth.service';
+import { RequestsService } from '../services/requests/requests.service';
+
 
 @Component({
   selector: 'app-account',
@@ -19,7 +21,11 @@ export class AccountComponent implements OnInit {
   userId: string = '';
   requestCount: number = 0;
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(
+    private router: Router, 
+    private authService: AuthService,
+    private requestsService: RequestsService, 
+  ) {}
 
   ngOnInit(): void {
     // Retrieve currentUser information from local storage
@@ -66,7 +72,7 @@ export class AccountComponent implements OnInit {
 
       // Remove any pending requests for the user
       if (this.username) {
-        this.authService.removePendingRequests(this.username);
+        this.requestsService.removePendingRequests(this.username);
       }
 
       // Clear user data from local storage

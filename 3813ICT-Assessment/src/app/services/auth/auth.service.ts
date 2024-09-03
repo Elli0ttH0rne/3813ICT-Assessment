@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { RequestsService } from '../requests/requests.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable({
   providedIn: 'root'
@@ -324,35 +326,19 @@ export class AuthService {
     },
   ];
 
-  private defaultGroupJoinRequests = [];
-  private defaultReportRequests = [];
+  
 
 
 
   //******************************Initilising Methods******************************
-  constructor() {
-    this.initializeUsers();
+  constructor(
+    private requestsService: RequestsService,
+    private usersService: UsersService,
+  ) {
     this.initializeGroups();
-    this.initializeRequests();
   }
 
-  private initializeRequests() {
-    const groupJoinRequests = localStorage.getItem('groupJoinRequests');
-    if (!groupJoinRequests) {
-      localStorage.setItem('groupJoinRequests', JSON.stringify(this.defaultGroupJoinRequests));
-    }
-    const reportRequests = localStorage.getItem('reportRequests');
-    if (!reportRequests) {
-      localStorage.setItem('reportRequests', JSON.stringify(this.defaultReportRequests));
-    }
-  }
 
-  private initializeUsers() {
-    const validUsers = localStorage.getItem('validUsers');
-    if (!validUsers) {
-      localStorage.setItem('validUsers', JSON.stringify(this.defaultUsers));
-    }
-  }
 
   private initializeGroups() {
     const allGroups = localStorage.getItem('allGroups');
@@ -361,148 +347,6 @@ export class AuthService {
     }
   }
 
-
-
-
-  //******************************Join Group Request Methods******************************
-  private saveGroupJoinRequests(requests: any[]) {
-    localStorage.setItem('groupJoinRequests', JSON.stringify(requests));
-  }
-
-  requestToJoinGroup(username: string, groupName: string): boolean {
-    const requests = this.getGroupJoinRequests();
-    if (requests.some(req => req.groupName === groupName)) {
-      console.warn('Request already exists.');
-      return false;
-    }
-
-    requests.push({ username, groupName, status: 'pending' });
-    this.saveGroupJoinRequests(requests);
-    return true;
-  }
-
-  getJoinRequests(): any[] {
-    return this.getGroupJoinRequests();
-  }
-
-  private getGroupJoinRequests() {
-    return JSON.parse(localStorage.getItem('groupJoinRequests') || '[]');
-  }
-
-  approveJoinRequest(username: string, groupName: string): boolean {
-    // Retrieve the join requests from local storage
-    const requests = this.getGroupJoinRequests();
-    
-    // Find the index of the request to be approved
-    const requestIndex = requests.findIndex(req => req.username === username && req.groupName === groupName);
-  
-    if (requestIndex === -1) {
-      console.warn('Join request not found.');
-      return false;
-    }
-  
-    // Remove the approved request from the list
-    requests.splice(requestIndex, 1);
-    this.saveGroupJoinRequests(requests); // Save the updated requests back to local storage
-  
-    // Add the user to the group
-    const users = this.getValidUsers();
-    const user = users.find(u => u.username === username);
-    
-    if (user) {
-      // Add the group to the user's group list if they aren't already a member
-      if (!user.groups.includes(groupName)) {
-        user.groups.push(groupName);
-        this.saveValidUsers(users);
-        console.log(`User ${user.username} added to group ${groupName}`);
-      } else {
-        console.warn(`User ${user.username} is already a member of group ${groupName}`);
-      }
-    } else {
-      console.error(`User with ${username} not found`);
-      return false;
-    }
-  
-    return true;
-  }
-
-  rejectJoinRequest(username: string, groupName: string): boolean {
-    const requests = this.getGroupJoinRequests();
-    const requestIndex = requests.findIndex(req => req.username === username && req.groupName === groupName);
-  
-    if (requestIndex === -1) {
-      console.warn('Join request not found.');
-      return false;
-    }
-  
-    // Reject the join request
-    requests.splice(requestIndex, 1);
-    this.saveGroupJoinRequests(requests);
-  
-    return true;
-  }
-
-  //******************************Reported User Request Methods ******************************
-  getReportedUsers(): any[] {
-    return JSON.parse(localStorage.getItem('reportRequests') || '[]');
-  }
-
-  createReportRequest(reporterId: string, reportedUserId: string, reporterUsername: string, reportedUsername: string, reason: string): boolean {
-    const requests = this.getReportRequests();
-    requests.push({ reporterId, reportedUserId, reporterUsername, reportedUsername, reason, status: 'pending' });
-    this.saveReportRequests(requests);
-    return true;
-  }
-
-  resolveReportRequest(reporterId: string, reportedUserId: string): boolean {
-    const requests = this.getReportRequests();
-    const requestIndex = requests.findIndex(req => req.reporterId === reporterId && req.reportedUserId === reportedUserId);
-
-    if (requestIndex === -1) {
-      console.warn('Report request not found.');
-      return false;
-    }
-
-    requests[requestIndex].status = 'resolved';
-    this.saveReportRequests(requests);
-    return true;
-  }
-
-  private saveReportRequests(requests: any[]) {
-    localStorage.setItem('reportRequests', JSON.stringify(requests));
-  }
-
-  private getReportRequests() {
-    return JSON.parse(localStorage.getItem('reportRequests') || '[]');
-  }
-
-  removePendingRequests(username: string): boolean {
-    // Retrieve the current list of group join requests
-    const requests = this.getGroupJoinRequests();
-
-    // Filter out requests made by the specified username
-    const updatedRequests = requests.filter(req => req.username !== username);
-
-    // Save the updated list of requests back to local storage
-    this.saveGroupJoinRequests(updatedRequests);
-
-    console.log(`Removed pending requests for username: ${username}`);
-    return true;
-  }
-
-  removePendingRequestsByGroup(groupName: string): boolean {
-    // Retrieve the current list of group join requests
-    const requests = this.getGroupJoinRequests();
-
-    // Filter out requests made for the specified group
-    const updatedRequests = requests.filter(req => req.groupName !== groupName);
-
-    // Save the updated list of requests back to local storage
-    this.saveGroupJoinRequests(updatedRequests);
-
-    console.log(`Removed pending requests for group: ${groupName}`);
-    return true;
-  }
 
   //******************************Data Creation Methods******************************
   createGroup(groupName: string, creatorUsername: string, isSuperAdmin: boolean): boolean {
@@ -516,7 +360,7 @@ export class AuthService {
     }
   
     // Create a new group with no channels
-    const creatorUser = this.getValidUsers().find(user => user.username === creatorUsername);
+    const creatorUser = this.usersService.getValidUsers().find(user => user.username === creatorUsername);
     const newGroup = {
       name: groupName,
       channels: [],
@@ -530,7 +374,7 @@ export class AuthService {
   
     // Update only the creator's group list
     if (creatorUser) {
-      const users = this.getValidUsers();
+      const users = this.usersService.getValidUsers();
       const updatedUsers = users.map(user => 
         user.username === creatorUsername
           ? { ...user, groups: [...user.groups, groupName] }
@@ -578,22 +422,9 @@ export class AuthService {
     return true;
   }
 
-  addUser(user: { 
-    userId: string,
-    username: string, 
-    password: string, 
-    email: string, 
-    roles: string[], 
-    groups: string[] 
-  }) {
-    const users = this.getValidUsers();
-    users.push(user);
-    localStorage.setItem('validUsers', JSON.stringify(users));
-  }
+  
 
-  private saveValidUsers(users: any[]) {
-    localStorage.setItem('validUsers', JSON.stringify(users));
-  }
+
 
   private saveGroupsToLocalStorage(groups: any[]) {
     localStorage.setItem('allGroups', JSON.stringify(groups));
@@ -601,7 +432,7 @@ export class AuthService {
 
   promoteToGroupAdmin(username: string): boolean {
     // Retrieve the current list of users and groups from local storage
-    const users = this.getValidUsers();
+    const users = this.usersService.getValidUsers();
     const groups = this.getGroupsFromLocalStorage();
   
     // Find the user to be promoted
@@ -621,7 +452,7 @@ export class AuthService {
     user.roles.push('groupAdmin');
   
     // Update the users list
-    this.saveValidUsers(users);
+    this.usersService.saveValidUsers(users);
   
     // Add the user to the admins list of each group they are a member of
     user.groups.forEach(groupName => {
@@ -647,7 +478,7 @@ export class AuthService {
   
   promoteToSuperAdmin(username: string): boolean {
     // Retrieve the current list of users and groups from local storage
-    const users = this.getValidUsers();
+    const users = this.usersService.getValidUsers();
     const groups = this.getGroupsFromLocalStorage();
   
     // Find the user to be promoted
@@ -667,7 +498,7 @@ export class AuthService {
     user.roles.push('superAdmin');
   
     // Update the users list
-    this.saveValidUsers(users);
+    this.usersService.saveValidUsers(users);
   
     // Add the user to the admins list of each group they are a member of
     user.groups.forEach(groupName => {
@@ -694,7 +525,7 @@ export class AuthService {
 
   //******************************Data Retrieveal Methods******************************
   getGroupsForUser(userId: string) {
-    const users = this.getValidUsers();
+    const users = this.usersService.getValidUsers();
     const user = users.find(user => user.userId === userId);
     if (user) {
       return user.groups;
@@ -713,7 +544,7 @@ export class AuthService {
   }
 
   getUsersInGroup(groupName: string): { userId: string; username: string }[] {
-    const users = this.getValidUsers();
+    const users = this.usersService.getValidUsers();
     return users.filter(user => user.groups.includes(groupName))
                 .map(user => ({ userId: user.userId, username: user.username }));
   }
@@ -731,15 +562,13 @@ export class AuthService {
     const groups = this.getGroupsFromLocalStorage();
     const group = groups.find(g => g.name === groupName);
     if (group) {
-      const creator = this.getValidUsers().find(user => user.userId === group.creatorId);
+      const creator = this.usersService.getValidUsers().find(user => user.userId === group.creatorId);
       return creator ? creator.username : '';
     }
     return '';
   }
 
-  getValidUsers() {
-    return JSON.parse(localStorage.getItem('validUsers') || '[]');
-  }
+
 
   private getGroupsFromLocalStorage() {
     return JSON.parse(localStorage.getItem('allGroups') || '[]');
@@ -747,8 +576,7 @@ export class AuthService {
 
   getRequestCount(): number {
     // Implement logic to return the actual count of requests
-    // This is just a placeholder
-    const count = this.getGroupJoinRequests().length + this.getReportedUsers().length;
+    const count = this.requestsService.getGroupJoinRequests().length + this.requestsService.getReportedUsers().length;
 
     return count; // Example count
   }
@@ -804,7 +632,7 @@ export class AuthService {
   }
 
   deleteUser(username: string): boolean {
-    const users = this.getValidUsers();
+    const users = this.usersService.getValidUsers();
     if (users.length === 0) {
       console.warn('No users available to delete.');
       return false;
@@ -824,7 +652,7 @@ export class AuthService {
   
 
   leaveGroup(username: string, groupName: string): boolean {
-    const users = this.getValidUsers();
+    const users = this.usersService.getValidUsers();
     const user = users.find(u => u.username === username);
   
     if (!user) {
@@ -839,13 +667,13 @@ export class AuthService {
     }
   
     user.groups.splice(groupIndex, 1);
-    this.saveValidUsers(users);
+    this.usersService.saveValidUsers(users);
     console.log(`User ${username} removed from group ${groupName}`);
     return true;
   }
 
   kickUserFromGroup(username: string, groupName: string,){
-    const users = this.getValidUsers();
+    const users = this.usersService.getValidUsers();
     const user = users.find(u => u.username === username);
   
     if (!user) {
@@ -860,7 +688,7 @@ export class AuthService {
     }
   
     user.groups.splice(groupIndex, 1);
-    this.saveValidUsers(users);
+    this.usersService.saveValidUsers(users);
     console.log(`User ${username} removed from group ${groupName}`);
     return true;
   }
@@ -868,10 +696,10 @@ export class AuthService {
 
   //******************************Other Methods******************************
   getSuperAdmins(): { username: string; role: string }[] {
-    const users = this.getValidUsers(); // Fetch the list of valid users
+    const users = this.usersService.getValidUsers()
     return users
-      .filter(user => user.roles.includes('superAdmin')) // Filter users with the 'superAdmin' role
-      .map(user => ({ username: user.username, role: 'superAdmin' })); // Map to the desired format
+      .filter(user => user.roles.includes('superAdmin'))
+      .map(user => ({ username: user.username, role: 'superAdmin' }));
   }
 
 }

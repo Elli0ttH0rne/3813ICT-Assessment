@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { AuthService } from '../services/auth/auth.service';
 import { FormsModule } from '@angular/forms';
+import { RequestsService } from '../services/requests/requests.service';
+
 
 @Component({
   selector: 'app-user-group',
@@ -30,7 +32,11 @@ export class UserGroupComponent implements OnInit {
   newChannelDescription: string = '';
   requestCount: number = 0; // New property for request count
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(
+    private router: Router, 
+    private authService: AuthService,
+    private requestsService: RequestsService 
+  ) {}
 
   ngOnInit(): void {
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -121,7 +127,7 @@ export class UserGroupComponent implements OnInit {
         alert('Group deleted successfully.');
         this.groups = this.groups.filter(g => g !== group);
         delete this.channels[group];
-        this.authService.removePendingRequestsByGroup(group);
+        this.requestsService.removePendingRequestsByGroup(group);
       } else {
         alert('Failed to delete group.');
       }
