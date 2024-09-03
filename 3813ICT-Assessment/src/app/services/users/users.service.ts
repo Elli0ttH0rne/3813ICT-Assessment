@@ -206,6 +206,7 @@ export class UsersService {
   getValidUsers() {
     return JSON.parse(localStorage.getItem('validUsers') || '[]');
   }
+
   saveValidUsers(users: any[]) {
     localStorage.setItem('validUsers', JSON.stringify(users));
   }
@@ -241,5 +242,4 @@ export class UsersService {
     localStorage.setItem('validUsers', JSON.stringify(updatedUsers));
     return true;
   }
-  
 }

@@ -150,7 +150,8 @@ export class GroupsService {
       localStorage.setItem('allGroups', JSON.stringify(this.defaultGroups));
     }
   }
-  
+
+  //******************************Creation Methods******************************
   createGroup(groupName: string, creatorUsername: string, isSuperAdmin: boolean): boolean {
     const groups = this.getGroupsFromLocalStorage();
     
@@ -224,10 +225,8 @@ export class GroupsService {
     return true;
   }
 
-  saveGroupsToLocalStorage(groups: any[]) {
-    localStorage.setItem('allGroups', JSON.stringify(groups));
-  }
 
+  //******************************Data Retrieval******************************
   getGroupsForUser(userId: string) {
     const users = this.usersService.getValidUsers();
     const user = users.find(user => user.userId === userId);
@@ -236,7 +235,7 @@ export class GroupsService {
     }
     return [];
   }
-
+  
   getAllGroups() {
     return this.getGroupsFromLocalStorage();
   }
@@ -276,6 +275,14 @@ export class GroupsService {
     return JSON.parse(localStorage.getItem('allGroups') || '[]');
   }
 
+
+  //******************************Data Saving******************************
+  saveGroupsToLocalStorage(groups: any[]) {
+    localStorage.setItem('allGroups', JSON.stringify(groups));
+  }
+
+
+  //******************************Data Removal******************************
   deleteChannel(groupName: string, channelName: string, currentUsername: string, isSuperAdmin: boolean): boolean {
     const groups = this.getGroupsFromLocalStorage();
     const group = groups.find(g => g.name === groupName);
@@ -366,5 +373,4 @@ export class GroupsService {
     console.log(`User ${username} removed from group ${groupName}`);
     return true;
   }
-
 }

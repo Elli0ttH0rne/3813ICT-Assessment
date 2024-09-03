@@ -28,6 +28,7 @@ export class RequestsService {
     }
   }
 
+
   //******************************Join Group Request Methods******************************
   saveGroupJoinRequests(requests: any[]) {
     localStorage.setItem('groupJoinRequests', JSON.stringify(requests));
@@ -44,7 +45,6 @@ export class RequestsService {
     this.saveGroupJoinRequests(requests);
     return true;
   }
-
 
   getGroupJoinRequests() {
     return JSON.parse(localStorage.getItem('groupJoinRequests') || '[]');
@@ -103,6 +103,8 @@ export class RequestsService {
     return true;
   }
 
+
+  //******************************Reported User Methods******************************
   getReportedUsers(): any[] {
     return JSON.parse(localStorage.getItem('reportRequests') || '[]');
   }
@@ -136,6 +138,8 @@ export class RequestsService {
     return JSON.parse(localStorage.getItem('reportRequests') || '[]');
   }
 
+
+  //******************************Pending Requests******************************
   removePendingRequests(username: string): boolean {
     // Retrieve the current list of group join requests
     const requests = this.getGroupJoinRequests();
@@ -164,6 +168,7 @@ export class RequestsService {
     return true;
   }
   
+
   //******************************UI Methods******************************
   getRequestCount(): number {
     // Implement logic to return the actual count of requests
