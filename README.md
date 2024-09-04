@@ -58,7 +58,15 @@ The solution currently includes seven components that make up the entire fronten
 * `user-group`: This screen is displayed after a user logs in. It shows the groups that the user has joined. Group admins have additional options to create and delete groups and channels, but they can only modify groups they have created. Super admins have the same abilities but can modify any group without needing to be the creator.
 
 ### Services
+Within this project, four services were created to manage data and provide methods for performing various actions on that data. These services are:
 
+* `auth.service.ts`: This service contains functions used to promote users to group admin or super admin roles.
+
+* `groups.service.ts`: This service manages the data for all default groups and provides the necessary methods to support the functionality of the solution.
+
+* `requests.service`.ts: This service holds the arrays for different types of requests, such as group join requests, report requests, and promotion requests. It also includes methods for creating, approving, rejecting, and deleting these requests.
+
+* users.service.ts`: This service handles methods related to retrieving user information, as well as creating and deleting users.
 
 ## REST API, Node Server Architecture and Server Side Routes
 Unfortunetly my solution doesn't utilise the REST API, Node Server or any Server Side Routes. My solution has it's data stored inside the browsers local storage on launch and utilisies services to modify and retrieve the data. I realised too late that the solution required these components and was unable to make any major modifications in the remaining time.
