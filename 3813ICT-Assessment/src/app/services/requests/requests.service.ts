@@ -71,7 +71,7 @@ export class RequestsService {
   
     // Remove the approved request from the list
     requests.splice(requestIndex, 1);
-    this.saveGroupJoinRequests(requests); // Save the updated requests back to local storage
+    this.saveGroupJoinRequests(requests);
   
     // Add the user to the group
     const users = this.usersService.getValidUsers();

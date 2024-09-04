@@ -24,16 +24,13 @@ export class RegisterComponent {
    ) {}
 
   handleSubmit() {
-    // Check if the username already exists
     if (this.usersService.getValidUsers().some(user => user.username === this.username)) {
       alert('Username already exists');
       return;
     }
 
-    // Generate a unique userId
     const newUserId = this.generateUserId();
 
-    // Add the new user
     const newUser = {
       userId: newUserId,
       username: this.username,
@@ -50,7 +47,6 @@ export class RegisterComponent {
 
     this.usersService.addUser(newUser);
 
-    // Store the new user data in local storage
     localStorage.setItem('currentUser', JSON.stringify({
       userId: newUser.userId,
       username: newUser.username,
@@ -59,7 +55,6 @@ export class RegisterComponent {
       valid: true
     }));
 
-    // Navigate to the user group
     this.router.navigate(['/user-group']);
   }
 

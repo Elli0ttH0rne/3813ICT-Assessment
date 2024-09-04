@@ -33,7 +33,7 @@ export class ChannelComponent implements OnInit {
   isCreator: boolean = false;
   isSuperAdmin: boolean = false;
   isGroupAdmin: boolean = false;
-  showUserLists: boolean = false;  // New property to control the visibility of user lists
+  showUserLists: boolean = false;  
 
   constructor(
     private route: ActivatedRoute, 
@@ -205,7 +205,6 @@ export class ChannelComponent implements OnInit {
       const success = this.authService.promoteToGroupAdmin(username);
       if (success) {
         alert('User promoted to Group Admin successfully.');
-        // Update group admins and user list after promotion
         this.groupAdmins = this.groupsService.getGroupAdmins(this.groupName).concat(this.authService.getSuperAdmins());
       } else {
         alert('Failed to promote user.');
@@ -219,7 +218,6 @@ export class ChannelComponent implements OnInit {
       const success = this.authService.promoteToSuperAdmin(username);
       if (success) {
         alert('User promoted to Super Admin successfully.');
-        // Update group admins and user list after promotion
         this.groupAdmins = this.groupsService.getGroupAdmins(this.groupName).concat(this.authService.getSuperAdmins());
       } else {
         alert('Failed to promote user.');
@@ -230,7 +228,6 @@ export class ChannelComponent implements OnInit {
 
   //******************************Button Methods******************************
   deleteChannel(): void {
-    // Show confirmation dialog
     const confirmed = window.confirm('Are you sure you want to delete this channel? This action cannot be undone.');
 
     if (confirmed) {
@@ -238,7 +235,6 @@ export class ChannelComponent implements OnInit {
         const success = this.groupsService.deleteChannel(this.groupName, this.channelName, this.username, this.isSuperAdmin);
         if (success) {
           alert('Channel deleted successfully.');
-          // Navigate or refresh as needed
           this.navigateToUserGroup();
         } else {
           alert('Failed to delete channel.');

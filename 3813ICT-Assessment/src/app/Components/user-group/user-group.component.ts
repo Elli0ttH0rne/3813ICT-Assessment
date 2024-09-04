@@ -31,7 +31,7 @@ export class UserGroupComponent implements OnInit {
   showCreateChannelForGroup: string | null = null; 
   newChannelName: string = ''; 
   newChannelDescription: string = '';
-  requestCount: number = 0; // New property for request count
+  requestCount: number = 0; 
 
   constructor(
     private router: Router, 
@@ -46,7 +46,6 @@ export class UserGroupComponent implements OnInit {
     this.username = storedUser.username;
     this.roles = storedUser.roles;
 
-    // Fetch request count
     if (this.isGroupAdminOrSuperAdmin()) {
       this.requestCount = this.requestsService.getRequestCount(this.username); 
     }
@@ -144,7 +143,6 @@ export class UserGroupComponent implements OnInit {
       const success = this.groupsService.createGroup(this.newGroupName, this.username, isSuperAdmin);
   
       if (success) {
-        // Update the groups array directly
         this.groups.push(this.newGroupName);
         this.channels[this.newGroupName] = [];
         this.groupCreators[this.newGroupName] = this.username; 
@@ -153,7 +151,6 @@ export class UserGroupComponent implements OnInit {
         this.showCreateGroup = false;
         this.newGroupName = '';
   
-        // Optionally, reset openGroups array to include the new group
         this.openGroups.push(false);
       } else {
         alert('Failed to create group.');

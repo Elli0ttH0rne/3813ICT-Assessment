@@ -36,10 +36,6 @@ export class InboxComponent implements OnInit {
     this.username = storedUser.username;
     this.roles = storedUser.roles;
 
-    console.log(this.joinRequests.length);
-    console.log(this.reportRequests.length);
-    console.log(this.promotionRequests.length);
-
     // Load requests based on roles and active tab
     if (this.isGroupAdminOrSuperAdmin()) {
       this.loadJoinRequests();
@@ -114,10 +110,8 @@ export class InboxComponent implements OnInit {
       const success = this.groupsService.kickUserFromGroup(reportedUser.reportedUsername, reportedUser.groupName);
   
       if (success) {          
-        // Refresh the list of reported users after banning
         this.reportRequests = this.reportRequests.filter(user => user !== reportedUser);
   
-        // Remove the report request after banning
         this.removeReportedUserRequest(reportedUser);
       } else {
         alert(`Failed to ban ${reportedUser.reportedUsername} from the group.`);
@@ -131,8 +125,8 @@ export class InboxComponent implements OnInit {
     const requestIndex = requests.findIndex(req => req.reportedUsername === user.reportedUsername && req.groupName === groupName);
   
     if (requestIndex !== -1) {
-      requests.splice(requestIndex, 1);  // Remove the specific report request
-      this.requestsService.saveReportRequests(requests);  // Save the updated list
+      requests.splice(requestIndex, 1);  
+      this.requestsService.saveReportRequests(requests);  
 
       // Refresh local reportRequests
       this.reportRequests = this.reportRequests.filter(reportedUser => reportedUser !== user);
@@ -153,7 +147,6 @@ export class InboxComponent implements OnInit {
       if (success) {
         alert('User promoted to Group Admin successfully.');
   
-        // Remove the approved request from the list
         this.promotionRequests = this.promotionRequests.filter(req => req !== promotionRequest);
       } else {
         alert('Failed to promote user.');
@@ -170,9 +163,7 @@ export class InboxComponent implements OnInit {
   
     const confirmed = window.confirm('Are you sure you want to deny this promotion request?');
     if (confirmed) {
-      // Optionally, handle any backend operations or logic needed to deny the request
   
-      // Remove the denied request from the list
       this.promotionRequests = this.promotionRequests.filter(req => req !== promotionRequest);
       alert('Promotion request denied.');
     }

@@ -39,7 +39,6 @@ export class AccountComponent implements OnInit {
     }
   }
   //******************************Checks******************************
-  // Method to check if the user is a groupAdmin or superAdmin
   isGroupAdminOrSuperAdmin(): boolean {
     return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
   }
@@ -49,35 +48,27 @@ export class AccountComponent implements OnInit {
 
   //******************************Button Methods******************************
   logout(): void {
-    // Clear previous user data from local storage
     localStorage.removeItem('currentUser');
     console.log('User logged out');
-    // Navigate back to the login screen or home page
     this.router.navigate(['/']);
   }
   deleteAccount(): void {
-    // Check if the user is a groupAdmin or superAdmin
     if (this.isGroupAdminOrSuperAdmin()) {
       alert('Group Admins and Super Admins cannot delete their accounts.');
       return;
     }
 
-    // Show confirmation dialog
     const confirmed = window.confirm('Are you sure you want to delete your account? This action cannot be undone.');
 
     if (confirmed) {
-      // Call the deleteUser method from AuthService
       this.usersService.deleteUser(this.username);
 
-      // Remove any pending requests for the user
       if (this.username) {
         this.requestsService.removePendingRequests(this.username);
       }
 
-      // Clear user data from local storage
       localStorage.removeItem('currentUser');
 
-      // Navigate back to the login screen or home page
       this.router.navigate(['/']);
     } else {
       console.log('Account deletion cancelled');

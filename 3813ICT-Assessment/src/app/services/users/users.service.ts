@@ -238,7 +238,6 @@ export class UsersService {
       return false;
     }
   
-    // Save the updated user list
     localStorage.setItem('validUsers', JSON.stringify(updatedUsers));
     return true;
   }
