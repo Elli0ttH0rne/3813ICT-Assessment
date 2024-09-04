@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../services/auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { RequestsService } from '../services/requests/requests.service';
-
+import { GroupsService } from '../services/groups/groups.service';
 
 @Component({
   selector: 'app-inbox',
@@ -18,14 +17,16 @@ export class InboxComponent implements OnInit {
   roles: string[] = [];
   activeTab: string = 'joinRequests'; // Default active tab
   joinRequests: any[] = []; // Store join requests
-  reportedUsers: any[] = []; // Store reported users
+  reportRequests: any[] = []; // Store reported users
   promotionRequests: any[] = []; // Store promotion requests
   requestCount: number = 0; // New property for request count
+  usersInGroup: any[] = []; // Store users in the group
+  selectedGroupName: string = ''; // Store the selected group's name
 
   constructor(
     private router: Router, 
-    private authService: AuthService,
-    private requestsService: RequestsService 
+    private requestsService: RequestsService,
+    private groupsService: GroupsService
   ) {}
 
   ngOnInit(): void {
@@ -52,22 +53,16 @@ export class InboxComponent implements OnInit {
     return this.roles.includes('superAdmin');
   }
 
-
-  
-
   //******************************Loading Methods******************************
   loadJoinRequests(): void {
     this.joinRequests = this.requestsService.getGroupJoinRequests();
   }
 
   loadReportedUsers(): void {
-    this.reportedUsers = this.requestsService.getReportedUsers();
+    this.reportRequests = this.requestsService.getReportRequests();
   }
 
-
-
-
-  //******************************Request Methods******************************
+  //******************************Group Request Methods******************************
   approveRequest(request: any): void {
     if (!request.username) {
       console.error('Username is undefined');
@@ -84,7 +79,7 @@ export class InboxComponent implements OnInit {
 
   denyRequest(request: any): void {
     if (!request.username) {
-      console.error('username is undefined');
+      console.error('Username is undefined');
       return;
     }
     const success = this.requestsService.rejectJoinRequest(request.username, request.groupName);
@@ -96,24 +91,51 @@ export class InboxComponent implements OnInit {
     }
   }
 
-  banReportedUser(user: any): void {
-    
+  //******************************Report Request Methods******************************
+  banReportedUser(reportedUser: any): void {
+    if (!reportedUser.reportedUsername) {
+      console.error('Username is undefined');
+      return;
+    }
+    const confirmed = window.confirm(`Are you sure you want to ban ${reportedUser.reportedUsername} from the group ${reportedUser.groupName}? This action cannot be undone.`);
+
+    if (confirmed) {
+      const success = this.groupsService.kickUserFromGroup(reportedUser.reportedUsername, reportedUser.groupName);
+  
+      if (success) {          
+        // Refresh the list of reported users after banning
+        this.reportRequests = this.reportRequests.filter(reportedUsername => reportedUsername !== reportedUsername);
+  
+        // Remove the report request after banning
+        this.removeReportedUserRequest(reportedUser);
+      } else {
+        alert(`Failed to ban ${reportedUser.reportedUsername} from the group.`);
+      }
+    }
   }
-
-  removeReportedUser(user: any): void {
-
+  
+  removeReportedUserRequest(user: any): void {
+    const groupName = user.groupName;
+    const requests = this.requestsService.getReportRequests();
+    const requestIndex = requests.findIndex(req => req.reportedUserId === user.userId && req.groupName === groupName);
+  
+    if (requestIndex !== -1) {
+      this.reportRequests = this.reportRequests.filter(reportedUsername => reportedUsername !== reportedUsername);
+      requests.splice(requestIndex, 1);  // Remove the specific report request
+      this.requestsService.saveReportRequests(requests);  // Save the updated list
+  
+    } else {
+      console.warn('Report request not found.');
+    }
   }
 
   approvePromotionRequest(request: any): void {
-
+    // Implementation for approving promotion requests
   }
 
   denyPromotionRequest(request: any): void {
-
+    // Implementation for denying promotion requests
   }
-
-
-
 
   //******************************UI Methods******************************
   setActiveTab(tab: string): void {
@@ -126,11 +148,7 @@ export class InboxComponent implements OnInit {
     }
   }
 
-
-
   //******************************Component Navigation******************************
-
-
   navigateToAccount(): void {
     this.router.navigate(['/account']);
   }

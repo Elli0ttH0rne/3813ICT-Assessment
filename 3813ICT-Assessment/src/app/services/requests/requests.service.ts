@@ -105,13 +105,15 @@ export class RequestsService {
 
 
   //******************************Reported User Methods******************************
-  getReportedUsers(): any[] {
-    return JSON.parse(localStorage.getItem('reportRequests') || '[]');
-  }
-
-  createReportRequest(reporterId: string, reportedUserId: string, reporterUsername: string, reportedUsername: string, reason: string): boolean {
+  createReportRequest(reporterUsername: string, reportedUsername: string, reason: string, groupName: string): boolean {
     const requests = this.getReportRequests();
-    requests.push({ reporterId, reportedUserId, reporterUsername, reportedUsername, reason, status: 'pending' });
+    requests.push({  
+      reporterUsername, 
+      reportedUsername, 
+      reason, 
+      groupName,
+      status: 'pending' 
+    });
     this.saveReportRequests(requests);
     return true;
   }
@@ -172,7 +174,7 @@ export class RequestsService {
   //******************************UI Methods******************************
   getRequestCount(): number {
     // Implement logic to return the actual count of requests
-    const count = this.getGroupJoinRequests().length + this.getReportedUsers().length;
+    const count = this.getGroupJoinRequests().length + this.getReportRequests().length;
 
     return count; // Example count
   }

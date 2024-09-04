@@ -81,6 +81,35 @@ export class ChannelComponent implements OnInit {
 
   
   //**************************Drop Down Menu Functions**************************
+  reportUser(reportedUsername: string): void {
+    const reportedUser = this.usersInGroup.find(user => user.username === reportedUsername);
+
+    if (reportedUsername === this.username) {
+      alert('You cannot report yourself.');
+      return;
+    }
+    
+    if (!reportedUser) {
+      alert('User not found.');
+      return;
+    }
+
+    const success = this.requestsService.createReportRequest(
+      this.username,                // reporterUsername
+      reportedUsername,             // reportedUsername
+      'Violation of group rules',   // Reason for reporting
+      this.groupName || ''          // Group name where the user was reported
+    );
+
+    if (success) {
+      alert('User reported successfully.');
+    } else {
+      alert('Failed to report user.');
+    }
+  }
+  
+  
+  
   kickUserFromGroup(username: string): void {
     // Check if the user attempting to kick is the same as the user being kicked
     if (username === this.username) {

@@ -33,8 +33,8 @@
                   Dropdown button
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <li><a class="dropdown-item">Report User to Admins</a></li>
-                    <li *ngIf="isCreator || isSuperAdmin"><a class="dropdown-item" (click)="kickUserFromGroup(user.username)">Remove user from Group</a></li>
+                  <li><a class="dropdown-item" (click)="reportUser(user.username)">Report User to Admins</a></li>
+                  <li *ngIf="isCreator || isSuperAdmin"><a class="dropdown-item" (click)="kickUserFromGroup(user.username)">Remove user from Group</a></li>
                     <li *ngIf="isCreator"><a class="dropdown-item">Remove user from group and report to Super Admin</a></li>
                     <li *ngIf="isSuperAdmin"><a class="dropdown-item" (click)="deleteUsersAccount(user.username)">Delete Users Account</a></li>
                     <li *ngIf="isSuperAdmin"><a class="dropdown-item" (click)="promoteToGroupAdmin(user.username)">Promote to Group Admin</a></li>
