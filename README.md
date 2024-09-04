@@ -33,9 +33,31 @@ Group data is managed within the `groups.service.ts` file. The `defaultGroups` a
 * `admins`: An array of objects containing information about each group admin, including `userId`, `username`, and `role` (either creator or admin).
 
 ### Request Data Structure
+Request data is managed within the `requests.service.ts` file. Initially, three empty arrays are established to handle different types of requests in the project:
+* `defaultGroupRequests`: Stores requests from users who wish to join a group they are not yet part of.
+* `defaultReportRequests`: Stores requests generated when a user reports another user.
+* `promotionRequests`: Stores requests created by group admins when they want to promote a user to group admin.
 
 
 ## Angular Architecture
+### Components
+The solution currently includes seven components that make up the entire frontend of the project. These components are:
+
+* `account`: This component allows users to view their username and email. It also provides two buttons: one for logging out and another for deleting their account.
+
+* `all-group-list`: Displays all existing groups, allowing users to request to join any group they are not already part of. These requests must be approved by a group admin.
+
+* `channel`: Displays the details of the selected channel within a group.
+
+* `inbox`: This component is visible only to group admins and super admins. Group admins can use it to view and manage pending group requests. Super admins have access to additional tabs: one for report requests, where they can see users who have been reported, and another for promotion requests, where they can manage requests to promote users to group admins.
+
+* `login`: Enables users to log in by entering their credentials, which are checked against the data stored in local storage to verify their validity.
+
+* `register`: Allows users to create an account by entering a unique username, email, and password.
+
+* `user-group`: This screen is displayed after a user logs in. It shows the groups that the user has joined. Group admins have additional options to create and delete groups and channels, but they can only modify groups they have created. Super admins have the same abilities but can modify any group without needing to be the creator.
+
+### Services
 
 
 ## REST API, Node Server Architecture and Server Side Routes
