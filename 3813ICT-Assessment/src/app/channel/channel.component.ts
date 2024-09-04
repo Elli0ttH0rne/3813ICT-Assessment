@@ -58,7 +58,7 @@ export class ChannelComponent implements OnInit {
 
     // Fetch request count
     if (this.isGroupAdminOrSuperAdmin()) {
-      this.requestCount = this.requestsService.getRequestCount(); 
+      this.requestCount = this.requestsService.getRequestCount(this.username); 
     }
 
     if (this.groupName) {
@@ -82,32 +82,49 @@ export class ChannelComponent implements OnInit {
   
   //**************************Drop Down Menu Functions**************************
   reportUser(reportedUsername: string): void {
-    const reportedUser = this.usersInGroup.find(user => user.username === reportedUsername);
-
+    // Check if the user is trying to report themselves
     if (reportedUsername === this.username) {
       alert('You cannot report yourself.');
       return;
     }
-    
+  
+    // Find the reported user in the group
+    const reportedUser = this.usersInGroup.find(user => user.username === reportedUsername);
+  
     if (!reportedUser) {
       alert('User not found.');
       return;
     }
-
+  
+    // Retrieve existing report requests
+    const existingReports = this.requestsService.getReportRequests();
+  
+    // Check if a report from this user about this reported user and group already exists
+    const duplicateReport = existingReports.some(req =>
+      req.reporterUsername === this.username &&
+      req.reportedUsername === reportedUsername &&
+      req.groupName === this.groupName
+    );
+  
+    if (duplicateReport) {
+      alert('You have already reported this user.');
+      return;
+    }
+  
+    // Create a new report request
     const success = this.requestsService.createReportRequest(
       this.username,                // reporterUsername
       reportedUsername,             // reportedUsername
       'Violation of group rules',   // Reason for reporting
       this.groupName || ''          // Group name where the user was reported
     );
-
+  
     if (success) {
       alert('User reported successfully.');
     } else {
       alert('Failed to report user.');
     }
   }
-  
   
   
   kickUserFromGroup(username: string): void {
@@ -142,6 +159,11 @@ export class ChannelComponent implements OnInit {
         alert('Failed to delete user account.');
       }
     }
+  }
+
+  kickUserFromGroupAndReport(username: string): void {
+    this.reportUser(username);
+    this.kickUserFromGroup(username);
   }
 
    promoteToGroupAdmin(username: string): void {

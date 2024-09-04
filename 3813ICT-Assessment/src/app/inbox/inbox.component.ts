@@ -36,7 +36,7 @@ export class InboxComponent implements OnInit {
 
     if (this.isGroupAdminOrSuperAdmin()) {
       this.loadJoinRequests();
-      this.requestCount = this.requestsService.getRequestCount(); 
+      this.requestCount = this.requestsService.getRequestCount(this.username); 
     }
     
     if (this.isSuperAdmin()) {

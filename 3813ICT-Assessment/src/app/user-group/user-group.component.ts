@@ -48,7 +48,7 @@ export class UserGroupComponent implements OnInit {
 
     // Fetch request count
     if (this.isGroupAdminOrSuperAdmin()) {
-      this.requestCount = this.requestsService.getRequestCount(); 
+      this.requestCount = this.requestsService.getRequestCount(this.username); 
     }
 
     if (this.roles.includes('superAdmin')) {

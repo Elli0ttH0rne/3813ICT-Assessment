@@ -35,7 +35,7 @@ export class AccountComponent implements OnInit {
     this.userId = storedUser.userId || '';
 
     if (this.isGroupAdminOrSuperAdmin()) {
-      this.requestCount = this.requestsService.getRequestCount(); 
+      this.requestCount = this.requestsService.getRequestCount(this.username); 
     }
   }
   //******************************Checks******************************

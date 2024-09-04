@@ -172,10 +172,23 @@ export class RequestsService {
   
 
   //******************************UI Methods******************************
-  getRequestCount(): number {
-    // Implement logic to return the actual count of requests
-    const count = this.getGroupJoinRequests().length + this.getReportRequests().length;
+  getRequestCount(currentUsername: string): number {
+    // Retrieve the user's role from UsersService or other source
+    const users = this.usersService.getValidUsers();
+    const currentUser = users.find(user => user.username === currentUsername);
+  
+    const isGroupAdmin = currentUser.roles.includes('groupAdmin') 
+    const isSuperAdmin = currentUser.roles.includes('superAdmin');
+  
+    if (isGroupAdmin && !isSuperAdmin) {
+      return this.getGroupJoinRequests().length;
+    } 
+    
+    if(isSuperAdmin) {
+      return this.getGroupJoinRequests().length + this.getReportRequests().length;
+    }
 
-    return count; // Example count
+    return 0;
   }
+  
 }

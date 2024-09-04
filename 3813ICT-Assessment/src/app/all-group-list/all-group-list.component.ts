@@ -38,7 +38,7 @@ export class AllGroupListComponent implements OnInit {
     this.roles = storedUser.roles || [];
 
     if (this.isGroupAdminOrSuperAdmin()) {
-      this.requestCount = this.requestsService.getRequestCount(); 
+      this.requestCount = this.requestsService.getRequestCount(this.username); 
     }
   }
   
