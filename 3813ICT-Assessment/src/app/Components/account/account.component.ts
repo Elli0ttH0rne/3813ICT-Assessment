@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { RequestsService } from '../services/requests/requests.service';
-import { UsersService } from '../services/users/users.service';
+import { RequestsService } from '../../services/requests/requests.service';
+import { UsersService } from '../../services/users/users.service';
 
 @Component({
   selector: 'app-account',

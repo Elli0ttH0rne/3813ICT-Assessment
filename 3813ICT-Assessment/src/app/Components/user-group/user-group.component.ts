@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../services/auth/auth.service';
+import { AuthService } from '../../services/auth/auth.service';
 import { FormsModule } from '@angular/forms';
-import { RequestsService } from '../services/requests/requests.service';
-import { GroupsService } from '../services/groups/groups.service';
+import { RequestsService } from '../../services/requests/requests.service';
+import { GroupsService } from '../../services/groups/groups.service';
 
 
 @Component({

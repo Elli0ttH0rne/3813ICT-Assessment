@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { RequestsService } from '../services/requests/requests.service';
-import { GroupsService } from '../services/groups/groups.service';
+import { RequestsService } from '../../services/requests/requests.service';
+import { GroupsService } from '../../services/groups/groups.service';
 
 
 
