@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { RequestsService } from '../services/requests/requests.service';
 import { GroupsService } from '../services/groups/groups.service';
+import { AuthService } from '../services/auth/auth.service';
 
 @Component({
   selector: 'app-inbox',
@@ -15,18 +16,19 @@ import { GroupsService } from '../services/groups/groups.service';
 export class InboxComponent implements OnInit {
   username: string = '';
   roles: string[] = [];
-  activeTab: string = 'joinRequests'; // Default active tab
-  joinRequests: any[] = []; // Store join requests
-  reportRequests: any[] = []; // Store reported users
-  promotionRequests: any[] = []; // Store promotion requests
-  requestCount: number = 0; // New property for request count
-  usersInGroup: any[] = []; // Store users in the group
-  selectedGroupName: string = ''; // Store the selected group's name
+  activeTab: string = 'joinRequests'; 
+  joinRequests: any[] = []; 
+  reportRequests: any[] = []; 
+  promotionRequests: any[] = []; 
+  requestCount: number = 0; 
+  groupAdmins: { username: string; role: string }[] = [];
+
 
   constructor(
     private router: Router, 
     private requestsService: RequestsService,
-    private groupsService: GroupsService
+    private groupsService: GroupsService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -34,6 +36,11 @@ export class InboxComponent implements OnInit {
     this.username = storedUser.username;
     this.roles = storedUser.roles;
 
+    console.log(this.joinRequests.length);
+    console.log(this.reportRequests.length);
+    console.log(this.promotionRequests.length);
+
+    // Load requests based on roles and active tab
     if (this.isGroupAdminOrSuperAdmin()) {
       this.loadJoinRequests();
       this.requestCount = this.requestsService.getRequestCount(this.username); 
@@ -60,6 +67,10 @@ export class InboxComponent implements OnInit {
 
   loadReportedUsers(): void {
     this.reportRequests = this.requestsService.getReportRequests();
+  }
+
+  loadPromotionRequests(): void {
+    this.promotionRequests = this.requestsService.getPromotionRequests();
   }
 
   //******************************Group Request Methods******************************
@@ -104,7 +115,7 @@ export class InboxComponent implements OnInit {
   
       if (success) {          
         // Refresh the list of reported users after banning
-        this.reportRequests = this.reportRequests.filter(reportedUsername => reportedUsername !== reportedUsername);
+        this.reportRequests = this.reportRequests.filter(user => user !== reportedUser);
   
         // Remove the report request after banning
         this.removeReportedUserRequest(reportedUser);
@@ -116,26 +127,57 @@ export class InboxComponent implements OnInit {
   
   removeReportedUserRequest(user: any): void {
     const groupName = user.groupName;
-    const requests = this.requestsService.getReportRequests();
-    const requestIndex = requests.findIndex(req => req.reportedUserId === user.userId && req.groupName === groupName);
+    let requests = this.requestsService.getReportRequests();
+    const requestIndex = requests.findIndex(req => req.reportedUsername === user.reportedUsername && req.groupName === groupName);
   
     if (requestIndex !== -1) {
-      this.reportRequests = this.reportRequests.filter(reportedUsername => reportedUsername !== reportedUsername);
       requests.splice(requestIndex, 1);  // Remove the specific report request
       this.requestsService.saveReportRequests(requests);  // Save the updated list
-  
+
+      // Refresh local reportRequests
+      this.reportRequests = this.reportRequests.filter(reportedUser => reportedUser !== user);
     } else {
       console.warn('Report request not found.');
     }
   }
 
-  approvePromotionRequest(request: any): void {
-    // Implementation for approving promotion requests
+  approvePromotionRequest(promotionRequest: any): void {
+    if (!promotionRequest || !promotionRequest.promotionUser) {
+      console.error('Invalid promotion request');
+      return;
+    }
+  
+    const confirmed = window.confirm('Are you sure you want to promote this user to Group Admin?');
+    if (confirmed) {
+      const success = this.authService.promoteToGroupAdmin(promotionRequest.promotionUser);
+      if (success) {
+        alert('User promoted to Group Admin successfully.');
+  
+        // Remove the approved request from the list
+        this.promotionRequests = this.promotionRequests.filter(req => req !== promotionRequest);
+      } else {
+        alert('Failed to promote user.');
+      }
+    }
   }
+  
 
-  denyPromotionRequest(request: any): void {
-    // Implementation for denying promotion requests
+  denyPromotionRequest(promotionRequest: any): void {
+    if (!promotionRequest || !promotionRequest.promotionUser) {
+      console.error('Invalid promotion request');
+      return;
+    }
+  
+    const confirmed = window.confirm('Are you sure you want to deny this promotion request?');
+    if (confirmed) {
+      // Optionally, handle any backend operations or logic needed to deny the request
+  
+      // Remove the denied request from the list
+      this.promotionRequests = this.promotionRequests.filter(req => req !== promotionRequest);
+      alert('Promotion request denied.');
+    }
   }
+  
 
   //******************************UI Methods******************************
   setActiveTab(tab: string): void {
@@ -145,6 +187,8 @@ export class InboxComponent implements OnInit {
       this.loadJoinRequests();
     } else if (tab === 'reportedUsers' && this.isSuperAdmin()) {
       this.loadReportedUsers();
+    } else if (tab === 'promotionRequests' && this.isSuperAdmin()) {
+      this.loadPromotionRequests();
     }
   }
 

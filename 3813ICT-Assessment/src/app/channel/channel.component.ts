@@ -32,6 +32,7 @@ export class ChannelComponent implements OnInit {
   // Flags to check user permissions
   isCreator: boolean = false;
   isSuperAdmin: boolean = false;
+  isGroupAdmin: boolean = false;
   showUserLists: boolean = false;  // New property to control the visibility of user lists
 
   constructor(
@@ -66,6 +67,7 @@ export class ChannelComponent implements OnInit {
       this.usersInGroup = this.groupsService.getUsersInGroup(this.groupName);
       this.groupAdmins = this.groupsService.getGroupAdmins(this.groupName).concat(this.authService.getSuperAdmins());
       this.groupCreator = this.groupsService.getGroupCreator(this.groupName);
+      this.isGroupAdmin = this.roles.includes('groupAdmin')
 
       // Check if the current user is the group creator or a super admin
       this.isCreator = this.username === this.groupCreator || this.isSuperAdmin;
@@ -166,7 +168,38 @@ export class ChannelComponent implements OnInit {
     this.kickUserFromGroup(username);
   }
 
-   promoteToGroupAdmin(username: string): void {
+  requestPromotionToGroupAdmin(username: string): void {
+    const confirmed = window.confirm('Are you sure you want to request this user to be promoted to Group Admin?');
+    if (confirmed) {
+      // Check if the user is trying to promote themselves
+      if (username === this.username) {
+        alert('You cannot request to promote yourself.');
+        return;
+      }
+    
+      // Find the user to be promoted in the group
+      const userToPromote = this.usersInGroup.find(user => user.username === username);
+    
+      if (!userToPromote) {
+        alert('User not found.');
+        return;
+      }
+    
+      // Create a new promotion request
+      const success = this.requestsService.createPromotionRequest(
+        this.username,                // requesterUsername
+        username,                     // targetUsername
+      );
+    
+      if (success) {
+        alert('Promotion request submitted successfully.');
+      } else {
+        alert('Failed to submit promotion request.');
+      }
+    }
+  }
+
+  promoteToGroupAdmin(username: string): void {
     const confirmed = window.confirm('Are you sure you want to promote this user to Group Admin?');
     if (confirmed) {
       const success = this.authService.promoteToGroupAdmin(username);
@@ -193,8 +226,6 @@ export class ChannelComponent implements OnInit {
       }
     }
   }
-
-
 
 
   //******************************Button Methods******************************

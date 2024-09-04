@@ -9,6 +9,7 @@ export class RequestsService {
 
   private defaultGroupJoinRequests = [];
   private defaultReportRequests = [];
+  private promotionRequests = [];
 
   constructor(
     private usersService: UsersService,
@@ -18,6 +19,7 @@ export class RequestsService {
   }
 
   private initializeRequests() {
+    console.log('Initializing requests...');
     const groupJoinRequests = localStorage.getItem('groupJoinRequests');
     if (!groupJoinRequests) {
       localStorage.setItem('groupJoinRequests', JSON.stringify(this.defaultGroupJoinRequests));
@@ -26,7 +28,12 @@ export class RequestsService {
     if (!reportRequests) {
       localStorage.setItem('reportRequests', JSON.stringify(this.defaultReportRequests));
     }
+    const promotionRequests = localStorage.getItem('promotionRequests');
+    if (!promotionRequests) {
+      localStorage.setItem('promotionRequests', JSON.stringify(this.promotionRequests));
+    }
   }
+  
 
 
   //******************************Join Group Request Methods******************************
@@ -140,6 +147,43 @@ export class RequestsService {
     return JSON.parse(localStorage.getItem('reportRequests') || '[]');
   }
 
+  //******************************Group Admin Promotion Requests Methods******************************
+  createPromotionRequest(requestedAdmin: string, promotionUser: string): boolean {
+    const requests = this.getPromotionRequests();
+    console.log('Before adding request:', requests);
+    requests.push({  
+      requestedAdmin, 
+      promotionUser, 
+      status: 'pending' 
+    });
+    this.savePromotionRequests(requests);
+    console.log('After adding request:', this.getPromotionRequests());
+    return true;
+  }
+  
+  resolvePromotionRequest(requestedAdmin: string, promotionUser: string): boolean {
+    const requests = this.getPromotionRequests();
+    const requestIndex = requests.findIndex(req => req.requestedAdmin === requestedAdmin && req.promotionUser === promotionUser);
+  
+    if (requestIndex === -1) {
+      return false;
+    }
+  
+    requests[requestIndex].status = 'resolved';
+    this.savePromotionRequests(requests);
+    return true;
+  }
+  
+ 
+  savePromotionRequests(requests: any[]) {
+    localStorage.setItem('promotionRequests', JSON.stringify(requests));
+  }
+
+  getPromotionRequests() {
+    const requests = JSON.parse(localStorage.getItem('promotionRequests') || '[]');
+    return requests;
+  }
+  
 
   //******************************Pending Requests******************************
   removePendingRequests(username: string): boolean {
@@ -185,7 +229,7 @@ export class RequestsService {
     } 
     
     if(isSuperAdmin) {
-      return this.getGroupJoinRequests().length + this.getReportRequests().length;
+      return this.getGroupJoinRequests().length + this.getReportRequests().length + this.getPromotionRequests().length;
     }
 
     return 0;
