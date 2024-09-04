@@ -5,7 +5,7 @@
 ### Repository Organization
 
 <div style="border: 1px solid #000; padding: 10px; margin: 10px;">
-  The repository contains all necessary files to run the project, excluding node modules. Within the `src` folder, there is a crucial file named `main.ts` located in the `app` directory. This file handles the routing and paths of the project. The `app` folder also includes two key subdirectories: `components` and `services`. The `components` directory holds all Angular components required for the frontend, while the `services` directory contains files related to the backend functionality.
+  The repository contains all necessary files to run the project, excluding node modules. Within the `src` folder, there is a crucial file named <strong>main.ts</strong> located in the <strong>app</strong> directory. This file handles the routing and paths of the project. The <strong>app</strong> folder also includes two key subdirectories: <strong>components</strong> and <strong>services</strong>. The <strong>components</strong> directory holds all Angular components required for the frontend, while the <strong>services</strong> directory contains files related to the backend functionality.
 </div>
 
 ### Git Workflow
@@ -21,6 +21,7 @@
 <div style="border: 1px solid #000; padding: 10px; margin: 10px;">
   I made it a practice to commit changes to the branch I was working on whenever a feature or function was functional or nearly complete. This approach ensured that I always had an up-to-date cloud version of my current work, safeguarding against potential issues with my local version.
 </div>
+
 
 
 
