@@ -66,9 +66,12 @@ Within this project, four services were created to manage data and provide metho
 
 * `requests.service`.ts: This service holds the arrays for different types of requests, such as group join requests, report requests, and promotion requests. It also includes methods for creating, approving, rejecting, and deleting these requests.
 
-* users.service.ts`: This service handles methods related to retrieving user information, as well as creating and deleting users.
+* `users.service.ts`: This service handles methods related to retrieving user information, as well as creating and deleting users.
 
 ## REST API, Node Server Architecture and Server Side Routes
 Unfortunetly my solution doesn't utilise the REST API, Node Server or any Server Side Routes. My solution has it's data stored inside the browsers local storage on launch and utilisies services to modify and retrieve the data. I realised too late that the solution required these components and was unable to make any major modifications in the remaining time.
 
 ## How data was changed and how the angular components were updated
+To effectively manage and update the data within the application, I developed specific methods within the relevant services. These methods were responsible for modifying the stored data, ensuring that any changes were reflected throughout the application.
+
+Whenever a user action required data modification—such as updating user roles, adding a new group, or processing a request—these methods would first perform the necessary changes to the data stored in local storage. After updating the data, the methods would then trigger a refresh of the Angular components that display this data. This ensured that the user interface remained consistent with the current state of the data.
