@@ -4,17 +4,14 @@
 
 ### Repository Organization
 
-<div style="border: 1px solid #000; padding: 10px; margin: 10px;">
-  The repository contains all necessary files to run the project, excluding node modules. Within the `src` folder, there is a crucial file named <strong>main.ts</strong> located in the <strong>app</strong> directory. This file handles the routing and paths of the project. The <strong>app</strong> folder also includes two key subdirectories: <strong>components</strong> and <strong>services</strong>. The <strong>components</strong> directory holds all Angular components required for the frontend, while the <strong>services</strong> directory contains files related to the backend functionality.
-</div>
+  The repository contains all necessary files to run the project, excluding node modules. Within the `src` folder, there is a crucial file named `main.ts` located in the `app` directory. This file handles the routing and paths of the project. The `app` folder also includes two key subdirectories: `components` and `services`. The `components` directory holds all Angular components required for the frontend, while the `services` directory contains files related to the backend functionality.
+
 
 ### Git Workflow
 
 #### Branching Strategy
+To maintain a stable main version of the project, I utilized branching extensively. When implementing a new feature, I created a dedicated branch with a descriptive name. Upon completing the feature, I merged the branch back into the main branch. Direct work on the main branch was rare and only done when necessary.
 
-<div style="border: 1px solid #000; padding: 10px; margin: 10px;">
-  To maintain a stable main version of the project, I utilized branching extensively. When implementing a new feature, I created a dedicated branch with a descriptive name. Upon completing the feature, I merged the branch back into the main branch. Direct work on the main branch was rare and only done when necessary.
-</div>
 
 #### Commit Frequency
 
