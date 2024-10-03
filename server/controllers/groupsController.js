@@ -25,7 +25,7 @@ const getGroupDetails = (req, res) => {
     const group = groups.find(g => g.name === groupName);
 
     if (!group) {
-      return res.status(404).json({ error: 'Group not found.' });
+      return res.status(404).json({ error: `Group with name "${groupName}" not found.` });
     }
 
     res.json(group);
@@ -35,6 +35,10 @@ const getGroupDetails = (req, res) => {
 // Create a new group
 const createGroup = (req, res) => {
   const { groupName, creatorUsername, creatorId } = req.body;
+
+  if (!groupName || !creatorUsername || !creatorId) {
+    return res.status(400).json({ error: 'Group name, creator username, and creator ID are required.' });
+  }
 
   readFile(groupsFilePath, (err, groups) => {
     if (err) {
@@ -60,6 +64,24 @@ const createGroup = (req, res) => {
       }
       res.status(201).json({ message: 'New group created successfully.' });
     });
+  });
+};
+
+// Get channels for a specific group
+const getGroupChannels = (req, res) => {
+  const { groupName } = req.params;
+
+  readFile(groupsFilePath, (err, groups) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to read groups data.' });
+    }
+
+    const group = groups.find(g => g.name === groupName);
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found.' });
+    }
+
+    res.json(group.channels); // Assuming channels are stored in an array in the group object
   });
 };
 
@@ -98,5 +120,6 @@ module.exports = {
   getAllGroups,
   getGroupDetails,
   createGroup,
+  getGroupChannels,
   deleteGroup,
 };

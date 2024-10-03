@@ -3,7 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const groupsRoutes = require('./routes/groupsRoutes');
 const requestsRoutes = require('./routes/requestsRoutes');
-const usersRoutes = require('./routes/usersRoutes'); // Import user routes
+const usersRoutes = require('./routes/usersRoutes');
 
 const app = express();
 const PORT = 3000;
