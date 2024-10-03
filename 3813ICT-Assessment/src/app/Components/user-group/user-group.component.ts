@@ -5,8 +5,8 @@ import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { FormsModule } from '@angular/forms';
 import { RequestsService } from '../../services/requests/requests.service';
-import { GroupsService } from '../../services/groups/groups.service';
-
+import { GroupsService, Channel } from '../../services/groups/groups.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-user-group',
@@ -17,7 +17,7 @@ import { GroupsService } from '../../services/groups/groups.service';
 })
 export class UserGroupComponent implements OnInit {
   groups: string[] = [];
-  channels: { [group: string]: { name: string; description: string; }[] } = {};
+  channels: { [group: string]: Channel[] } = {};
   badgeClasses = [
     'bg-primary', 'bg-secondary', 'bg-success', 'bg-danger', 'bg-warning text-dark',
   ];
@@ -46,30 +46,66 @@ export class UserGroupComponent implements OnInit {
     this.username = storedUser.username;
     this.roles = storedUser.roles;
 
+    // Load request count
     if (this.isGroupAdminOrSuperAdmin()) {
-      this.requestCount = this.requestsService.getRequestCount(this.username); 
+      this.requestsService.getRequestCount().subscribe({
+        next: (count: number) => {
+          this.requestCount = count;
+        },
+        error: (err) => {
+          console.error('Failed to get request count:', err);
+        }
+      });
     }
 
+    // Fetch groups
     if (this.roles.includes('superAdmin')) {
-      const allGroups = this.groupsService.getAllGroups();
-      localStorage.setItem('allGroups', JSON.stringify(allGroups));
-      this.groups = allGroups.map(group => group.name);
-      this.groups.forEach(group => {
-        this.channels[group] = this.groupsService.getGroupChannels(group);
-        this.groupCreators[group] = this.groupsService.getGroupCreator(group);
+      this.groupsService.getAllGroups().subscribe({
+        next: (allGroups) => {
+          this.groups = allGroups.map(group => group.name);
+          this.openGroups = new Array(this.groups.length).fill(false);
+
+          // Fetch channels and group creators for each group
+          this.groups.forEach(group => {
+            forkJoin([
+              this.groupsService.getGroupChannels(group),
+              this.groupsService.getGroupCreator(group)
+            ]).subscribe({
+              next: ([channels, creator]) => {
+                this.channels[group] = channels;
+                this.groupCreators[group] = creator;
+              },
+              error: (error) => {
+                console.error(`Failed to load channels or creator for group "${group}":`, error);
+              }
+            });
+          });
+        },
+        error: (error) => {
+          console.error('Failed to load all groups:', error);
+        }
       });
     } else {
       this.groups = storedUser.groups;
       this.openGroups = new Array(this.groups.length).fill(false);
+
+      // Fetch channels and group creators for each group the user is part of
       this.groups.forEach(group => {
-        this.channels[group] = this.groupsService.getGroupChannels(group);
-        this.groupCreators[group] = this.groupsService.getGroupCreator(group);
+        forkJoin([
+          this.groupsService.getGroupChannels(group),
+          this.groupsService.getGroupCreator(group)
+        ]).subscribe({
+          next: ([channels, creator]) => {
+            this.channels[group] = channels;
+            this.groupCreators[group] = creator;
+          },
+          error: (error) => {
+            console.error(`Failed to load channels or creator for group "${group}":`, error);
+          }
+        });
       });
     }
   }
-
-
-  
 
   //******************************Checks******************************
   isGroupAdminOrSuperAdmin(): boolean {
@@ -79,7 +115,7 @@ export class UserGroupComponent implements OnInit {
   isUserOrGroupAdmin(): boolean {
     return this.roles.includes('user') || this.roles.includes('groupAdmin');
   }
-  
+
   isSuperAdmin(): boolean {
     return this.roles.includes('superAdmin');
   }
@@ -95,9 +131,6 @@ export class UserGroupComponent implements OnInit {
   isGroupCreator(group: string): boolean {
     return this.username === this.groupCreators[group];
   }
-
-
-
 
   //******************************UI Methods******************************
   getBadgeClass(index: number): string {
@@ -116,22 +149,22 @@ export class UserGroupComponent implements OnInit {
     this.showCreateChannelForGroup = group;
   }
 
-
-  
-
   //******************************Group/Channel Methods******************************
   deleteGroup(group: string): void {
     const confirmed = window.confirm('Are you sure you want to delete this group? This action cannot be undone.');
     if (confirmed) {
-      const success = this.groupsService.deleteGroup(group, this.username, this.roles.includes('superAdmin'));
-      if (success) {
-        alert('Group deleted successfully.');
-        this.groups = this.groups.filter(g => g !== group);
-        delete this.channels[group];
-        this.requestsService.removePendingRequestsByGroup(group);
-      } else {
-        alert('Failed to delete group.');
-      }
+      this.groupsService.deleteGroup(group, this.username, this.roles.includes('superAdmin')).subscribe({
+        next: () => {
+          alert('Group deleted successfully.');
+          this.groups = this.groups.filter(g => g !== group);
+          delete this.channels[group];
+          this.requestsService.removePendingRequestsByGroup(group).subscribe(); // Handle request deletion if needed
+        },
+        error: (error) => {
+          console.error('Failed to delete group:', error);
+          alert('Failed to delete group.');
+        }
+      });
     }
   }
 
@@ -139,26 +172,28 @@ export class UserGroupComponent implements OnInit {
     if (this.newGroupName.trim()) {
       const isSuperAdmin = this.roles.includes('superAdmin');
       
-      // Create the group using the `groupsService` and check if it was successful
-      const success = this.groupsService.createGroup(this.newGroupName, this.username, isSuperAdmin);
+      this.groupsService.createGroup(this.newGroupName, this.username, this.userID).subscribe({
+        next: () => {
+          this.groups.push(this.newGroupName);
+          this.channels[this.newGroupName] = [];
+          this.groupCreators[this.newGroupName] = this.username;
   
-      if (success) {
-        this.groups.push(this.newGroupName);
-        this.channels[this.newGroupName] = [];
-        this.groupCreators[this.newGroupName] = this.username; 
-  
-        // Reset the form and hide it
-        this.showCreateGroup = false;
-        this.newGroupName = '';
-  
-        this.openGroups.push(false);
-      } else {
-        alert('Failed to create group.');
-      }
+          // Reset the form and hide it
+          this.showCreateGroup = false;
+          this.newGroupName = '';
+          this.openGroups.push(false);
+        },
+        error: (error) => {
+          console.error('Failed to create group:', error);
+          alert('Failed to create group.');
+        }
+      });
     } else {
       alert('Please enter a group name.');
     }
   }
+  
+
 
   cancelCreateGroup(): void {
     this.showCreateGroup = false;
@@ -169,57 +204,58 @@ export class UserGroupComponent implements OnInit {
     if (this.newChannelName.trim() && this.newChannelDescription.trim()) {
       const currentUsername = this.username;
       const isSuperAdmin = this.roles.includes('superAdmin');
-  
-      const success = this.groupsService.createChannel(
-        group, 
-        this.newChannelName, 
-        this.newChannelDescription, 
-        currentUsername, 
+
+      this.groupsService.createChannel(
+        group,
+        this.newChannelName,
+        this.newChannelDescription,
+        currentUsername,
         isSuperAdmin
-      );
-  
-      if (success) {
-        this.channels[group].push({ name: this.newChannelName, description: this.newChannelDescription });
-        this.showCreateChannelForGroup = null;
-        this.newChannelName = '';
-        this.newChannelDescription = '';
-      } else {
-        alert('Failed to create channel.');
-      }
+      ).subscribe({
+        next: () => {
+          this.channels[group].push({ name: this.newChannelName, description: this.newChannelDescription });
+          this.showCreateChannelForGroup = null;
+          this.newChannelName = '';
+          this.newChannelDescription = '';
+        },
+        error: (error) => {
+          console.error('Failed to create channel:', error);
+          alert('Failed to create channel.');
+        }
+      });
     } else {
       alert('Please enter both channel name and description.');
     }
   }
-  
+
   leaveGroup(groupName: string): void {
     const confirmed = window.confirm(`Are you sure you want to leave the group "${groupName}"?`);
     if (confirmed) {
-      const success = this.groupsService.leaveGroup(this.username, groupName);
-      if (success) {
-        // Remove the group from the local groups array and delete related channels
-        this.groups = this.groups.filter(g => g !== groupName);
-        delete this.channels[groupName];
-  
-        // Update local storage to reflect the removed group
-        const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-        storedUser.groups = this.groups; // Update the groups array in local storage
-        localStorage.setItem('currentUser', JSON.stringify(storedUser));
-  
-        alert(`You have left the group "${groupName}".`);
-      } else {
-        alert('Failed to leave group.');
-      }
+      this.groupsService.leaveGroup(groupName, this.username).subscribe({
+        next: () => {
+          this.groups = this.groups.filter(g => g !== groupName);
+          delete this.channels[groupName];
+
+          // Update local storage to reflect the removed group
+          const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+          storedUser.groups = this.groups;
+          localStorage.setItem('currentUser', JSON.stringify(storedUser));
+
+          alert(`You have left the group "${groupName}".`);
+        },
+        error: (error) => {
+          console.error('Failed to leave group:', error);
+          alert('Failed to leave group.');
+        }
+      });
     }
   }
-  
+
   cancelCreateChannel(): void {
     this.showCreateChannelForGroup = null;
     this.newChannelName = '';
     this.newChannelDescription = '';
   }
-
-
-
 
   //******************************Component Navigation******************************
   navigateToAccount(): void {

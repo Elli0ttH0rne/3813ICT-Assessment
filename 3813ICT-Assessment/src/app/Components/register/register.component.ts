@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { UsersService } from '../../services/users/users.service';
-
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-register',
@@ -21,46 +21,55 @@ export class RegisterComponent {
   constructor(
     private router: Router,
     private usersService: UsersService,
-   ) {}
+  ) {}
 
   handleSubmit() {
-    if (this.usersService.getValidUsers().some(user => user.username === this.username)) {
-      alert('Username already exists');
-      return;
-    }
+    this.usersService.getValidUsers().subscribe({
+      next: (users) => {
+        // Check if the username already exists
+        if (users.some(user => user.username === this.username)) {
+          alert('Username already exists');
+          return;
+        }
 
-    const newUserId = this.generateUserId();
+        // Check if any fields are empty
+        if (this.username === '' || this.email === '' || this.password === '') {
+          alert('Please fill in all fields');
+          return;
+        }
 
-    const newUser = {
-      userId: newUserId,
-      username: this.username,
-      email: this.email,
-      password: this.password,
-      roles: ['user'],
-      groups: []
-    };
+        // Generate a new user ID
+        const newUserId = this.generateUserId(users); // Pass users to the function
 
-    if(this.username == '' || this.email == '' || this.password == ''){
-      alert('Please fill in all fields');
-      return;
-    }
+        const newUser = {
+          userId: newUserId,
+          username: this.username,
+          email: this.email,
+          password: this.password,
+          roles: ['user'],
+          groups: []
+        };
 
-    this.usersService.addUser(newUser);
+        this.usersService.addUser(newUser);
 
-    localStorage.setItem('currentUser', JSON.stringify({
-      userId: newUser.userId,
-      username: newUser.username,
-      email: newUser.email,
-      roles: newUser.roles,
-      valid: true
-    }));
+        localStorage.setItem('currentUser', JSON.stringify({
+          userId: newUser.userId,
+          username: newUser.username,
+          email: newUser.email,
+          roles: newUser.roles,
+          valid: true
+        }));
 
-    this.router.navigate(['/user-group']);
+        this.router.navigate(['/user-group']);
+      },
+      error: (err) => {
+        console.error('Failed to load users:', err);
+      }
+    });
   }
 
   // Generate a unique userId (e.g., 'u007')
-  private generateUserId(): string {
-    const users = this.usersService.getValidUsers();
+  private generateUserId(users: any[]): string {
     const lastUserId = users.length ? users[users.length - 1].userId : 'u000';
     const lastIdNumber = parseInt(lastUserId.substring(1));
     const newUserId = 'u' + (lastIdNumber + 1).toString().padStart(3, '0');

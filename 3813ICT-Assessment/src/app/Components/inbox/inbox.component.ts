@@ -23,7 +23,6 @@ export class InboxComponent implements OnInit {
   requestCount: number = 0; 
   groupAdmins: { username: string; role: string }[] = [];
 
-
   constructor(
     private router: Router, 
     private requestsService: RequestsService,
@@ -39,9 +38,16 @@ export class InboxComponent implements OnInit {
     // Load requests based on roles and active tab
     if (this.isGroupAdminOrSuperAdmin()) {
       this.loadJoinRequests();
-      this.requestCount = this.requestsService.getRequestCount(this.username); 
+      this.requestsService.getRequestCount().subscribe({
+        next: (count: number) => {
+          this.requestCount = count;
+        },
+        error: (err) => {
+          console.error('Failed to get request count:', err);
+        }
+      });
     }
-    
+
     if (this.isSuperAdmin()) {
       this.loadReportedUsers();
     }
@@ -58,15 +64,36 @@ export class InboxComponent implements OnInit {
 
   //******************************Loading Methods******************************
   loadJoinRequests(): void {
-    this.joinRequests = this.requestsService.getGroupJoinRequests();
+    this.requestsService.getGroupJoinRequests().subscribe({
+      next: (requests) => {
+        this.joinRequests = requests;
+      },
+      error: (err) => {
+        console.error('Failed to load join requests:', err);
+      }
+    });
   }
 
   loadReportedUsers(): void {
-    this.reportRequests = this.requestsService.getReportRequests();
+    this.requestsService.getReportRequests().subscribe({
+      next: (requests) => {
+        this.reportRequests = requests;
+      },
+      error: (err) => {
+        console.error('Failed to load report requests:', err);
+      }
+    });
   }
 
   loadPromotionRequests(): void {
-    this.promotionRequests = this.requestsService.getPromotionRequests();
+    this.requestsService.getPromotionRequests().subscribe({
+      next: (requests) => {
+        this.promotionRequests = requests;
+      },
+      error: (err) => {
+        console.error('Failed to load promotion requests:', err);
+      }
+    });
   }
 
   //******************************Group Request Methods******************************
@@ -75,13 +102,15 @@ export class InboxComponent implements OnInit {
       console.error('Username is undefined');
       return;
     }
-    const success = this.requestsService.approveJoinRequest(request.username, request.groupName);
-    if (success) {
-      this.joinRequests = this.joinRequests.filter(req => req !== request);
-      console.log(`Approved request from ${request.username}`);
-    } else {
-      console.error(`Failed to approve request from ${request.username}`);
-    }
+    this.requestsService.approveJoinRequest(request).subscribe({
+      next: () => {
+        this.joinRequests = this.joinRequests.filter(req => req !== request);
+        console.log(`Approved request from ${request.username}`);
+      },
+      error: (err) => {
+        console.error(`Failed to approve request from ${request.username}`, err);
+      }
+    });
   }
 
   denyRequest(request: any): void {
@@ -89,13 +118,15 @@ export class InboxComponent implements OnInit {
       console.error('Username is undefined');
       return;
     }
-    const success = this.requestsService.rejectJoinRequest(request.username, request.groupName);
-    if (success) {
-      this.joinRequests = this.joinRequests.filter(req => req !== request);
-      console.log(`Denied request from ${request.username}`);
-    } else {
-      console.error(`Failed to deny request from ${request.username}`);
-    }
+    this.requestsService.rejectJoinRequest(request).subscribe({
+      next: () => {
+        this.joinRequests = this.joinRequests.filter(req => req !== request);
+        console.log(`Denied request from ${request.username}`);
+      },
+      error: (err) => {
+        console.error(`Failed to deny request from ${request.username}`, err);
+      }
+    });
   }
 
   //******************************Report Request Methods******************************
@@ -107,32 +138,37 @@ export class InboxComponent implements OnInit {
     const confirmed = window.confirm(`Are you sure you want to ban ${reportedUser.reportedUsername} from the group ${reportedUser.groupName}? This action cannot be undone.`);
 
     if (confirmed) {
-      const success = this.groupsService.kickUserFromGroup(reportedUser.reportedUsername, reportedUser.groupName);
-  
-      if (success) {          
-        this.reportRequests = this.reportRequests.filter(user => user !== reportedUser);
-  
-        this.removeReportedUserRequest(reportedUser);
-      } else {
-        alert(`Failed to ban ${reportedUser.reportedUsername} from the group.`);
-      }
+      this.groupsService.kickUserFromGroup(reportedUser.groupName, reportedUser.reportedUsername).subscribe({
+        next: () => {
+          alert(`User ${reportedUser.reportedUsername} removed successfully.`);
+          this.reportRequests = this.reportRequests.filter(user => user !== reportedUser);
+          this.removeReportedUserRequest(reportedUser);
+        },
+        error: (error) => {
+          console.error('Failed to remove user:', error);
+          alert('Failed to remove user.');
+        }
+      });
     }
   }
-  
-  removeReportedUserRequest(user: any): void {
-    const groupName = user.groupName;
-    let requests = this.requestsService.getReportRequests();
-    const requestIndex = requests.findIndex(req => req.reportedUsername === user.reportedUsername && req.groupName === groupName);
-  
-    if (requestIndex !== -1) {
-      requests.splice(requestIndex, 1);  
-      this.requestsService.saveReportRequests(requests);  
 
-      // Refresh local reportRequests
-      this.reportRequests = this.reportRequests.filter(reportedUser => reportedUser !== user);
-    } else {
-      console.warn('Report request not found.');
-    }
+  removeReportedUserRequest(user: any): void {
+    this.requestsService.getReportRequests().subscribe({
+      next: (requests) => {
+        const updatedRequests = requests.filter(req => !(req.reportedUsername === user.reportedUsername && req.groupName === user.groupName));
+        this.requestsService.updateReportRequests(updatedRequests).subscribe({
+          next: () => {
+            console.log('Requests updated successfully.');
+          },
+          error: (err) => {
+            console.error('Failed to update requests:', err);
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Failed to load report requests:', err);
+      }
+    });
   }
 
   approvePromotionRequest(promotionRequest: any): void {
@@ -140,35 +176,34 @@ export class InboxComponent implements OnInit {
       console.error('Invalid promotion request');
       return;
     }
-  
+
     const confirmed = window.confirm('Are you sure you want to promote this user to Group Admin?');
     if (confirmed) {
-      const success = this.authService.promoteToGroupAdmin(promotionRequest.promotionUser);
-      if (success) {
-        alert('User promoted to Group Admin successfully.');
-  
-        this.promotionRequests = this.promotionRequests.filter(req => req !== promotionRequest);
-      } else {
-        alert('Failed to promote user.');
-      }
+      this.authService.promoteToGroupAdmin(promotionRequest.promotionUser).subscribe({
+        next: () => {
+          alert('User promoted to Group Admin successfully.');
+          this.promotionRequests = this.promotionRequests.filter(req => req !== promotionRequest);
+        },
+        error: (err) => {
+          console.error('Failed to promote user:', err);
+          alert('Failed to promote user.');
+        }
+      });
     }
   }
-  
 
   denyPromotionRequest(promotionRequest: any): void {
     if (!promotionRequest || !promotionRequest.promotionUser) {
       console.error('Invalid promotion request');
       return;
     }
-  
+
     const confirmed = window.confirm('Are you sure you want to deny this promotion request?');
     if (confirmed) {
-  
       this.promotionRequests = this.promotionRequests.filter(req => req !== promotionRequest);
       alert('Promotion request denied.');
     }
   }
-  
 
   //******************************UI Methods******************************
   setActiveTab(tab: string): void {

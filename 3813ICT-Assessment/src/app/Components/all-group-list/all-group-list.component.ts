@@ -38,8 +38,16 @@ export class AllGroupListComponent implements OnInit {
     this.roles = storedUser.roles || [];
 
     if (this.isGroupAdminOrSuperAdmin()) {
-      this.requestCount = this.requestsService.getRequestCount(this.username); 
+      this.requestsService.getRequestCount().subscribe({
+        next: (count: number) => {
+          this.requestCount = count;
+        },
+        error: (err) => {
+          console.error('Failed to get request count:', err);
+        }
+      });
     }
+    
   }
   
   //******************************Checks******************************
@@ -56,8 +64,16 @@ export class AllGroupListComponent implements OnInit {
 
   //******************************Group List Methods******************************
   private loadGroups(): void {
-    this.groups = this.groupsService.getAllGroups();
+    this.groupsService.getAllGroups().subscribe({
+      next: (groups) => {
+        this.groups = groups;
+      },
+      error: (error) => {
+        console.error('Failed to load groups:', error);
+      }
+    });
   }
+  
 
   private loadUserGroups(): void {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');

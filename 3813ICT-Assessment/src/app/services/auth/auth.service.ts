@@ -2,116 +2,43 @@ import { Injectable } from '@angular/core';
 import { RequestsService } from '../requests/requests.service';
 import { UsersService } from '../users/users.service';
 import { GroupsService } from '../groups/groups.service';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
+  private apiUrl = 'http://localhost:3000/api'; // Base URL for the API
+
   constructor(
     private requestsService: RequestsService,
     private usersService: UsersService,
-    private groupsService: GroupsService
+    private groupsService: GroupsService,
+    private http: HttpClient
   ) { }
 
-
-  promoteToGroupAdmin(username: string): boolean {
-    // Retrieve the current list of users and groups from local storage
-    const users = this.usersService.getValidUsers();
-    const groups = this.groupsService.getGroupsFromLocalStorage();
-  
-    // Find the user to be promoted
-    const user = users.find(u => u.username === username);
-    if (!user) {
-      console.warn('User not found.');
-      return false;
-    }
-  
-    // Check if the user is already a group admin
-    if (user.roles.includes('groupAdmin')) {
-      console.warn('User is already a group admin.');
-      return false;
-    }
-  
-    // Add 'groupAdmin' to the user's roles
-    user.roles.push('groupAdmin');
-  
-    // Update the users list
-    this.usersService.saveValidUsers(users);
-  
-    // Add the user to the admins list of each group they are a member of
-    user.groups.forEach(groupName => {
-      const group = groups.find(g => g.name === groupName);
-      if (group) {
-        // Check if the user is already an admin in the group
-        const adminExists = group.admins.some(a => a.username === username);
-        if (!adminExists) {
-          // Add user as admin
-          group.admins.push({ 
-            userId: user.userId, 
-            username: user.username, 
-            role: 'groupAdmin' 
-          });
-          this.groupsService.saveGroupsToLocalStorage(groups);
-        }
-      }
-    });
-  
-    console.log(`User ${username} has been promoted to group admin.`);
-    return true;
-  }
-  
-  promoteToSuperAdmin(username: string): boolean {
-    // Retrieve the current list of users and groups from local storage
-    const users = this.usersService.getValidUsers();
-    const groups = this.groupsService.getGroupsFromLocalStorage();
-  
-    // Find the user to be promoted
-    const user = users.find(u => u.username === username);
-    if (!user) {
-      console.warn('User not found.');
-      return false;
-    }
-  
-    // Check if the user is already a group admin
-    if (user.roles.includes('superAdmin')) {
-      console.warn('User is already a super admin.');
-      return false;
-    }
-  
-    // Add 'superAdmin' to the user's roles
-    user.roles.push('superAdmin');
-  
-    // Update the users list
-    this.usersService.saveValidUsers(users);
-  
-    // Add the user to the admins list of each group they are a member of
-    user.groups.forEach(groupName => {
-      const group = groups.find(g => g.name === groupName);
-      if (group) {
-        // Check if the user is already an admin in the group
-        const adminExists = group.admins.some(a => a.username === username);
-        if (!adminExists) {
-          // Add user as admin
-          group.admins.push({ 
-            userId: user.userId, 
-            username: user.username, 
-            role: 'superAdmin' 
-          });
-          this.groupsService.saveGroupsToLocalStorage(groups);
-        }
-      }
-    });
-  
-    console.log(`User ${username} has been promoted to group admin.`);
-    return true;
+  promoteToGroupAdmin(username: string): Observable<boolean> {
+    return this.http.post(`${this.apiUrl}/promote/groupAdmin`, { username }).pipe(
+      map(() => {
+        console.log(`User ${username} has been promoted to group admin.`);
+        return true;
+      })
+    );
   }
 
-  getSuperAdmins(): { username: string; role: string }[] {
-    const users = this.usersService.getValidUsers()
-    return users
-      .filter(user => user.roles.includes('superAdmin'))
-      .map(user => ({ username: user.username, role: 'superAdmin' }));
+  promoteToSuperAdmin(username: string): Observable<boolean> {
+    return this.http.post(`${this.apiUrl}/promote/superAdmin`, { username }).pipe(
+      map(() => {
+        console.log(`User ${username} has been promoted to super admin.`);
+        return true;
+      })
+    );
   }
 
+  getSuperAdmins(): Observable<{ userId: string; username: string; role: string }[]> {
+    return this.http.get<{ userId: string; username: string; role: string }[]>(`${this.apiUrl}/users/superAdmins`);
+  }
 }

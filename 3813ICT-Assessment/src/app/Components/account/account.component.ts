@@ -35,16 +35,22 @@ export class AccountComponent implements OnInit {
     this.userId = storedUser.userId || '';
 
     if (this.isGroupAdminOrSuperAdmin()) {
-      this.requestCount = this.requestsService.getRequestCount(this.username); 
+      // Subscribe to the observable to get the request count value
+      this.requestsService.getRequestCount().subscribe({
+        next: (count) => {
+          this.requestCount = count;
+        },
+        error: (err) => {
+          console.error('Failed to get request count:', err);
+        }
+      });
     }
   }
+
   //******************************Checks******************************
   isGroupAdminOrSuperAdmin(): boolean {
     return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
   }
-
-
-
 
   //******************************Button Methods******************************
   logout(): void {
@@ -52,6 +58,7 @@ export class AccountComponent implements OnInit {
     console.log('User logged out');
     this.router.navigate(['/']);
   }
+
   deleteAccount(): void {
     if (this.isGroupAdminOrSuperAdmin()) {
       alert('Group Admins and Super Admins cannot delete their accounts.');
@@ -61,30 +68,39 @@ export class AccountComponent implements OnInit {
     const confirmed = window.confirm('Are you sure you want to delete your account? This action cannot be undone.');
 
     if (confirmed) {
-      this.usersService.deleteUser(this.username);
+      this.usersService.deleteUser(this.username).subscribe({
+        next: () => {
+          // Remove pending requests after user deletion
+          this.requestsService.removePendingRequests(this.username).subscribe({
+            next: () => {
+              console.log(`Pending requests for ${this.username} removed.`);
+            },
+            error: (err) => {
+              console.error('Failed to remove pending requests:', err);
+            }
+          });
 
-      if (this.username) {
-        this.requestsService.removePendingRequests(this.username);
-      }
-
-      localStorage.removeItem('currentUser');
-
-      this.router.navigate(['/']);
+          localStorage.removeItem('currentUser');
+          this.router.navigate(['/']);
+        },
+        error: (err) => {
+          console.error('Failed to delete user:', err);
+        }
+      });
     } else {
       console.log('Account deletion cancelled');
     }
   }
 
-
-
-  
   //******************************Component Navigation******************************
   navigateToAccount(): void {
     this.router.navigate(['/account']);
   }
+
   navigateToInbox(): void {
     this.router.navigate(['/inbox']);
   }
+
   navigateToUserGroup(): void {
     this.router.navigate(['/user-group']);
   }
