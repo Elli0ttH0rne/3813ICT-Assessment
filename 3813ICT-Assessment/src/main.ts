@@ -1,5 +1,6 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http'; 
 import { AppComponent } from './app/app.component';
 import { LoginComponent } from './app/Components/login/login.component';
 import { UserGroupComponent } from './app/Components/user-group/user-group.component';
@@ -11,6 +12,7 @@ import { AllGroupListComponent } from './app/Components/all-group-list/all-group
 
 bootstrapApplication(AppComponent, {
   providers: [
+    provideHttpClient(), 
     provideRouter([
       { path: '', component: LoginComponent },
       { path: 'user-group', component: UserGroupComponent },
