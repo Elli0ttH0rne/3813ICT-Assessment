@@ -7,7 +7,15 @@ const readFile = (filePath, callback) => {
     if (err) {
       return callback(err);
     }
-    callback(null, JSON.parse(data));
+    if (!data) {
+      return callback(null, []);
+    }
+    try {
+      const parsedData = JSON.parse(data);
+      callback(null, parsedData);
+    } catch (err) {
+      callback(err);
+    }
   });
 };
 

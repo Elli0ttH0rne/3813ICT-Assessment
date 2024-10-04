@@ -81,7 +81,7 @@ const getGroupChannels = (req, res) => {
       return res.status(404).json({ error: 'Group not found.' });
     }
 
-    res.json(group.channels); // Assuming channels are stored in an array in the group object
+    res.json(group.channels); 
   });
 };
 

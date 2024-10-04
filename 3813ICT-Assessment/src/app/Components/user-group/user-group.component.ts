@@ -45,8 +45,7 @@ export class UserGroupComponent implements OnInit {
     this.userID = storedUser.userId;
     this.username = storedUser.username;
     this.roles = storedUser.roles;
-
-    // Load request count
+  
     if (this.isGroupAdminOrSuperAdmin()) {
       this.requestsService.getRequestCount().subscribe({
         next: (count: number) => {
@@ -57,14 +56,14 @@ export class UserGroupComponent implements OnInit {
         }
       });
     }
-
-    // Fetch groups
-    if (this.roles.includes('superAdmin')) {
+  
+    if (this.isSuperAdmin()) {
+      // Fetch all groups for super admin
       this.groupsService.getAllGroups().subscribe({
         next: (allGroups) => {
           this.groups = allGroups.map(group => group.name);
           this.openGroups = new Array(this.groups.length).fill(false);
-
+  
           // Fetch channels and group creators for each group
           this.groups.forEach(group => {
             forkJoin([
@@ -86,9 +85,10 @@ export class UserGroupComponent implements OnInit {
         }
       });
     } else {
+      // Fetch groups only for the logged-in user
       this.groups = storedUser.groups;
       this.openGroups = new Array(this.groups.length).fill(false);
-
+  
       // Fetch channels and group creators for each group the user is part of
       this.groups.forEach(group => {
         forkJoin([
@@ -106,7 +106,7 @@ export class UserGroupComponent implements OnInit {
       });
     }
   }
-
+  
   //******************************Checks******************************
   isGroupAdminOrSuperAdmin(): boolean {
     return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
