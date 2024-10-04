@@ -17,4 +17,11 @@ router.post('/', groupsController.createGroup);
 // Route to delete a specific group by its name
 router.delete('/:groupName', groupsController.deleteGroup);
 
+// Route to get a users groups by their id
+router.get('/user/:userId', groupsController.getGroupsByUserId);
+
+
+// Route to leave a group 
+router.post('/:groupName/leave', groupsController.leaveGroup);
+
 module.exports = router;

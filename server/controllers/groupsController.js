@@ -2,6 +2,7 @@ const path = require('path');
 const { readFile, writeFile } = require('../helpers/fileHelper');
 
 const groupsFilePath = path.join(__dirname, '../data/groups.json');
+const usersFilePath = path.join(__dirname, '../data/users.json');
 
 // Get all groups
 const getAllGroups = (req, res) => {
@@ -85,6 +86,86 @@ const getGroupChannels = (req, res) => {
   });
 };
 
+// Leave a group
+const leaveGroup = (req, res) => {
+  const { groupName } = req.params;
+  const { userId } = req.body;
+
+  readFile(groupsFilePath, (err, groups) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to read groups data.' });
+    }
+
+    const group = groups.find(g => g.name === groupName);
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found.' });
+    }
+
+    if (!group.members.includes(userId)) {
+      return res.status(400).json({ error: 'User is not a member of this group.' });
+    }
+
+    group.members = group.members.filter(member => member !== userId);
+
+    writeFile(groupsFilePath, groups, (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to save updated group data.' });
+      }
+      res.status(200).json({ message: 'User successfully left the group.' });
+    });
+  });
+};
+
+
+const joinGroup = (req, res) => {
+  const { groupName } = req.params;
+  const { userId } = req.body;
+
+  readFile(groupsFilePath, (err, groups) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to read groups data.' });
+    }
+
+    const group = groups.find(g => g.name === groupName);
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found.' });
+    }
+
+    if (!group.members) {
+      group.members = [];
+    }
+
+    if (!group.members.includes(userId)) {
+      group.members.push(userId);
+    } else {
+      return res.status(400).json({ error: 'User is already a member of this group.' });
+    }
+
+    writeFile(groupsFilePath, groups, (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to update group data.' });
+      }
+      res.status(200).json({ message: 'User added to group successfully.' });
+    });
+  });
+};
+
+// Get groups for a specific user by userId
+const getGroupsByUserId = (req, res) => {
+  const { userId } = req.params;
+
+  readFile(groupsFilePath, (err, groups) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to read groups data.' });
+    }
+
+    // Filter the groups to only include those where the user is a member
+    const userGroups = groups.filter(group => group.members && group.members.includes(userId));
+
+    res.json(userGroups);
+  });
+};
+
 // Delete a group
 const deleteGroup = (req, res) => {
   const { groupName } = req.params;
@@ -120,6 +201,9 @@ module.exports = {
   getAllGroups,
   getGroupDetails,
   createGroup,
+  joinGroup,
   getGroupChannels,
   deleteGroup,
+  getGroupsByUserId,
+  leaveGroup
 };

@@ -78,11 +78,16 @@ export class GroupsService {
     return this.http.get<{ userId: string; username: string }[]>(`${this.apiUrl}/${groupName}/users`);
   }
 
+  // Method to get the groups for a specific user by their userId
+  getUserGroups(userId: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/user/${userId}`);
+  }
+
   // Leave a group
   leaveGroup(groupName: string, username: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/${groupName}/leave`, { username });
   }
-
+  
   // Kick a user from a group
   kickUserFromGroup(groupName: string, username: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/${groupName}/kick`, { username });
