@@ -174,6 +174,7 @@ export class UserGroupComponent implements OnInit {
       });
     }
   }
+  
 
   createGroup(): void {
     if (this.newGroupName.trim()) {
@@ -212,17 +213,15 @@ export class UserGroupComponent implements OnInit {
 
   createChannel(group: string): void {
     if (this.newChannelName.trim() && this.newChannelDescription.trim()) {
-      const currentUsername = this.username;
-      const isSuperAdmin = this.roles.includes('superAdmin');
-
       this.groupsService.createChannel(
-        group,
-        this.newChannelName,
-        this.newChannelDescription,
-        currentUsername,
-        isSuperAdmin
+        group, 
+        this.newChannelName, 
+        this.newChannelDescription 
       ).subscribe({
         next: () => {
+          if (!this.channels[group]) {
+            this.channels[group] = [];
+          }
           this.channels[group].push({ name: this.newChannelName, description: this.newChannelDescription });
           this.showCreateChannelForGroup = null;
           this.newChannelName = '';
@@ -237,6 +236,7 @@ export class UserGroupComponent implements OnInit {
       alert('Please enter both channel name and description.');
     }
   }
+  
 
   leaveGroup(groupName: string): void {
     const confirmed = window.confirm(`Are you sure you want to leave the group "${groupName}"?`);

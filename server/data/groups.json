@@ -315,5 +315,38 @@
       "u008",
       "u022"
     ]
+  },
+  {
+    "name": "test",
+    "channels": [],
+    "admins": [
+      {
+        "userId": "u021",
+        "username": "groupAdmin1",
+        "role": "creator"
+      }
+    ],
+    "creatorId": "u021",
+    "members": []
+  },
+  {
+    "name": "tests",
+    "channels": [
+      {
+        "name": "tee",
+        "description": "tee"
+      }
+    ],
+    "admins": [
+      {
+        "userId": "u021",
+        "username": "groupAdmin1",
+        "role": "creator"
+      }
+    ],
+    "creatorId": "u021",
+    "members": [
+      "u021"
+    ]
   }
 ]

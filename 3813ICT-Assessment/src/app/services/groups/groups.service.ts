@@ -47,11 +47,10 @@ export class GroupsService {
     return this.http.post(this.apiUrl, { groupName, creatorUsername, creatorId });
   }
 
-  // Create a new channel in a group
-  createChannel(groupName: string, channelName: string, channelDescription: string, currentUsername: string, isSuperAdmin: boolean): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${groupName}/channels`, { channelName, channelDescription, currentUsername, isSuperAdmin });
+  // Create a channel
+  createChannel(groupName: string, name: string, description: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${groupName}/channels`, { name, description });
   }
-
   // Get all channels for a specific group
   getGroupChannels(groupName: string): Observable<Channel[]> {
     return this.http.get<Channel[]>(`${this.apiUrl}/${groupName}/channels`);

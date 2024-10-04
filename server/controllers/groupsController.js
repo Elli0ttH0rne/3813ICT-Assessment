@@ -34,12 +34,9 @@ const getGroupDetails = (req, res) => {
 };
 
 // Create a new group
+// groupsController.js
 const createGroup = (req, res) => {
   const { groupName, creatorUsername, creatorId } = req.body;
-
-  if (!groupName || !creatorUsername || !creatorId) {
-    return res.status(400).json({ error: 'Group name, creator username, and creator ID are required.' });
-  }
 
   readFile(groupsFilePath, (err, groups) => {
     if (err) {
@@ -54,7 +51,8 @@ const createGroup = (req, res) => {
       name: groupName,
       channels: [],
       admins: [{ userId: creatorId, username: creatorUsername, role: 'creator' }],
-      creatorId
+      creatorId,
+      members: [creatorId]
     };
 
     groups.push(newGroup);
@@ -67,6 +65,7 @@ const createGroup = (req, res) => {
     });
   });
 };
+
 
 // Get channels for a specific group
 const getGroupChannels = (req, res) => {
@@ -85,6 +84,51 @@ const getGroupChannels = (req, res) => {
     res.json(group.channels); 
   });
 };
+
+// Create a new channel
+const createChannel = (req, res) => {
+  const { groupName } = req.params;
+  const { name, description } = req.body;
+
+  if (!name || !description) {
+    return res.status(400).json({ error: 'Channel name and description are required.' });
+  }
+
+  readFile(groupsFilePath, (err, groups) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to read groups data.' });
+    }
+
+    const group = groups.find(g => g.name === groupName);
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found.' });
+    }
+
+    // Check if the channel already exists in the group
+    if (group.channels.some(c => c.name === name)) {
+      return res.status(400).json({ error: 'Channel already exists in this group.' });
+    }
+
+    // Create the new channel object
+    const newChannel = {
+      name,
+      description
+    };
+
+    // Add the new channel to the group
+    group.channels.push(newChannel);
+
+    writeFile(groupsFilePath, groups, (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to save new channel.' });
+      }
+      console.log('Channel created successfully:', newChannel);
+      res.status(201).json({ message: 'Channel created successfully.' });
+    });
+  });
+};
+
+
 
 // Leave a group
 const leaveGroup = (req, res) => {
@@ -118,9 +162,6 @@ const leaveGroup = (req, res) => {
     });
   });
 };
-
-
-
 
 const joinGroup = (req, res) => {
   const { groupName } = req.params;
@@ -187,6 +228,7 @@ const deleteGroup = (req, res) => {
     }
 
     const group = groups[groupIndex];
+    // Check if the current user is the creator or a super admin
     if (group.creatorId !== currentUsername && !isSuperAdmin) {
       return res.status(403).json({ error: 'Unauthorized to delete group.' });
     }
@@ -202,6 +244,7 @@ const deleteGroup = (req, res) => {
   });
 };
 
+
 module.exports = {
   getAllGroups,
   getGroupDetails,
@@ -210,5 +253,6 @@ module.exports = {
   getGroupChannels,
   deleteGroup,
   getGroupsByUserId,
-  leaveGroup
+  leaveGroup,
+  createChannel
 };
