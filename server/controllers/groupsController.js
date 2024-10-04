@@ -96,25 +96,30 @@ const leaveGroup = (req, res) => {
       return res.status(500).json({ error: 'Failed to read groups data.' });
     }
 
-    const group = groups.find(g => g.name === groupName);
-    if (!group) {
+    const groupIndex = groups.findIndex(g => g.name === groupName);
+    if (groupIndex === -1) {
       return res.status(404).json({ error: 'Group not found.' });
     }
+
+    const group = groups[groupIndex];
 
     if (!group.members.includes(userId)) {
       return res.status(400).json({ error: 'User is not a member of this group.' });
     }
 
-    group.members = group.members.filter(member => member !== userId);
+    // Remove the user from the group members
+    group.members = group.members.filter(memberId => memberId !== userId);
 
     writeFile(groupsFilePath, groups, (err) => {
       if (err) {
-        return res.status(500).json({ error: 'Failed to save updated group data.' });
+        return res.status(500).json({ error: 'Failed to update groups data.' });
       }
-      res.status(200).json({ message: 'User successfully left the group.' });
+      res.status(200).json({ message: 'User left the group successfully.' });
     });
   });
 };
+
+
 
 
 const joinGroup = (req, res) => {

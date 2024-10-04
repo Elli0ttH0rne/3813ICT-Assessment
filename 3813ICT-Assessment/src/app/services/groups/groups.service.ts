@@ -84,9 +84,10 @@ export class GroupsService {
   }
 
   // Leave a group
-  leaveGroup(groupName: string, username: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${groupName}/leave`, { username });
+  leaveGroup(groupName: string, userId: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${groupName}/leave`, { userId });
   }
+
   
   // Kick a user from a group
   kickUserFromGroup(groupName: string, username: string): Observable<any> {

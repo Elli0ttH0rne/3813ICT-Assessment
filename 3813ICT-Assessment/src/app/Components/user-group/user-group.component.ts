@@ -241,16 +241,17 @@ export class UserGroupComponent implements OnInit {
   leaveGroup(groupName: string): void {
     const confirmed = window.confirm(`Are you sure you want to leave the group "${groupName}"?`);
     if (confirmed) {
-      this.groupsService.leaveGroup(groupName, this.username).subscribe({
+      // Sending userId to the server to identify which user is leaving
+      this.groupsService.leaveGroup(groupName, this.userID).subscribe({
         next: () => {
           this.groups = this.groups.filter(g => g !== groupName);
           delete this.channels[groupName];
-
+  
           // Update local storage to reflect the removed group
           const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
           storedUser.groups = this.groups;
           localStorage.setItem('currentUser', JSON.stringify(storedUser));
-
+  
           alert(`You have left the group "${groupName}".`);
         },
         error: (error) => {
@@ -260,6 +261,7 @@ export class UserGroupComponent implements OnInit {
       });
     }
   }
+  
 
   cancelCreateChannel(): void {
     this.showCreateChannelForGroup = null;
