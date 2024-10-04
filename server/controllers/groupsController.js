@@ -140,28 +140,41 @@ const leaveGroup = (req, res) => {
       return res.status(500).json({ error: 'Failed to read groups data.' });
     }
 
-    const groupIndex = groups.findIndex(g => g.name === groupName);
-    if (groupIndex === -1) {
+    const group = groups.find(g => g.name === groupName);
+    if (!group) {
       return res.status(404).json({ error: 'Group not found.' });
     }
 
-    const group = groups[groupIndex];
-
-    if (!group.members.includes(userId)) {
+    // Remove the user from the group's members list
+    const memberIndex = group.members.indexOf(userId);
+    if (memberIndex === -1) {
       return res.status(400).json({ error: 'User is not a member of this group.' });
     }
 
-    // Remove the user from the group members
-    group.members = group.members.filter(memberId => memberId !== userId);
+    group.members.splice(memberIndex, 1);
+
+    // If there are no members left, delete the group
+    if (group.members.length === 0) {
+      const groupIndex = groups.indexOf(group);
+      if (groupIndex !== -1) {
+        groups.splice(groupIndex, 1);
+      }
+    }
 
     writeFile(groupsFilePath, groups, (err) => {
       if (err) {
         return res.status(500).json({ error: 'Failed to update groups data.' });
       }
-      res.status(200).json({ message: 'User left the group successfully.' });
+
+      if (group.members.length === 0) {
+        return res.status(200).json({ message: 'Group deleted successfully as it has no members left.' });
+      }
+
+      res.status(200).json({ message: 'User removed from the group successfully.' });
     });
   });
 };
+
 
 const joinGroup = (req, res) => {
   const { groupName } = req.params;
