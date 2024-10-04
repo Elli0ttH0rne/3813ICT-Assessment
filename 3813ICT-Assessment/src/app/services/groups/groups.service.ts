@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 // Define the structure of Group, Channel, and Admin for typing
 export interface Channel {
@@ -20,6 +20,7 @@ export interface Group {
   channels: Channel[];
   admins: Admin[];
   creatorId: string;
+  members: string[]; // Include members as part of the group definition
 }
 
 @Injectable({
@@ -51,6 +52,7 @@ export class GroupsService {
   createChannel(groupName: string, name: string, description: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/${groupName}/channels`, { name, description });
   }
+
   // Get all channels for a specific group
   getGroupChannels(groupName: string): Observable<Channel[]> {
     return this.http.get<Channel[]>(`${this.apiUrl}/${groupName}/channels`);
@@ -71,15 +73,14 @@ export class GroupsService {
     return this.http.get<Admin[]>(`${this.apiUrl}/${groupName}/admins`);
   }
 
-
   // Get users in a specific group
   getUsersInGroup(groupName: string): Observable<{ userId: string; username: string }[]> {
     return this.http.get<{ userId: string; username: string }[]>(`${this.apiUrl}/${groupName}/users`);
   }
 
   // Method to get the groups for a specific user by their userId
-  getUserGroups(userId: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/user/${userId}`);
+  getUserGroups(userId: string): Observable<Group[]> {
+    return this.http.get<Group[]>(`${this.apiUrl}/user/${userId}`);
   }
 
   // Leave a group
@@ -87,7 +88,6 @@ export class GroupsService {
     return this.http.post(`${this.apiUrl}/${groupName}/leave`, { userId });
   }
 
-  
   // Kick a user from a group
   kickUserFromGroup(groupName: string, username: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/${groupName}/kick`, { username });

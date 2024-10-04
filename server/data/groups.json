@@ -63,8 +63,7 @@
     "creatorId": "u021",
     "members": [
       "u005",
-      "u008",
-      "u021"
+      "u008"
     ]
   },
   {
@@ -97,8 +96,7 @@
     ],
     "creatorId": "u021",
     "members": [
-      "u004",
-      "u021"
+      "u004"
     ]
   },
   {
@@ -132,8 +130,7 @@
     "creatorId": "u021",
     "members": [
       "u001",
-      "u013",
-      "u021"
+      "u013"
     ]
   },
   {
@@ -195,8 +192,7 @@
     ],
     "creatorId": "u022",
     "members": [
-      "u002",
-      "u022"
+      "u002"
     ]
   },
   {
@@ -224,8 +220,7 @@
     ],
     "creatorId": "u022",
     "members": [
-      "u014",
-      "u022"
+      "u014"
     ]
   },
   {
@@ -253,8 +248,7 @@
     ],
     "creatorId": "u022",
     "members": [
-      "u006",
-      "u022"
+      "u006"
     ]
   },
   {
@@ -283,8 +277,7 @@
     "creatorId": "u022",
     "members": [
       "u007",
-      "u015",
-      "u022"
+      "u015"
     ]
   },
   {
@@ -312,12 +305,37 @@
     ],
     "creatorId": "u022",
     "members": [
-      "u008",
-      "u022"
+      "u008"
     ]
   },
   {
     "name": "test",
+    "channels": [],
+    "admins": [
+      {
+        "userId": "u021",
+        "username": "groupAdmin1",
+        "role": "creator"
+      }
+    ],
+    "creatorId": "u021",
+    "members": []
+  },
+  {
+    "name": "tests",
+    "channels": [],
+    "admins": [
+      {
+        "userId": "u021",
+        "username": "groupAdmin1",
+        "role": "creator"
+      }
+    ],
+    "creatorId": "u021",
+    "members": []
+  },
+  {
+    "name": "SEJGKbv l;dszBN",
     "channels": [],
     "admins": [
       {

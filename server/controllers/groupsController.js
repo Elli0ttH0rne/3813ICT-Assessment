@@ -34,7 +34,6 @@ const getGroupDetails = (req, res) => {
 };
 
 // Create a new group
-// groupsController.js
 const createGroup = (req, res) => {
   const { groupName, creatorUsername, creatorId } = req.body;
 
@@ -52,7 +51,7 @@ const createGroup = (req, res) => {
       channels: [],
       admins: [{ userId: creatorId, username: creatorUsername, role: 'creator' }],
       creatorId,
-      members: [creatorId]
+      members: [] // Creator should not be added to members list
     };
 
     groups.push(newGroup);
@@ -65,7 +64,6 @@ const createGroup = (req, res) => {
     });
   });
 };
-
 
 // Get channels for a specific group
 const getGroupChannels = (req, res) => {
@@ -81,7 +79,7 @@ const getGroupChannels = (req, res) => {
       return res.status(404).json({ error: 'Group not found.' });
     }
 
-    res.json(group.channels); 
+    res.json(group.channels);
   });
 };
 
@@ -128,8 +126,6 @@ const createChannel = (req, res) => {
   });
 };
 
-
-
 // Leave a group
 const leaveGroup = (req, res) => {
   const { groupName } = req.params;
@@ -143,6 +139,11 @@ const leaveGroup = (req, res) => {
     const group = groups.find(g => g.name === groupName);
     if (!group) {
       return res.status(404).json({ error: 'Group not found.' });
+    }
+
+    // Prevent the creator from leaving the group using this endpoint
+    if (group.creatorId === userId) {
+      return res.status(400).json({ error: 'Group creator cannot leave the group. Please delete the group instead.' });
     }
 
     // Remove the user from the group's members list
@@ -171,40 +172,6 @@ const leaveGroup = (req, res) => {
       }
 
       res.status(200).json({ message: 'User removed from the group successfully.' });
-    });
-  });
-};
-
-
-const joinGroup = (req, res) => {
-  const { groupName } = req.params;
-  const { userId } = req.body;
-
-  readFile(groupsFilePath, (err, groups) => {
-    if (err) {
-      return res.status(500).json({ error: 'Failed to read groups data.' });
-    }
-
-    const group = groups.find(g => g.name === groupName);
-    if (!group) {
-      return res.status(404).json({ error: 'Group not found.' });
-    }
-
-    if (!group.members) {
-      group.members = [];
-    }
-
-    if (!group.members.includes(userId)) {
-      group.members.push(userId);
-    } else {
-      return res.status(400).json({ error: 'User is already a member of this group.' });
-    }
-
-    writeFile(groupsFilePath, groups, (err) => {
-      if (err) {
-        return res.status(500).json({ error: 'Failed to update group data.' });
-      }
-      res.status(200).json({ message: 'User added to group successfully.' });
     });
   });
 };
@@ -257,12 +224,10 @@ const deleteGroup = (req, res) => {
   });
 };
 
-
 module.exports = {
   getAllGroups,
   getGroupDetails,
   createGroup,
-  joinGroup,
   getGroupChannels,
   deleteGroup,
   getGroupsByUserId,

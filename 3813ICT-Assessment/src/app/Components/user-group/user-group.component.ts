@@ -26,15 +26,15 @@ export class UserGroupComponent implements OnInit {
   username: string = '';
   roles: string[] = [];
   groupCreators: { [group: string]: string } = {};
-  newGroupName: string = '';
-  showCreateGroup: boolean = false;
-  showCreateChannelForGroup: string | null = null;
-  newChannelName: string = '';
+  newGroupName: string = ''; 
+  showCreateGroup: boolean = false; 
+  showCreateChannelForGroup: string | null = null; 
+  newChannelName: string = ''; 
   newChannelDescription: string = '';
-  requestCount: number = 0;
+  requestCount: number = 0; 
 
   constructor(
-    private router: Router,
+    private router: Router, 
     private authService: AuthService,
     private requestsService: RequestsService,
     private groupsService: GroupsService
@@ -57,6 +57,7 @@ export class UserGroupComponent implements OnInit {
       });
     }
 
+    // Fetch groups based on user role
     if (this.isSuperAdmin()) {
       // Fetch all groups for super admin
       this.groupsService.getAllGroups().subscribe({
@@ -85,9 +86,10 @@ export class UserGroupComponent implements OnInit {
         }
       });
     } else {
-      // Fetch groups only for the logged-in user
+      // Fetch groups for the logged-in user (including admin groups)
       this.groupsService.getUserGroups(this.userID).subscribe({
         next: (userGroups) => {
+          // Collect all groups where the user is either a member or an admin
           this.groups = userGroups.map(group => group.name);
           this.openGroups = new Array(this.groups.length).fill(false);
 
@@ -105,6 +107,21 @@ export class UserGroupComponent implements OnInit {
                 console.error(`Failed to load channels or creator for group "${group}":`, error);
               }
             });
+          });
+
+          // Now fetch groups where the user is an admin, if not already included
+          this.groupsService.getAllGroups().subscribe({
+            next: (allGroups) => {
+              allGroups.forEach(group => {
+                if (group.admins.some(admin => admin.userId === this.userID) && !this.groups.includes(group.name)) {
+                  this.groups.push(group.name);
+                  this.openGroups.push(false); // Initialize open state for new groups
+                }
+              });
+            },
+            error: (error) => {
+              console.error('Failed to load all groups for admins:', error);
+            }
           });
         },
         error: (error) => {
@@ -127,16 +144,20 @@ export class UserGroupComponent implements OnInit {
     return this.roles.includes('superAdmin');
   }
 
+  isGroupCreator(group: string): boolean {
+    return this.groupCreators[group] === this.username;
+  }
+
   canDeleteGroup(group: string): boolean {
-    return this.username === this.groupCreators[group] || this.roles.includes('superAdmin');
+    return this.isGroupCreator(group) || this.roles.includes('superAdmin');
+  }
+
+  canLeaveGroup(group: string): boolean {
+    return this.isUserOrGroupAdmin() && !this.isGroupCreator(group);
   }
 
   canCreateGroup(): boolean {
     return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
-  }
-
-  isGroupCreator(group: string): boolean {
-    return this.username === this.groupCreators[group];
   }
 
   //******************************UI Methods******************************
@@ -174,22 +195,16 @@ export class UserGroupComponent implements OnInit {
       });
     }
   }
-  
 
   createGroup(): void {
     if (this.newGroupName.trim()) {
       const isSuperAdmin = this.roles.includes('superAdmin');
-
+      
       this.groupsService.createGroup(this.newGroupName, this.username, this.userID).subscribe({
         next: () => {
           this.groups.push(this.newGroupName);
           this.channels[this.newGroupName] = [];
           this.groupCreators[this.newGroupName] = this.username;
-
-          // Update currentUser's groups in local storage
-          const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-          storedUser.groups.push(this.newGroupName);
-          localStorage.setItem('currentUser', JSON.stringify(storedUser));
 
           // Reset the form and hide it
           this.showCreateGroup = false;
@@ -213,15 +228,15 @@ export class UserGroupComponent implements OnInit {
 
   createChannel(group: string): void {
     if (this.newChannelName.trim() && this.newChannelDescription.trim()) {
+      const currentUsername = this.username;
+      const isSuperAdmin = this.roles.includes('superAdmin');
+
       this.groupsService.createChannel(
-        group, 
-        this.newChannelName, 
-        this.newChannelDescription 
+        group,
+        this.newChannelName,
+        this.newChannelDescription,
       ).subscribe({
         next: () => {
-          if (!this.channels[group]) {
-            this.channels[group] = [];
-          }
           this.channels[group].push({ name: this.newChannelName, description: this.newChannelDescription });
           this.showCreateChannelForGroup = null;
           this.newChannelName = '';
@@ -236,22 +251,20 @@ export class UserGroupComponent implements OnInit {
       alert('Please enter both channel name and description.');
     }
   }
-  
 
   leaveGroup(groupName: string): void {
     const confirmed = window.confirm(`Are you sure you want to leave the group "${groupName}"?`);
     if (confirmed) {
-      // Sending userId to the server to identify which user is leaving
-      this.groupsService.leaveGroup(groupName, this.userID).subscribe({
+      this.groupsService.leaveGroup(groupName, this.username).subscribe({
         next: () => {
           this.groups = this.groups.filter(g => g !== groupName);
           delete this.channels[groupName];
-  
+
           // Update local storage to reflect the removed group
           const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
           storedUser.groups = this.groups;
           localStorage.setItem('currentUser', JSON.stringify(storedUser));
-  
+
           alert(`You have left the group "${groupName}".`);
         },
         error: (error) => {
@@ -261,7 +274,6 @@ export class UserGroupComponent implements OnInit {
       });
     }
   }
-  
 
   cancelCreateChannel(): void {
     this.showCreateChannelForGroup = null;
