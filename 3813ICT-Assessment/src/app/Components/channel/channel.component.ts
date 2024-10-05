@@ -43,6 +43,7 @@ export class ChannelComponent implements OnInit {
     private groupsService: GroupsService,
     private usersService: UsersService,
   ) {
+    // Retrieve groupName and channelName from route parameters
     this.route.paramMap.subscribe(params => {
       this.groupName = params.get('groupName');
       this.channelName = params.get('channelName');
@@ -54,23 +55,53 @@ export class ChannelComponent implements OnInit {
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.username = storedUser.username || '';
     this.roles = storedUser.roles || [];
-
     this.isSuperAdmin = this.roles.includes('superAdmin');
-
-    // Fetch request count
-    if (this.isGroupAdminOrSuperAdmin()) {
-      this.requestsService.getRequestCount().subscribe({
-        next: (count: number) => {
-          this.requestCount = count;
-        },
-        error: (err) => {
-          console.error('Failed to get request count:', err);
-        }
-      });
-    }
+    this.isGroupAdmin = this.roles.includes('groupAdmin');
 
     if (this.groupName) {
-      // Fetch users in the group
+      this.loadInitialData();
+    }
+  }
+
+  //******************************Data Loading******************************
+  private loadInitialData(): void {
+    // Fetch request count if the user is group admin or super admin
+    if (this.isGroupAdminOrSuperAdmin()) {
+      this.loadRequestCount();
+    }
+
+    // Load users, admins, and creator of the group
+    forkJoin([
+      this.groupsService.getUsersInGroup(this.groupName!),
+      this.groupsService.getGroupAdmins(this.groupName!),
+      this.authService.getSuperAdmins(),
+      this.groupsService.getGroupCreator(this.groupName!)
+    ]).subscribe({
+      next: ([users, admins, superAdmins, creator]) => {
+        this.usersInGroup = users;
+        this.groupAdmins = [...admins, ...superAdmins];
+        this.groupCreator = creator;
+        this.isCreator = this.username === this.groupCreator || this.isSuperAdmin;
+      },
+      error: (error) => {
+        console.error('Failed to load initial data:', error);
+      }
+    });
+  }
+
+  private loadRequestCount(): void {
+    this.requestsService.getRequestCount().subscribe({
+      next: (count: number) => {
+        this.requestCount = count;
+      },
+      error: (err) => {
+        console.error('Failed to get request count:', err);
+      }
+    });
+  }
+
+  private loadUsersInGroup(): void {
+    if (this.groupName) {
       this.groupsService.getUsersInGroup(this.groupName).subscribe({
         next: (users) => {
           this.usersInGroup = users;
@@ -79,33 +110,6 @@ export class ChannelComponent implements OnInit {
           console.error('Failed to load users in group:', error);
         }
       });
-
-      // Fetch group admins and super admins using forkJoin
-      forkJoin([
-        this.groupsService.getGroupAdmins(this.groupName),
-        this.authService.getSuperAdmins()
-      ]).subscribe({
-        next: ([admins, superAdmins]) => {
-          this.groupAdmins = [...admins, ...superAdmins];
-        },
-        error: (error) => {
-          console.error('Failed to load group admins:', error);
-        }
-      });
-
-      // Fetch group creator
-      this.groupsService.getGroupCreator(this.groupName).subscribe({
-        next: (creator) => {
-          this.groupCreator = creator;
-          // Check if the current user is the group creator or a super admin
-          this.isCreator = this.username === this.groupCreator || this.isSuperAdmin;
-        },
-        error: (error) => {
-          console.error('Failed to load group creator:', error);
-        }
-      });
-
-      this.isGroupAdmin = this.roles.includes('groupAdmin');
     }
   }
 
@@ -114,18 +118,15 @@ export class ChannelComponent implements OnInit {
     return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
   }
 
-  //******************************Drop Down Menu Functions**************************
+  //******************************User Actions******************************
   reportUser(reportedUsername: string): void {
-    // Check if the user is trying to report themselves
     if (reportedUsername === this.username) {
       alert('You cannot report yourself.');
       return;
     }
 
-    // Retrieve existing report requests
     this.requestsService.getReportRequests().subscribe({
       next: (existingReports) => {
-        // Check if a report from this user about this reported user and group already exists
         const duplicateReport = existingReports.some(req =>
           req.reporterUsername === this.username &&
           req.reportedUsername === reportedUsername &&
@@ -137,12 +138,11 @@ export class ChannelComponent implements OnInit {
           return;
         }
 
-        // Create a new report request
         this.requestsService.createReportRequest(
-          this.username,                // reporterUsername
-          reportedUsername,             // reportedUsername
-          'Violation of group rules',   // Reason for reporting
-          this.groupName || ''          // Group name where the user was reported
+          this.username, // reporterUsername
+          reportedUsername, // reportedUsername
+          'Violation of group rules', // Reason for reporting
+          this.groupName || '' // Group name where the user was reported
         ).subscribe({
           next: () => {
             alert('User reported successfully.');
@@ -159,7 +159,6 @@ export class ChannelComponent implements OnInit {
   }
 
   kickUserFromGroup(username: string): void {
-    // Check if the user attempting to kick is the same as the user being kicked
     if (username === this.username) {
       alert('You cannot remove yourself from the group.');
       return;
@@ -170,8 +169,7 @@ export class ChannelComponent implements OnInit {
       this.groupsService.kickUserFromGroup(this.groupName || '', username).subscribe({
         next: () => {
           alert('User removed successfully.');
-          // Update user list after removal
-          this.loadUsersInGroup();
+          this.loadUsersInGroup(); // Reload users in group after removal
         },
         error: (error) => {
           console.error('Failed to remove user:', error);
@@ -181,21 +179,7 @@ export class ChannelComponent implements OnInit {
     }
   }
 
-  // Function to reload users in the group
-  private loadUsersInGroup(): void {
-    if (this.groupName) {
-      this.groupsService.getUsersInGroup(this.groupName).subscribe({
-        next: (users) => {
-          this.usersInGroup = users;
-        },
-        error: (error) => {
-          console.error('Failed to load users in group:', error);
-        }
-      });
-    }
-  }
-
-  //******************************Button Methods******************************
+  //******************************Channel Management******************************
   deleteChannel(): void {
     const confirmed = window.confirm('Are you sure you want to delete this channel? This action cannot be undone.');
 

@@ -68,15 +68,15 @@ export class GroupsService {
     return this.http.delete(`${this.apiUrl}/${groupName}/channels/${channelName}`, { body: { currentUsername, isSuperAdmin } });
   }
 
-  // Get group admins
-  getGroupAdmins(groupName: string): Observable<Admin[]> {
-    return this.http.get<Admin[]>(`${this.apiUrl}/${groupName}/admins`);
-  }
-
 
   // Get users in a specific group
   getUsersInGroup(groupName: string): Observable<{ userId: string; username: string }[]> {
     return this.http.get<{ userId: string; username: string }[]>(`${this.apiUrl}/${groupName}/users`);
+  }
+
+  // Get group admins
+  getGroupAdmins(groupName: string): Observable<Admin[]> {
+    return this.http.get<Admin[]>(`${this.apiUrl}/${groupName}/admins`);
   }
 
   // Leave a group

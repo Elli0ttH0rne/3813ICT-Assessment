@@ -175,6 +175,43 @@ const deleteGroup = (req, res) => {
   });
 };
 
+// Get users in a specific group
+const getUsersInGroup = (req, res) => {
+  const { groupName } = req.params;
+
+  readFile(usersFilePath, (err, users) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to read users data.' });
+    }
+
+    // Filter users who belong to the specified group
+    const usersInGroup = users.filter(user => user.groups.includes(groupName));
+
+    // Return the list of users in the group
+    res.json(usersInGroup.map(user => ({ userId: user.userId, username: user.username })));
+  });
+};
+
+// Get admins of a specific group
+const getGroupAdmins = (req, res) => {
+  const { groupName } = req.params;
+
+  readFile(groupsFilePath, (err, groups) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to read groups data.' });
+    }
+
+    // Find the group by name
+    const group = groups.find(g => g.name === groupName);
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found.' });
+    }
+
+    // Return the list of admins for the group
+    res.json(group.admins);
+  });
+};
+
 
 
 module.exports = {
@@ -183,5 +220,7 @@ module.exports = {
   createGroup,
   getGroupChannels,
   deleteGroup,
-  leaveGroup
+  leaveGroup,
+  getUsersInGroup,
+  getGroupAdmins
 };
