@@ -32,5 +32,7 @@ router.get('/:groupName/users', groupsController.getUsersInGroup);
 // Route to get admins of a specific group
 router.get('/:groupName/admins', groupsController.getGroupAdmins);
 
+// Route to remove a user from a group
+router.delete('/groups/:groupName/users/:userId', groupsController.removeUserFromGroup);
 
 module.exports = router;

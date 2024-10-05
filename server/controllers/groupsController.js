@@ -327,6 +327,32 @@ const deleteChannel = (req, res) => {
   });
 };
 
+// Function to remove a user from a group and update users.json
+const removeUserFromGroup = (req, res) => {
+  const { groupName, userId } = req.params;
+
+  readFile(usersFilePath, (err, users) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to read users data.' });
+    }
+
+    // Find the user by ID and remove the group from the groups array
+    const user = users.find(user => user.userId === userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    user.groups = user.groups.filter(group => group !== groupName);
+
+    writeFile(usersFilePath, users, (writeErr) => {
+      if (writeErr) {
+        return res.status(500).json({ error: 'Failed to update user data.' });
+      }
+
+      res.status(200).json({ message: 'User removed from group successfully.' });
+    });
+  });
+};
 
 
 
@@ -340,5 +366,6 @@ module.exports = {
   createChannel,
   leaveGroup,
   deleteGroup,
-  deleteChannel
+  deleteChannel,
+  removeUserFromGroup
 };

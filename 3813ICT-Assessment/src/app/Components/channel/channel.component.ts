@@ -145,10 +145,16 @@ export class ChannelComponent implements OnInit {
       alert('You cannot remove yourself from the group.');
       return;
     }
-
+  
     const confirmed = window.confirm('Are you sure you want to remove this user from the group?');
-    if (confirmed) {
-      this.groupsService.kickUserFromGroup(this.groupName || '', username).subscribe({
+    if (confirmed && this.groupName) {
+      const user = this.usersInGroup.find(user => user.username === username);
+      if (!user) {
+        alert('User not found in the group.');
+        return;
+      }
+  
+      this.groupsService.kickUserFromGroup(this.groupName, user.userId).subscribe({
         next: () => {
           alert('User removed successfully.');
           this.loadUsersInGroup(); // Reload users in group after removal

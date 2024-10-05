@@ -33,14 +33,42 @@
                   Dropdown button
                 </button>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                  <li><a class="dropdown-item" (click)="reportUser(user.username)">Report User to Admins</a></li>
-                    <li *ngIf="isCreator || isSuperAdmin"><a class="dropdown-item" (click)="kickUserFromGroup(user.username)">Remove user from Group</a></li>
-                    <li *ngIf="isCreator"><a class="dropdown-item" (click)="kickUserFromGroupAndReport(user.username)">Remove user from group and report to Super Admin</a></li>
-                    <li *ngIf="isGroupAdmin"><a class="dropdown-item" (click)="requestPromotionToGroupAdmin(user.username)">Request user be promoted to Group Admin</a></li>
-                    <li *ngIf="isSuperAdmin"><a class="dropdown-item" (click)="deleteUsersAccount(user.username)">Delete Users Account</a></li>
-                    <li *ngIf="isSuperAdmin"><a class="dropdown-item" (click)="promoteToGroupAdmin(user.username)">Promote to Group Admin</a></li>
-                    <li *ngIf="isSuperAdmin"><a class="dropdown-item" (click)="promoteToSuperAdmin(user.username)">Promote to Super Admin</a></li>
+                  <!-- Only show 'Report User to Admins' if not a super admin -->
+                  <li *ngIf="!isSuperAdmin">
+                    <a class="dropdown-item" (click)="reportUser(user.username)">Report User to Admins</a>
+                  </li>
+                
+                  <!-- Only show 'Remove user from Group' if the user is the creator or a super admin -->
+                  <li *ngIf="isCreator || isSuperAdmin">
+                    <a class="dropdown-item" (click)="kickUserFromGroup(user.username)">Remove user from Group</a>
+                  </li>
+                
+                  <!-- Removed 'Remove user from group and report to Super Admin' for super admins -->
+                  <li *ngIf="isCreator && !isSuperAdmin">
+                    <a class="dropdown-item" (click)="kickUserFromGroupAndReport(user.username)">Remove user from group and report to Super Admin</a>
+                  </li>
+                
+                  <!-- Removed 'Request user be promoted to Group Admin' for super admins -->
+                  <li *ngIf="isGroupAdmin && !isSuperAdmin">
+                    <a class="dropdown-item" (click)="requestPromotionToGroupAdmin(user.username)">Request user be promoted to Group Admin</a>
+                  </li>
+                
+                  <!-- Only show 'Delete Users Account' for super admins -->
+                  <li *ngIf="isSuperAdmin">
+                    <a class="dropdown-item" (click)="deleteUsersAccount(user.username)">Delete Users Account</a>
+                  </li>
+                
+                  <!-- Only show 'Promote to Group Admin' for super admins -->
+                  <li *ngIf="isSuperAdmin">
+                    <a class="dropdown-item" (click)="promoteToGroupAdmin(user.username)">Promote to Group Admin</a>
+                  </li>
+                
+                  <!-- Only show 'Promote to Super Admin' for super admins -->
+                  <li *ngIf="isSuperAdmin">
+                    <a class="dropdown-item" (click)="promoteToSuperAdmin(user.username)">Promote to Super Admin</a>
+                  </li>
                 </div>
+                
               </li>
             </ul>
 

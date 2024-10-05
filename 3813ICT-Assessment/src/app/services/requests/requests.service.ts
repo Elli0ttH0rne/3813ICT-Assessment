@@ -48,16 +48,7 @@ export class RequestsService {
   }
 
   getReportRequests(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}?type=report`).pipe(
-      map(requests => {
-        console.log('Report requests received from backend:', requests);
-        return requests;
-      }),
-      catchError((error) => {
-        console.error('Failed to get report requests:', error);
-        return of([]);
-      })
-    );
+    return this.getRequestsByType('report');
   }
   
 
