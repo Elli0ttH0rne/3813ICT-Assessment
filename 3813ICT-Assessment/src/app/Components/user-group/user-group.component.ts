@@ -139,6 +139,7 @@ export class UserGroupComponent implements OnInit {
     return this.userID === this.groupCreators[group] || this.roles.includes('superAdmin');
   }
   
+  
   isGroupCreator(group: string): boolean {
     return this.userID === this.groupCreators[group];
   }
@@ -190,18 +191,28 @@ export class UserGroupComponent implements OnInit {
 
   createGroup(): void {
     if (this.newGroupName.trim()) {
-      const isSuperAdmin = this.roles.includes('superAdmin');
-      
       this.groupsService.createGroup(this.newGroupName, this.username, this.userID).subscribe({
         next: () => {
+          // Add the new group to the local groups state
           this.groups.push(this.newGroupName);
           this.channels[this.newGroupName] = [];
-          this.groupCreators[this.newGroupName] = this.username;
+          this.groupCreators[this.newGroupName] = this.userID; // Set the current user as the creator by userID
+  
+          // Update local storage with the new group
+          const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+          if (!storedUser.groups) {
+            storedUser.groups = [];
+          }
+          storedUser.groups.push(this.newGroupName);
+          localStorage.setItem('currentUser', JSON.stringify(storedUser));
   
           // Reset the form and hide it
           this.showCreateGroup = false;
           this.newGroupName = '';
           this.openGroups.push(false);
+  
+          // Refresh visibility of buttons based on updated state
+          this.updateGroupPermissions();
         },
         error: (error) => {
           console.error('Failed to create group:', error);
@@ -213,7 +224,16 @@ export class UserGroupComponent implements OnInit {
     }
   }
   
-
+  private updateGroupPermissions(): void {
+    this.groups.forEach(group => {
+      // Ensure the group creator is set correctly in the state
+      if (!this.groupCreators[group]) {
+        // If the group creator is not set yet, fetch the creator (could also use cached value)
+        this.groupCreators[group] = this.userID;
+      }
+    });
+  }
+  
 
   cancelCreateGroup(): void {
     this.showCreateGroup = false;

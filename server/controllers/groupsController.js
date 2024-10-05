@@ -41,8 +41,10 @@ const createGroup = (req, res) => {
     return res.status(400).json({ error: 'Group name, creator username, and creator ID are required.' });
   }
 
+  // Step 1: Read and update groups.json
   readFile(groupsFilePath, (err, groups) => {
     if (err) {
+      console.error('Failed to read groups.json:', err);
       return res.status(500).json({ error: 'Failed to read groups data.' });
     }
 
@@ -59,14 +61,46 @@ const createGroup = (req, res) => {
 
     groups.push(newGroup);
 
-    writeFile(groupsFilePath, groups, (err) => {
-      if (err) {
+    writeFile(groupsFilePath, groups, (writeErr) => {
+      if (writeErr) {
+        console.error('Failed to save new group to groups.json:', writeErr);
         return res.status(500).json({ error: 'Failed to save new group.' });
       }
-      res.status(201).json({ message: 'New group created successfully.' });
+
+      // Step 2: Read and update users.json
+      readFile(usersFilePath, (userErr, users) => {
+        if (userErr) {
+          console.error('Failed to read users.json:', userErr);
+          return res.status(500).json({ error: 'Failed to read users data.' });
+        }
+
+        // Find the user and update their groups array
+        const userIndex = users.findIndex(u => u.userId === creatorId);
+        if (userIndex !== -1) {
+          if (!users[userIndex].groups) {
+            users[userIndex].groups = [];
+          }
+          users[userIndex].groups.push(groupName);
+
+          // Write the updated users data back to users.json
+          writeFile(usersFilePath, users, (userWriteErr) => {
+            if (userWriteErr) {
+              console.error('Failed to update user data in users.json:', userWriteErr);
+              return res.status(500).json({ error: 'Failed to update user data.' });
+            }
+
+            console.log(`User ${creatorId} successfully updated with new group ${groupName}.`);
+            res.status(201).json({ message: 'New group created successfully.' });
+          });
+        } else {
+          console.error('User not found in users.json:', creatorId);
+          return res.status(404).json({ error: 'User not found.' });
+        }
+      });
     });
   });
 };
+
 
 // Get channels for a specific group
 const getGroupChannels = (req, res) => {
