@@ -2,7 +2,10 @@ const express = require('express');
 const router = express.Router();
 const requestsController = require('../controllers/requestsController');
 
-router.get('/', requestsController.getAllRequests);
+// Route to create a new request
 router.post('/', requestsController.createRequest);
+
+// Route to get all requests
+router.get('/', requestsController.getAllRequests);
 
 module.exports = router;

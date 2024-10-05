@@ -9,19 +9,19 @@ import { map } from 'rxjs/operators';
 })
 export class RequestsService {
 
-  private apiUrl = 'http://localhost:3000/api/requests'; // Update with your server address
+  private apiUrl = 'http://localhost:3000/api/requests';
 
   constructor(private http: HttpClient) {}
 
   //******************************Join Group Request Methods******************************
-  requestToJoinGroup(username: string, groupName: string): Observable<any> {
-    const newRequest = { username, groupName, status: 'pending', type: 'joinGroup' };
-    return this.http.post(this.apiUrl, newRequest).pipe(
-      catchError((error) => {
-        console.error('Failed to request to join group:', error);
-        return of(null);
-      })
-    );
+  // Create a new request (join, report, or promotion)
+  createRequest(username: string, groupName: string, typeOfRequest: string): Observable<any> {
+    return this.http.post(this.apiUrl, { username, groupName, typeOfRequest });
+  }
+
+  // Get all requests
+  getAllRequests(): Observable<any[]> {
+    return this.http.get<any[]>(this.apiUrl);
   }
 
   getGroupJoinRequests(): Observable<any[]> {

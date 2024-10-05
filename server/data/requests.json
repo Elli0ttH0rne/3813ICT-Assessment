@@ -1,11 +1,12 @@
 [
   {
-    "reporterUsername": "user1",
-    "reportedUsername": "groupAdmin2",
-    "reason": "Violation of group rules",
-    "groupName": "Cooking",
-    "status": "pending",
-    "type": "report",
-    "id": "1728122799835"
+    "username": "user1",
+    "groupName": "Music",
+    "typeOfRequest": "join"
+  },
+  {
+    "username": "user1",
+    "groupName": "Reading",
+    "typeOfRequest": "join"
   }
 ]

@@ -81,21 +81,32 @@ export class AllGroupListComponent implements OnInit {
   }
 
   requestToJoin(groupName: string): void {
-    if (this.joinRequests[groupName]) return;
-
-    this.joinRequests[groupName] = true;
-
-    const success = this.requestsService.requestToJoinGroup(this.username, groupName);
-    if (success) {
-      console.log(`Request to join ${groupName} sent successfully by ${this.username}`);
-    } else {
-      console.error(`Failed to send request to join ${groupName}.`);
+    // Check if the request has already been sent
+    if (this.joinRequests[groupName]) {
+      alert(`You have already requested to join the group "${groupName}".`);
+      return;
     }
+  
+    // Set request status to true to prevent duplicate requests
+    this.joinRequests[groupName] = true;
+  
+    // Send the join request
+    this.requestsService.createRequest(this.username, groupName, 'join').subscribe({
+      next: () => {
+        console.log(`Request to join ${groupName} sent successfully by ${this.username}`);
+        alert(`Your request to join the group "${groupName}" has been sent successfully.`);
+      },
+      error: (error) => {
+        console.error(`Failed to send request to join ${groupName}:`, error);
+        alert(`You have already requested to join "${groupName}".`);
+        // If the request fails, reset the status so the user can try again
+        this.joinRequests[groupName] = false;
+      }
+    });
   }
-
-
-
-
+  
+  
+  
   //******************************Component Navigation******************************
   navigateToAccount(): void {
     this.router.navigate(['/account']);
