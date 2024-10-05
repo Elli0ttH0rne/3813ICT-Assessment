@@ -206,6 +206,27 @@ export class ChannelComponent implements OnInit {
     }
   }
   
+  deleteUsersAccount(username: string): void {
+    if (!this.isSuperAdmin) {
+      alert('Only Super Admins can delete user accounts.');
+      return;
+    }
+  
+    const confirmed = window.confirm('Are you sure you want to delete this user\'s account? This action cannot be undone.');
+    if (confirmed) {
+      this.usersService.deleteUserByUsername(username).subscribe({
+        next: () => {
+          alert('User account deleted successfully.');
+          this.loadUsersInGroup(); // Reload users in group after deletion
+        },
+        error: (error) => {
+          console.error('Failed to delete user account:', error);
+          alert('Failed to delete user account.');
+        }
+      });
+    }
+  }
+  
 
   //******************************Channel Management******************************
   deleteChannel(): void {

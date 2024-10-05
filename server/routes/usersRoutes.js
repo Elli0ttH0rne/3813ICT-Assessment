@@ -11,8 +11,8 @@ router.post('/', usersController.addUser);
 // Route to save updated list of users
 router.put('/save', usersController.saveUsers);
 
-// Route to delete a user by username
-router.delete('/:username', usersController.deleteUser);
+// Delete user by username
+router.delete('/username/:username', usersController.deleteUserByUsername);
 
 // Route to get all super admins
 router.get('/superAdmins', usersController.getSuperAdmins);
