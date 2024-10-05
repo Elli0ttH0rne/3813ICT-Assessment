@@ -63,13 +63,10 @@ export class UserGroupComponent implements OnInit {
       // Fetch all groups for super admin
       this.groupsService.getAllGroups().subscribe({
         next: (allGroups) => {
-          console.log('All groups:', allGroups); // Log all groups received
           this.groups = allGroups.map(group => group.name);
           this.openGroups = new Array(this.groups.length).fill(false);
   
-          // Fetch channels and group creators for each group
           this.groups.forEach(group => {
-            console.log(`Fetching channels and creator for group: ${group}`); // Log group name
   
             forkJoin([
               this.groupsService.getGroupChannels(group),
@@ -79,8 +76,6 @@ export class UserGroupComponent implements OnInit {
                 this.channels[group] = channels;
                 this.groupCreators[group] = creator;
   
-                // Log the group and creator to the console
-                console.log(`Group: ${group}, Creator: ${creator}`);
               },
               error: (error) => {
                 console.error(`Failed to load channels or creator for group "${group}":`, error);
@@ -93,8 +88,6 @@ export class UserGroupComponent implements OnInit {
         }
       });
     } else {
-      // Fetch groups only for the logged-in user
-      console.log('Fetching groups for user:', this.userID);
       this.groups = storedUser.groups;
       this.openGroups = new Array(this.groups.length).fill(false);
   

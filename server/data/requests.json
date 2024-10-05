@@ -6,9 +6,14 @@
   },
   {
     "username": "user1",
+    "groupName": "Gaming",
+    "typeOfRequest": "join"
+  },
+  {
+    "username": "user1",
     "groupName": "Cooking",
     "typeOfRequest": "report",
-    "reportedUsername": "user3",
+    "reportedUsername": "user5",
     "reason": "Violation of group rules"
   }
 ]

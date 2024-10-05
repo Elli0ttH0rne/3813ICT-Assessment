@@ -59,7 +59,7 @@ export class AccountComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  deleteAccount(): void {
+  /*deleteAccount(): void {
     if (this.isGroupAdminOrSuperAdmin()) {
       alert('Group Admins and Super Admins cannot delete their accounts.');
       return;
@@ -91,6 +91,7 @@ export class AccountComponent implements OnInit {
       console.log('Account deletion cancelled');
     }
   }
+*/
 
   //******************************Component Navigation******************************
   navigateToAccount(): void {

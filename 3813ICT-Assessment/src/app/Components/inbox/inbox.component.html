@@ -11,7 +11,7 @@
                 <i class="fas fa-inbox fa-2x me-2" style="cursor: pointer;" (click)="navigateToInbox()"></i>
                 <span class="badge badge-notification" *ngIf="requestCount > 0">{{ requestCount }}</span>
               </div>
-            </ng-container>  
+            </ng-container>
             <i class="fas fa-user-circle fa-2x me-2" style="cursor: pointer;" (click)="navigateToAccount()"></i>
           </div>
         </div>
@@ -19,25 +19,25 @@
           <!-- Tabs for Inbox -->
           <ul class="nav nav-tabs mb-3">
             <li class="nav-item">
-              <a 
-                class="nav-link" 
-                [class.active]="activeTab === 'joinRequests'" 
+              <a
+                class="nav-link"
+                [class.active]="activeTab === 'joinRequests'"
                 (click)="setActiveTab('joinRequests')">
                 Group Join Requests
               </a>
             </li>
             <li class="nav-item" *ngIf="isSuperAdmin()">
-              <a 
-                class="nav-link" 
-                [class.active]="activeTab === 'reportedUsers'" 
+              <a
+                class="nav-link"
+                [class.active]="activeTab === 'reportedUsers'"
                 (click)="setActiveTab('reportedUsers')">
                 Reported Users
               </a>
             </li>
             <li class="nav-item" *ngIf="isSuperAdmin()">
-              <a 
-                class="nav-link" 
-                [class.active]="activeTab === 'promotionRequests'" 
+              <a
+                class="nav-link"
+                [class.active]="activeTab === 'promotionRequests'"
                 (click)="setActiveTab('promotionRequests')">
                 User Promotion Requests
               </a>
@@ -45,9 +45,11 @@
           </ul>
 
           <!-- Tab Content -->
+
+          <!-- Group Join Requests Tab Content -->
           <div *ngIf="activeTab === 'joinRequests'">
-            <p>Here you can view and manage group join requests.</p>
-            <ul class="list-group">
+            <p *ngIf="joinRequests.length === 0">No group join requests available.</p>
+            <ul class="list-group" *ngIf="joinRequests.length > 0">
               <li *ngFor="let request of joinRequests" class="list-group-item d-flex justify-content-between align-items-center">
                 <span>{{ request.username }} wants to join {{ request.groupName }}</span>
                 <div>
@@ -57,24 +59,26 @@
               </li>
             </ul>
           </div>
-          
+
+          <!-- Reported Users Tab Content -->
           <div *ngIf="activeTab === 'reportedUsers'">
-            <p>Here you can view and manage reported users.</p>
-            <ul class="list-group">
+            <p *ngIf="reportRequests.length === 0">No reported users available.</p>
+            <ul class="list-group" *ngIf="reportRequests.length > 0">
               <li *ngFor="let reportedUser of reportRequests" class="list-group-item d-flex justify-content-between align-items-center">
-                <span>{{ reportedUser.reportedUsername }} has been reported for {{ reportedUser.reason }} in the group {{ reportedUser.groupName }} by {{ reportedUser.reporterUsername }} </span>
+                <span>{{ reportedUser.reportedUsername }} has been reported for "{{ reportedUser.reason }}" in the group {{ reportedUser.groupName }} by {{ reportedUser.username }}</span>
                 <div>
                   <button class="btn btn-danger btn-sm" (click)="banReportedUser(reportedUser)">Ban</button>
-                  <button class="btn btn-success btn-sm me-2" (click)="removeReportedUserRequest(reportedUser)">Deny</button>
+                  <button class="btn btn-secondary btn-sm me-2" (click)="removeReportedUserRequest(reportedUser)">Dismiss</button>
                 </div>
               </li>
             </ul>
           </div>
-          
 
+
+          <!-- Promotion Requests Tab Content -->
           <div *ngIf="activeTab === 'promotionRequests'">
-            <p>Here you can view and manage user promotion requests.</p>
-            <ul class="list-group">
+            <p *ngIf="promotionRequests.length === 0">No promotion requests available.</p>
+            <ul class="list-group" *ngIf="promotionRequests.length > 0">
               <li *ngFor="let promotionRequest of promotionRequests" class="list-group-item d-flex justify-content-between align-items-center">
                 <span>{{ promotionRequest.requestedAdmin }} is requesting that {{ promotionRequest.promotionUser }} be promoted to Group Admin</span>
                 <div>
@@ -84,7 +88,9 @@
               </li>
             </ul>
           </div>
-        </div>
+
+
+        <!-- Card Footer with Back Button -->
         <div class="card-footer d-flex justify-content-start">
           <i class="fas fa-arrow-left fa-2x" style="cursor: pointer;" (click)="navigateToUserGroup()"></i>
         </div>

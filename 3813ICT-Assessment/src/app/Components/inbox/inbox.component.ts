@@ -21,7 +21,6 @@ export class InboxComponent implements OnInit {
   reportRequests: any[] = []; 
   promotionRequests: any[] = []; 
   requestCount: number = 0; 
-  groupAdmins: { username: string; role: string }[] = [];
 
   constructor(
     private router: Router, 
@@ -35,7 +34,7 @@ export class InboxComponent implements OnInit {
     this.username = storedUser.username;
     this.roles = storedUser.roles;
 
-    // Load requests based on roles and active tab
+    // Load initial requests based on roles and active tab
     if (this.isGroupAdminOrSuperAdmin()) {
       this.loadJoinRequests();
       this.requestsService.getRequestCount().subscribe({
@@ -64,37 +63,38 @@ export class InboxComponent implements OnInit {
 
   //******************************Loading Methods******************************
   loadJoinRequests(): void {
-    this.requestsService.getGroupJoinRequests().subscribe({
+    this.requestsService.getAllRequests().subscribe({
       next: (requests) => {
-        this.joinRequests = requests;
+        this.joinRequests = requests.filter(request => request.typeOfRequest === 'join');
       },
       error: (err) => {
         console.error('Failed to load join requests:', err);
       }
     });
   }
-
+  
   loadReportedUsers(): void {
-    this.requestsService.getReportRequests().subscribe({
+    this.requestsService.getAllRequests().subscribe({
       next: (requests) => {
-        this.reportRequests = requests;
+        this.reportRequests = requests.filter(request => request.typeOfRequest === 'report');
       },
       error: (err) => {
         console.error('Failed to load report requests:', err);
       }
     });
   }
-
+  
   loadPromotionRequests(): void {
-    this.requestsService.getPromotionRequests().subscribe({
+    this.requestsService.getAllRequests().subscribe({
       next: (requests) => {
-        this.promotionRequests = requests;
+        this.promotionRequests = requests.filter(request => request.typeOfRequest === 'promotion');
       },
       error: (err) => {
         console.error('Failed to load promotion requests:', err);
       }
     });
   }
+  
 
   //******************************Group Request Methods******************************
   approveRequest(request: any): void {
@@ -130,47 +130,6 @@ export class InboxComponent implements OnInit {
   }
 
   //******************************Report Request Methods******************************
-  banReportedUser(reportedUser: any): void {
-    if (!reportedUser.reportedUsername) {
-      console.error('Username is undefined');
-      return;
-    }
-    const confirmed = window.confirm(`Are you sure you want to ban ${reportedUser.reportedUsername} from the group ${reportedUser.groupName}? This action cannot be undone.`);
-
-    if (confirmed) {
-      this.groupsService.kickUserFromGroup(reportedUser.groupName, reportedUser.reportedUsername).subscribe({
-        next: () => {
-          alert(`User ${reportedUser.reportedUsername} removed successfully.`);
-          this.reportRequests = this.reportRequests.filter(user => user !== reportedUser);
-          this.removeReportedUserRequest(reportedUser);
-        },
-        error: (error) => {
-          console.error('Failed to remove user:', error);
-          alert('Failed to remove user.');
-        }
-      });
-    }
-  }
-
-  removeReportedUserRequest(user: any): void {
-    this.requestsService.getReportRequests().subscribe({
-      next: (requests) => {
-        const updatedRequests = requests.filter(req => !(req.reportedUsername === user.reportedUsername && req.groupName === user.groupName));
-        this.requestsService.updateReportRequests(updatedRequests).subscribe({
-          next: () => {
-            console.log('Requests updated successfully.');
-          },
-          error: (err) => {
-            console.error('Failed to update requests:', err);
-          }
-        });
-      },
-      error: (err) => {
-        console.error('Failed to load report requests:', err);
-      }
-    });
-  }
-
   approvePromotionRequest(promotionRequest: any): void {
     if (!promotionRequest || !promotionRequest.promotionUser) {
       console.error('Invalid promotion request');
@@ -221,10 +180,6 @@ export class InboxComponent implements OnInit {
   //******************************Component Navigation******************************
   navigateToAccount(): void {
     this.router.navigate(['/account']);
-  }
-
-  navigateToInbox(): void {
-    this.router.navigate(['/inbox']);
   }
 
   navigateToUserGroup(): void {
