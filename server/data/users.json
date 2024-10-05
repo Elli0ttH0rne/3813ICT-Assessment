@@ -7,7 +7,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Cooking",
+      "Gardening",
+      "Travel",
+      "Fitness",
+      "Photography"
+    ]
   },
   {
     "userId": "u002",
@@ -17,7 +23,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Music",
+      "Reading",
+      "Gaming",
+      "DIY",
+      "Art"
+    ]
   },
   {
     "userId": "u003",
@@ -27,7 +39,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Photography",
+      "Gaming",
+      "Cooking",
+      "Travel",
+      "DIY"
+    ]
   },
   {
     "userId": "u004",
@@ -37,7 +55,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Fitness",
+      "Gardening",
+      "Art",
+      "Music",
+      "Gaming"
+    ]
   },
   {
     "userId": "u005",
@@ -47,7 +71,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Cooking",
+      "Reading",
+      "Travel",
+      "Photography",
+      "Fitness"
+    ]
   },
   {
     "userId": "u006",
@@ -57,7 +87,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Gaming",
+      "Music",
+      "Art",
+      "Travel",
+      "Cooking"
+    ]
   },
   {
     "userId": "u007",
@@ -67,7 +103,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Photography",
+      "DIY",
+      "Reading",
+      "Fitness",
+      "Travel"
+    ]
   },
   {
     "userId": "u008",
@@ -77,7 +119,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Cooking",
+      "Art",
+      "Music",
+      "Fitness",
+      "Gardening"
+    ]
   },
   {
     "userId": "u009",
@@ -87,7 +135,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Travel",
+      "Reading",
+      "Gaming",
+      "Art",
+      "Photography"
+    ]
   },
   {
     "userId": "u010",
@@ -97,7 +151,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "DIY",
+      "Music",
+      "Cooking",
+      "Fitness",
+      "Gaming"
+    ]
   },
   {
     "userId": "u011",
@@ -107,7 +167,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Gardening",
+      "Photography",
+      "Music",
+      "Art",
+      "Reading"
+    ]
   },
   {
     "userId": "u012",
@@ -117,7 +183,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Art",
+      "Travel",
+      "Photography",
+      "Fitness",
+      "Music"
+    ]
   },
   {
     "userId": "u013",
@@ -127,7 +199,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Gaming",
+      "Travel",
+      "Photography",
+      "Fitness",
+      "Cooking"
+    ]
   },
   {
     "userId": "u014",
@@ -137,7 +215,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Reading",
+      "Music",
+      "Fitness",
+      "Art",
+      "Travel"
+    ]
   },
   {
     "userId": "u015",
@@ -147,7 +231,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "DIY",
+      "Photography",
+      "Music",
+      "Gaming",
+      "Cooking"
+    ]
   },
   {
     "userId": "u016",
@@ -157,7 +247,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Fitness",
+      "Travel",
+      "Gaming",
+      "Cooking",
+      "Music"
+    ]
   },
   {
     "userId": "u017",
@@ -167,7 +263,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Cooking",
+      "Fitness",
+      "Gaming",
+      "Art",
+      "Music"
+    ]
   },
   {
     "userId": "u018",
@@ -177,7 +279,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Travel",
+      "DIY",
+      "Art",
+      "Photography",
+      "Reading"
+    ]
   },
   {
     "userId": "u019",
@@ -187,7 +295,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Music",
+      "Photography",
+      "Cooking",
+      "Fitness",
+      "Travel"
+    ]
   },
   {
     "userId": "u020",
@@ -197,7 +311,13 @@
     "roles": [
       "user"
     ],
-    "groups": []
+    "groups": [
+      "Art",
+      "Gaming",
+      "Travel",
+      "Music",
+      "Cooking"
+    ]
   },
   {
     "userId": "u021",
@@ -208,7 +328,18 @@
       "user",
       "groupAdmin"
     ],
-    "groups": []
+    "groups": [
+      "Photography",
+      "Cooking",
+      "Gardening",
+      "Travel",
+      "Fitness",
+      "Music",
+      "Reading",
+      "Gaming",
+      "DIY",
+      "Art"
+    ]
   },
   {
     "userId": "u022",
@@ -219,7 +350,18 @@
       "user",
       "groupAdmin"
     ],
-    "groups": []
+    "groups": [
+      "Photography",
+      "Cooking",
+      "Gardening",
+      "Travel",
+      "Fitness",
+      "Music",
+      "Reading",
+      "Gaming",
+      "DIY",
+      "Art"
+    ]
   },
   {
     "userId": "u023",
