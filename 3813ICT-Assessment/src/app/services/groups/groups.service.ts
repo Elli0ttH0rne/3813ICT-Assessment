@@ -58,9 +58,10 @@ export class GroupsService {
   }
 
   // Delete a specific group
-  deleteGroup(groupName: string, currentUsername: string, isSuperAdmin: boolean): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${groupName}`, { body: { currentUsername, isSuperAdmin } });
+  deleteGroup(groupName: string, currentUserId: string, isSuperAdmin: boolean): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${groupName}`, { body: { currentUserId, isSuperAdmin } });
   }
+
 
   // Delete a specific channel from a group
   deleteChannel(groupName: string, channelName: string, currentUsername: string, isSuperAdmin: boolean): Observable<any> {

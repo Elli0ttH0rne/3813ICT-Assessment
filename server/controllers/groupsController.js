@@ -122,33 +122,60 @@ const leaveGroup = (req, res) => {
 // Delete a group
 const deleteGroup = (req, res) => {
   const { groupName } = req.params;
-  const { currentUsername, isSuperAdmin } = req.body;
+  const { currentUserId, isSuperAdmin } = req.body;
 
   readFile(groupsFilePath, (err, groups) => {
     if (err) {
       return res.status(500).json({ error: 'Failed to read groups data.' });
     }
 
+    // Find the group by name
     const groupIndex = groups.findIndex(g => g.name === groupName);
     if (groupIndex === -1) {
       return res.status(404).json({ error: 'Group not found.' });
     }
 
     const group = groups[groupIndex];
-    if (group.creatorId !== currentUsername && !isSuperAdmin) {
+
+    // Check if the current user is authorized to delete the group
+    if (group.creatorId !== currentUserId && !isSuperAdmin) {
       return res.status(403).json({ error: 'Unauthorized to delete group.' });
     }
 
+    // Remove the group from groups.json
     groups.splice(groupIndex, 1);
 
-    writeFile(groupsFilePath, groups, (err) => {
-      if (err) {
+    // Write the updated groups data back to groups.json
+    writeFile(groupsFilePath, groups, (writeErr) => {
+      if (writeErr) {
         return res.status(500).json({ error: 'Failed to delete group.' });
       }
-      res.status(200).json({ message: 'Group deleted successfully.' });
+
+      // Now remove the group from all users' groups array in users.json
+      readFile(usersFilePath, (userErr, users) => {
+        if (userErr) {
+          return res.status(500).json({ error: 'Failed to read users data.' });
+        }
+
+        // Update each user to remove the deleted group from their groups array
+        users.forEach(user => {
+          user.groups = user.groups.filter(group => group !== groupName);
+        });
+
+        // Write the updated users data back to users.json
+        writeFile(usersFilePath, users, (userWriteErr) => {
+          if (userWriteErr) {
+            return res.status(500).json({ error: 'Failed to update users data.' });
+          }
+
+          res.status(200).json({ message: `Group "${groupName}" deleted successfully.` });
+        });
+      });
     });
   });
 };
+
+
 
 module.exports = {
   getAllGroups,

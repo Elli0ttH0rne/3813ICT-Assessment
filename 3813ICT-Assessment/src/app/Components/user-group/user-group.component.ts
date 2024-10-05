@@ -164,12 +164,19 @@ export class UserGroupComponent implements OnInit {
   deleteGroup(group: string): void {
     const confirmed = window.confirm('Are you sure you want to delete this group? This action cannot be undone.');
     if (confirmed) {
-      this.groupsService.deleteGroup(group, this.username, this.roles.includes('superAdmin')).subscribe({
+      this.groupsService.deleteGroup(group, this.userID, this.roles.includes('superAdmin')).subscribe({
         next: () => {
           alert('Group deleted successfully.');
+          // Remove the group from the local state
           this.groups = this.groups.filter(g => g !== group);
           delete this.channels[group];
-          this.requestsService.removePendingRequestsByGroup(group).subscribe(); // Handle request deletion if needed
+  
+          // Update local storage if needed
+          const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+          if (storedUser.groups) {
+            storedUser.groups = storedUser.groups.filter(g => g !== group);
+            localStorage.setItem('currentUser', JSON.stringify(storedUser));
+          }
         },
         error: (error) => {
           console.error('Failed to delete group:', error);
@@ -178,6 +185,8 @@ export class UserGroupComponent implements OnInit {
       });
     }
   }
+  
+  
 
   createGroup(): void {
     if (this.newGroupName.trim()) {
