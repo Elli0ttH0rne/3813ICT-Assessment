@@ -4,7 +4,7 @@ const { readFile, writeFile } = require('../helpers/fileHelper');
 const requestsFilePath = path.join(__dirname, '../data/requests.json');
 
 const createRequest = (req, res) => {
-  const { username, groupName, typeOfRequest, reportedUsername, reason } = req.body;
+  const { username, groupName, typeOfRequest, reportedUsername, reason, promotionUser } = req.body;
 
   if (!username || !groupName || !typeOfRequest) {
     return res.status(400).json({ error: 'Username, group name, and type of request are required.' });
@@ -19,23 +19,26 @@ const createRequest = (req, res) => {
       return res.status(500).json({ error: 'Failed to read requests data.' });
     }
 
-    // Check for duplicate requests, considering 'reportedUsername' if it's a 'report' request
+    // Check for duplicate requests, considering 'reportedUsername' or 'promotionUser' if applicable
     const isDuplicate = requests.some(request => 
       request.username === username &&
       request.groupName === groupName &&
       request.typeOfRequest === typeOfRequest &&
-      (typeOfRequest !== 'report' || request.reportedUsername === reportedUsername)
+      (typeOfRequest !== 'report' || request.reportedUsername === reportedUsername) &&
+      (typeOfRequest !== 'promotion' || request.promotionUser === promotionUser)
     );
 
     if (isDuplicate) {
       return res.status(400).json({ error: 'Duplicate request already exists.' });
     }
 
-    // Add additional data for report requests
+    // Add additional data for report or promotion requests
     const newRequest = { username, groupName, typeOfRequest };
     if (typeOfRequest === 'report') {
       newRequest.reportedUsername = reportedUsername;
       newRequest.reason = reason;
+    } else if (typeOfRequest === 'promotion') {
+      newRequest.promotionUser = promotionUser;
     }
 
     requests.push(newRequest);

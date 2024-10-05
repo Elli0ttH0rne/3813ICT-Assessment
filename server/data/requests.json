@@ -29,5 +29,11 @@
     "typeOfRequest": "report",
     "reportedUsername": "user1",
     "reason": "Violation of group rules"
+  },
+  {
+    "username": "groupAdmin1",
+    "groupName": "Photography",
+    "typeOfRequest": "promotion",
+    "promotionUser": "user5"
   }
 ]
