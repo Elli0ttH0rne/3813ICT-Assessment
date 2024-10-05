@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UsersService {
-  private apiUrl = 'http://localhost:3000/api/users'; // Update this to match your server address
+  private apiUrl = 'http://localhost:3000/api/users';
 
   constructor(private http: HttpClient) {}
 
@@ -37,5 +38,24 @@ export class UsersService {
   deleteUserByUsername(username: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/users/username/${username}`);
   }
-  
+
+  // Promote a user to group admin by username
+  promoteToGroupAdmin(username: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/promote/groupAdmin/${username}`, {}).pipe(
+      catchError((error) => {
+        console.error(`Failed to promote user to Group Admin: ${error.message}`);
+        return of(null);
+      })
+    );
+  }
+
+  // Promote a user to super admin by username
+  promoteToSuperAdmin(username: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/promote/superAdmin/${username}`, {}).pipe(
+      catchError((error) => {
+        console.error(`Failed to promote user to Super Admin: ${error.message}`);
+        return of(null);
+      })
+    );
+  }
 }

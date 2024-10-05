@@ -1,5 +1,22 @@
 [
   {
+    "userId": "u001",
+    "username": "user1",
+    "password": "user1",
+    "email": "user1@gmail.com",
+    "roles": [
+      "user"
+    ],
+    "groups": [
+      "Cooking",
+      "Gardening",
+      "Travel",
+      "Fitness",
+      "Photography"
+    ],
+    "role": "groupAdmin"
+  },
+  {
     "userId": "u002",
     "username": "user2",
     "password": "user2",

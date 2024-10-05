@@ -189,7 +189,7 @@ export class UserGroupComponent implements OnInit {
           // Add the new group to the local groups state
           this.groups.push(this.newGroupName);
           this.channels[this.newGroupName] = [];
-          this.groupCreators[this.newGroupName] = this.userID; // Set the current user as the creator by userID
+          this.groupCreators[this.newGroupName] = this.userID;
   
           // Update local storage with the new group
           const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');

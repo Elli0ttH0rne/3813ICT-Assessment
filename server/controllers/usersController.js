@@ -64,7 +64,7 @@ const deleteUserByUsername = (req, res) => {
       return res.status(404).json({ error: 'User not found.' });
     }
 
-    users.splice(userIndex, 1); // Remove the user from the array
+    users.splice(userIndex, 1);
 
     writeFile(usersFilePath, users, (writeErr) => {
       if (writeErr) {
@@ -93,9 +93,10 @@ const getSuperAdmins = (req, res) => {
   });
 };
 
-// Promote a user to group admin
+
+// Promote user to Group Admin
 const promoteToGroupAdmin = (req, res) => {
-  const { username } = req.body;
+  const { username } = req.params;
 
   readFile(usersFilePath, (err, users) => {
     if (err) {
@@ -103,7 +104,6 @@ const promoteToGroupAdmin = (req, res) => {
     }
 
     const user = users.find(u => u.username === username);
-
     if (!user) {
       return res.status(404).json({ error: 'User not found.' });
     }
@@ -114,16 +114,16 @@ const promoteToGroupAdmin = (req, res) => {
 
     writeFile(usersFilePath, users, (err) => {
       if (err) {
-        return res.status(500).json({ error: 'Failed to update users data.' });
+        return res.status(500).json({ error: 'Failed to update user roles.' });
       }
-      res.status(200).json({ message: 'User promoted to group admin.' });
+      res.status(200).json({ message: 'User promoted to Group Admin successfully.' });
     });
   });
 };
 
-// Promote a user to super admin
+// Promote user to Super Admin
 const promoteToSuperAdmin = (req, res) => {
-  const { username } = req.body;
+  const { username } = req.params;
 
   readFile(usersFilePath, (err, users) => {
     if (err) {
@@ -131,7 +131,6 @@ const promoteToSuperAdmin = (req, res) => {
     }
 
     const user = users.find(u => u.username === username);
-
     if (!user) {
       return res.status(404).json({ error: 'User not found.' });
     }
@@ -142,12 +141,14 @@ const promoteToSuperAdmin = (req, res) => {
 
     writeFile(usersFilePath, users, (err) => {
       if (err) {
-        return res.status(500).json({ error: 'Failed to update users data.' });
+        return res.status(500).json({ error: 'Failed to update user roles.' });
       }
-      res.status(200).json({ message: 'User promoted to super admin.' });
+      res.status(200).json({ message: 'User promoted to Super Admin successfully.' });
     });
   });
 };
+
+
 
 module.exports = {
   getAllUsers,

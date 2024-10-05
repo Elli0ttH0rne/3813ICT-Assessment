@@ -17,10 +17,11 @@ router.delete('/username/:username', usersController.deleteUserByUsername);
 // Route to get all super admins
 router.get('/superAdmins', usersController.getSuperAdmins);
 
-// Route to promote a user to group admin
-router.post('/promote/groupAdmin', usersController.promoteToGroupAdmin);
+// Promote user to Group Admin
+router.patch('/promote/groupAdmin/:username', usersController.promoteToGroupAdmin);
 
-// Route to promote a user to super admin
-router.post('/promote/superAdmin', usersController.promoteToSuperAdmin);
+// Promote user to Super Admin
+router.patch('/promote/superAdmin/:username', usersController.promoteToSuperAdmin);
+
 
 module.exports = router;

@@ -41,7 +41,7 @@ const createGroup = (req, res) => {
     return res.status(400).json({ error: 'Group name, creator username, and creator ID are required.' });
   }
 
-  // Step 1: Read and update groups.json
+  // Read and update groups.json
   readFile(groupsFilePath, (err, groups) => {
     if (err) {
       console.error('Failed to read groups.json:', err);
@@ -67,7 +67,7 @@ const createGroup = (req, res) => {
         return res.status(500).json({ error: 'Failed to save new group.' });
       }
 
-      // Step 2: Read and update users.json
+      // Read and update users.json
       readFile(usersFilePath, (userErr, users) => {
         if (userErr) {
           console.error('Failed to read users.json:', userErr);
@@ -247,7 +247,7 @@ const getGroupAdmins = (req, res) => {
 };
 
 const createChannel = (req, res) => {
-  console.log('Request body:', req.body); // Log the entire body to see if currentId is being received
+  console.log('Request body:', req.body);
   const { groupName } = req.params;
   const { channelName, channelDescription, currentId, isSuperAdmin } = req.body;
 

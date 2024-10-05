@@ -24,7 +24,6 @@
     cursor: not-allowed;
   }
   
-  /* Ensure the card has proper padding */
 .card-body {
   padding: 3rem; /* Increase padding */
 }

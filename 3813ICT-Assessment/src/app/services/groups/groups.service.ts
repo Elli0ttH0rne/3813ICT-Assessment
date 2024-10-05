@@ -26,7 +26,7 @@ export interface Group {
   providedIn: 'root'
 })
 export class GroupsService {
-  private apiUrl = 'http://localhost:3000/api/groups'; // Update this to match your server address
+  private apiUrl = 'http://localhost:3000/api/groups';
 
   constructor(private http: HttpClient) {}
 
@@ -80,7 +80,6 @@ export class GroupsService {
   leaveGroup(groupName: string, userId: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/${groupName}/leave`, { userId });
   }
-
 
   // Kick a user from a group
   kickUserFromGroup(groupName: string, userId: string): Observable<any> {

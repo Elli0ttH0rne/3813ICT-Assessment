@@ -59,9 +59,6 @@ export class AllGroupListComponent implements OnInit {
     return this.userGroups.includes(groupName);
   }
   
-
-
-
   //******************************Group List Methods******************************
   private loadGroups(): void {
     this.groupsService.getAllGroups().subscribe({
@@ -73,7 +70,6 @@ export class AllGroupListComponent implements OnInit {
       }
     });
   }
-  
 
   private loadUserGroups(): void {
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');

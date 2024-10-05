@@ -20,14 +20,14 @@ export class ChannelComponent implements OnInit {
   channelName: string | null = null;
 
   // User information
-  userID: string = '';  // Add userID
+  userID: string = '';  
   username: string = '';
   roles: string[] = [];
 
   // Group and user information
   usersInGroup: { userId: string; username: string }[] = [];
   groupAdmins: Admin[] = [];
-  groupCreatorId: string = '';  // Change groupCreator to groupCreatorId
+  groupCreatorId: string = ''; 
   requestCount: number = 0;
 
   // Flags to check user permissions
@@ -54,7 +54,7 @@ export class ChannelComponent implements OnInit {
   ngOnInit(): void {
     // Retrieve currentUser information from local storage
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    this.userID = storedUser.userId || '';  // Retrieve userId
+    this.userID = storedUser.userId || ''; 
     this.username = storedUser.username || '';
     this.roles = storedUser.roles || [];
     this.isSuperAdmin = this.roles.includes('superAdmin');
@@ -82,8 +82,8 @@ export class ChannelComponent implements OnInit {
       next: ([users, admins, superAdmins, creatorId]) => {
         this.usersInGroup = users;
         this.groupAdmins = [...admins, ...superAdmins];
-        this.groupCreatorId = creatorId;  // Set groupCreatorId
-        this.isCreator = this.userID === this.groupCreatorId || this.isSuperAdmin;  // Check if the user is the creator or a super admin
+        this.groupCreatorId = creatorId;  
+        this.isCreator = this.userID === this.groupCreatorId || this.isSuperAdmin;  
       },
       error: (error) => {
         console.error('Failed to load initial data:', error);
@@ -156,7 +156,7 @@ export class ChannelComponent implements OnInit {
       this.groupsService.kickUserFromGroup(this.groupName, user.userId).subscribe({
         next: () => {
           alert('User removed successfully.');
-          this.loadUsersInGroup(); // Reload users in group after removal
+          this.loadUsersInGroup();
         },
         error: (error) => {
           console.error('Failed to remove user:', error);
@@ -222,6 +222,48 @@ export class ChannelComponent implements OnInit {
         error: (error) => {
           console.error('Failed to delete user account:', error);
           alert('Failed to delete user account.');
+        }
+      });
+    }
+  }
+
+  promoteToGroupAdmin(username: string): void {
+    if (!this.isSuperAdmin) {
+      alert('Only Super Admins can promote users to Group Admin.');
+      return;
+    }
+  
+    const confirmed = window.confirm('Are you sure you want to promote this user to Group Admin?');
+    if (confirmed) {
+      this.usersService.promoteToGroupAdmin(username).subscribe({
+        next: () => {
+          alert('User has been promoted to Group Admin successfully.');
+          this.loadUsersInGroup(); // Reload users to update roles
+        },
+        error: (error) => {
+          console.error('Failed to promote user to Group Admin:', error);
+          alert('Failed to promote user to Group Admin.');
+        }
+      });
+    }
+  }
+  
+  promoteToSuperAdmin(username: string): void {
+    if (!this.isSuperAdmin) {
+      alert('Only Super Admins can promote users to Super Admin.');
+      return;
+    }
+  
+    const confirmed = window.confirm('Are you sure you want to promote this user to Super Admin?');
+    if (confirmed) {
+      this.usersService.promoteToSuperAdmin(username).subscribe({
+        next: () => {
+          alert('User has been promoted to Super Admin successfully.');
+          this.loadUsersInGroup(); // Reload users to update roles
+        },
+        error: (error) => {
+          console.error('Failed to promote user to Super Admin:', error);
+          alert('Failed to promote user to Super Admin.');
         }
       });
     }

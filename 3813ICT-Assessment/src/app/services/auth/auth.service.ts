@@ -11,7 +11,7 @@ import { map } from 'rxjs/operators';
 })
 export class AuthService {
 
-  private apiUrl = 'http://localhost:3000/api'; // Base URL for the API
+  private apiUrl = 'http://localhost:3000/api'; 
 
   constructor(
     private requestsService: RequestsService,
