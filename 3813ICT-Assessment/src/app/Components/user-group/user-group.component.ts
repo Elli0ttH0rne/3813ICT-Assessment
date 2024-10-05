@@ -108,8 +108,6 @@ export class UserGroupComponent implements OnInit {
             this.channels[group] = channels;
             this.groupCreators[group] = creator;
   
-            // Log the group and creator to the console
-            console.log(`Group: ${group}, Creator: ${creator}`);
           },
           error: (error) => {
             console.error(`Failed to load channels or creator for group "${group}":`, error);
@@ -244,16 +242,16 @@ export class UserGroupComponent implements OnInit {
   leaveGroup(groupName: string): void {
     const confirmed = window.confirm(`Are you sure you want to leave the group "${groupName}"?`);
     if (confirmed) {
-      this.groupsService.leaveGroup(groupName, this.username).subscribe({
+      this.groupsService.leaveGroup(groupName, this.userID).subscribe({
         next: () => {
           this.groups = this.groups.filter(g => g !== groupName);
           delete this.channels[groupName];
-
+  
           // Update local storage to reflect the removed group
           const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
           storedUser.groups = this.groups;
           localStorage.setItem('currentUser', JSON.stringify(storedUser));
-
+  
           alert(`You have left the group "${groupName}".`);
         },
         error: (error) => {
@@ -263,6 +261,7 @@ export class UserGroupComponent implements OnInit {
       });
     }
   }
+  
 
   cancelCreateChannel(): void {
     this.showCreateChannelForGroup = null;

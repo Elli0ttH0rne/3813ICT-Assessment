@@ -2,6 +2,7 @@ const path = require('path');
 const { readFile, writeFile } = require('../helpers/fileHelper');
 
 const groupsFilePath = path.join(__dirname, '../data/groups.json');
+const usersFilePath = path.join(__dirname, '../data/users.json');
 
 // Get all groups
 const getAllGroups = (req, res) => {
@@ -85,6 +86,39 @@ const getGroupChannels = (req, res) => {
   });
 };
 
+// Leave a group
+const leaveGroup = (req, res) => {
+  const { userId } = req.body;
+  const { groupName } = req.params;
+
+  // Read users.json
+  readFile(usersFilePath, (err, users) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to read users data.' });
+    }
+
+    // Find the user by userId
+    const userIndex = users.findIndex(user => user.userId === userId);
+    if (userIndex === -1) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    // Remove the group from the user's groups array
+    const user = users[userIndex];
+    user.groups = user.groups.filter(group => group !== groupName);
+
+    // Write the updated users data back to users.json
+    writeFile(usersFilePath, users, (writeErr) => {
+      if (writeErr) {
+        return res.status(500).json({ error: 'Failed to update user data.' });
+      }
+
+      res.status(200).json({ message: `Successfully left the group "${groupName}".` });
+    });
+  });
+};
+
+
 // Delete a group
 const deleteGroup = (req, res) => {
   const { groupName } = req.params;
@@ -122,4 +156,5 @@ module.exports = {
   createGroup,
   getGroupChannels,
   deleteGroup,
+  leaveGroup
 };
