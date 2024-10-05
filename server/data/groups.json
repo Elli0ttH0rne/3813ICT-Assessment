@@ -301,7 +301,12 @@
   },
   {
     "name": "test",
-    "channels": [],
+    "channels": [
+      {
+        "name": "t",
+        "description": "t"
+      }
+    ],
     "admins": [
       {
         "userId": "u021",

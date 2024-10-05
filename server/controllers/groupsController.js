@@ -246,6 +246,48 @@ const getGroupAdmins = (req, res) => {
   });
 };
 
+const createChannel = (req, res) => {
+  console.log('Request body:', req.body); // Log the entire body to see if currentId is being received
+  const { groupName } = req.params;
+  const { channelName, channelDescription, currentId, isSuperAdmin } = req.body;
+
+  if (!channelName || !channelDescription) {
+    return res.status(400).json({ error: 'Channel name and description are required.' });
+  }
+
+  readFile(groupsFilePath, (err, groups) => {
+    if (err) {
+      console.error('Failed to read groups data:', err);
+      return res.status(500).json({ error: 'Failed to read groups data.' });
+    }
+
+    const group = groups.find(g => g.name === groupName);
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found.' });
+    }
+
+    // Check if the current user is authorized to create a channel
+    if (group.creatorId !== currentId && !isSuperAdmin) {
+      return res.status(403).json({ error: 'Unauthorized to create a channel.' });
+    }
+
+    // Add the new channel
+    const newChannel = { name: channelName, description: channelDescription };
+    group.channels.push(newChannel);
+
+    // Write the updated groups data
+    writeFile(groupsFilePath, groups, (writeErr) => {
+      if (writeErr) {
+        console.error('Failed to create channel:', writeErr);
+        return res.status(500).json({ error: 'Failed to create channel.' });
+      }
+
+      res.status(201).json({ message: 'Channel created successfully.', channel: newChannel });
+    });
+  });
+};
+
+
 
 
 module.exports = {
@@ -256,5 +298,6 @@ module.exports = {
   deleteGroup,
   leaveGroup,
   getUsersInGroup,
-  getGroupAdmins
+  getGroupAdmins,
+  createChannel
 };

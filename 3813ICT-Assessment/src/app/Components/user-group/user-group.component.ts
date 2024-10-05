@@ -46,7 +46,7 @@ export class UserGroupComponent implements OnInit {
     this.username = storedUser.username;
     this.roles = storedUser.roles;
   
-    console.log('Stored user:', storedUser); // Log stored user info to verify
+    console.log('Stored user:', storedUser);
   
     if (this.isGroupAdminOrSuperAdmin()) {
       this.requestsService.getRequestCount().subscribe({
@@ -242,17 +242,15 @@ export class UserGroupComponent implements OnInit {
 
   createChannel(group: string): void {
     if (this.newChannelName.trim() && this.newChannelDescription.trim()) {
-      const currentUsername = this.username;
-      const isSuperAdmin = this.roles.includes('superAdmin');
-
       this.groupsService.createChannel(
         group,
         this.newChannelName,
         this.newChannelDescription,
-        currentUsername,
-        isSuperAdmin
+        this.userID,  
+        this.isSuperAdmin()
       ).subscribe({
         next: () => {
+          // Update local channels and reset form
           this.channels[group].push({ name: this.newChannelName, description: this.newChannelDescription });
           this.showCreateChannelForGroup = null;
           this.newChannelName = '';
@@ -267,6 +265,8 @@ export class UserGroupComponent implements OnInit {
       alert('Please enter both channel name and description.');
     }
   }
+  
+  
 
   leaveGroup(groupName: string): void {
     const confirmed = window.confirm(`Are you sure you want to leave the group "${groupName}"?`);
