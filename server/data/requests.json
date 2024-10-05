@@ -22,5 +22,12 @@
     "typeOfRequest": "report",
     "reportedUsername": "user15",
     "reason": "Violation of group rules"
+  },
+  {
+    "username": "groupAdmin1",
+    "groupName": "Photography",
+    "typeOfRequest": "report",
+    "reportedUsername": "user1",
+    "reason": "Violation of group rules"
   }
 ]

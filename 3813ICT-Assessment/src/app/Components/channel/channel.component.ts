@@ -167,6 +167,18 @@ export class ChannelComponent implements OnInit {
     }
   }
 
+  kickUserFromGroupAndReport(username: string): void {
+    if (username === this.username) {
+      alert('You cannot remove yourself from the group.');
+      return;
+    }
+
+    const confirmed = window.confirm('Are you sure you want to remove this user from the group and report them?');
+    if (confirmed) {
+      this.kickUserFromGroup(username);
+      this.reportUser(username);
+    }
+  }
   //******************************Channel Management******************************
   deleteChannel(): void {
     const confirmed = window.confirm('Are you sure you want to delete this channel? This action cannot be undone.');
