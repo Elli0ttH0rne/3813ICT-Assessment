@@ -133,18 +133,18 @@ export class UserGroupComponent implements OnInit {
     return this.roles.includes('superAdmin');
   }
 
-  canDeleteGroup(group: string): boolean {
-    return this.username === this.groupCreators[group] || this.roles.includes('superAdmin');
-  }
-
   canCreateGroup(): boolean {
     return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
   }
 
-  isGroupCreator(group: string): boolean {
-    return this.username === this.groupCreators[group];
+  canDeleteGroup(group: string): boolean {
+    return this.userID === this.groupCreators[group] || this.roles.includes('superAdmin');
   }
-
+  
+  isGroupCreator(group: string): boolean {
+    return this.userID === this.groupCreators[group];
+  }
+  
   //******************************UI Methods******************************
   getBadgeClass(index: number): string {
     return this.badgeClasses[index % this.badgeClasses.length];
