@@ -126,39 +126,19 @@ export class ChannelComponent implements OnInit {
       alert('You cannot report yourself.');
       return;
     }
-
-    this.requestsService.getReportRequests().subscribe({
-      next: (existingReports) => {
-        const duplicateReport = existingReports.some(req =>
-          req.reporterUsername === this.username &&
-          req.reportedUsername === reportedUsername &&
-          req.groupName === this.groupName
-        );
-
-        if (duplicateReport) {
-          alert('You have already reported this user.');
-          return;
+  
+    this.requestsService.createRequest(this.username, this.groupName || '', 'report', reportedUsername, 'Violation of group rules')
+      .subscribe({
+        next: () => {
+          alert('User reported successfully.');
+        },
+        error: (error) => {
+          console.error('Failed to report user:', error);
+          alert('Failed to report user.');
         }
-
-        this.requestsService.createReportRequest(
-          this.username, // reporterUsername
-          reportedUsername, // reportedUsername
-          'Violation of group rules', // Reason for reporting
-          this.groupName || '' // Group name where the user was reported
-        ).subscribe({
-          next: () => {
-            alert('User reported successfully.');
-          },
-          error: (err) => {
-            console.error('Failed to report user:', err);
-          }
-        });
-      },
-      error: (err) => {
-        console.error('Failed to retrieve existing reports:', err);
-      }
-    });
+      });
   }
+  
 
   kickUserFromGroup(username: string): void {
     if (username === this.username) {

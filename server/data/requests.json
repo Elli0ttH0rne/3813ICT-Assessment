@@ -6,7 +6,9 @@
   },
   {
     "username": "user1",
-    "groupName": "Reading",
-    "typeOfRequest": "join"
+    "groupName": "Cooking",
+    "typeOfRequest": "report",
+    "reportedUsername": "user3",
+    "reason": "Violation of group rules"
   }
 ]

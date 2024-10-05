@@ -14,9 +14,9 @@ export class RequestsService {
   constructor(private http: HttpClient) {}
 
   //******************************Join Group Request Methods******************************
-  // Create a new request (join, report, or promotion)
-  createRequest(username: string, groupName: string, typeOfRequest: string): Observable<any> {
-    return this.http.post(this.apiUrl, { username, groupName, typeOfRequest });
+  // Create a new request
+  createRequest(username: string, groupName: string, typeOfRequest: string, reportedUsername?: string, reason?: string): Observable<any> {
+    return this.http.post(this.apiUrl, { username, groupName, typeOfRequest, reportedUsername, reason });
   }
 
   // Get all requests
