@@ -14,6 +14,9 @@ router.get('/:groupName/channels', groupsController.getGroupChannels);
 // Route to create a new group
 router.post('/', groupsController.createGroup);
 
+// Route to delete a specific group by its name
+router.delete('/:groupName', groupsController.deleteGroup);
+
 // Route to leave a group
 router.post('/:groupName/leave', groupsController.leaveGroup);
 
