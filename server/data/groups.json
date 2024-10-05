@@ -298,22 +298,5 @@
       }
     ],
     "creatorId": "u022"
-  },
-  {
-    "name": "test",
-    "channels": [
-      {
-        "name": "t",
-        "description": "t"
-      }
-    ],
-    "admins": [
-      {
-        "userId": "u021",
-        "username": "groupAdmin1",
-        "role": "creator"
-      }
-    ],
-    "creatorId": "u021"
   }
 ]

@@ -20,13 +20,14 @@ export class ChannelComponent implements OnInit {
   channelName: string | null = null;
 
   // User information
+  userID: string = '';  // Add userID
   username: string = '';
   roles: string[] = [];
 
   // Group and user information
   usersInGroup: { userId: string; username: string }[] = [];
   groupAdmins: Admin[] = [];
-  groupCreator: string = '';
+  groupCreatorId: string = '';  // Change groupCreator to groupCreatorId
   requestCount: number = 0;
 
   // Flags to check user permissions
@@ -53,6 +54,7 @@ export class ChannelComponent implements OnInit {
   ngOnInit(): void {
     // Retrieve currentUser information from local storage
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    this.userID = storedUser.userId || '';  // Retrieve userId
     this.username = storedUser.username || '';
     this.roles = storedUser.roles || [];
     this.isSuperAdmin = this.roles.includes('superAdmin');
@@ -77,11 +79,11 @@ export class ChannelComponent implements OnInit {
       this.authService.getSuperAdmins(),
       this.groupsService.getGroupCreator(this.groupName!)
     ]).subscribe({
-      next: ([users, admins, superAdmins, creator]) => {
+      next: ([users, admins, superAdmins, creatorId]) => {
         this.usersInGroup = users;
         this.groupAdmins = [...admins, ...superAdmins];
-        this.groupCreator = creator;
-        this.isCreator = this.username === this.groupCreator || this.isSuperAdmin;
+        this.groupCreatorId = creatorId;  // Set groupCreatorId
+        this.isCreator = this.userID === this.groupCreatorId || this.isSuperAdmin;  // Check if the user is the creator or a super admin
       },
       error: (error) => {
         console.error('Failed to load initial data:', error);
@@ -182,10 +184,10 @@ export class ChannelComponent implements OnInit {
   //******************************Channel Management******************************
   deleteChannel(): void {
     const confirmed = window.confirm('Are you sure you want to delete this channel? This action cannot be undone.');
-
+  
     if (confirmed) {
       if (this.groupName && this.channelName) {
-        this.groupsService.deleteChannel(this.groupName, this.channelName, this.username, this.isSuperAdmin).subscribe({
+        this.groupsService.deleteChannel(this.groupName, this.channelName, this.userID, this.isSuperAdmin).subscribe({
           next: () => {
             alert('Channel deleted successfully.');
             this.navigateToUserGroup();
@@ -198,7 +200,7 @@ export class ChannelComponent implements OnInit {
       }
     }
   }
-
+  
   toggleUserLists(): void {
     this.showUserLists = !this.showUserLists;
   }

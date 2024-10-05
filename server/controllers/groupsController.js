@@ -287,17 +287,58 @@ const createChannel = (req, res) => {
   });
 };
 
+const deleteChannel = (req, res) => {
+  const { groupName, channelName } = req.params;
+  const { currentId, isSuperAdmin } = req.query; 
+
+  readFile(groupsFilePath, (err, groups) => {
+    if (err) {
+      console.error('Failed to read groups data:', err);
+      return res.status(500).json({ error: 'Failed to read groups data.' });
+    }
+
+    const group = groups.find(g => g.name === groupName);
+    if (!group) {
+      return res.status(404).json({ error: 'Group not found.' });
+    }
+
+    // Check if the current user is authorized to delete the channel (either creator or super admin)
+    if (group.creatorId !== currentId && isSuperAdmin !== 'true') {
+      return res.status(403).json({ error: 'Unauthorized to delete a channel.' });
+    }
+
+    const channelIndex = group.channels.findIndex(channel => channel.name === channelName);
+    if (channelIndex === -1) {
+      return res.status(404).json({ error: 'Channel not found.' });
+    }
+
+    // Remove the channel from the group
+    group.channels.splice(channelIndex, 1);
+
+    // Write the updated groups data
+    writeFile(groupsFilePath, groups, (writeErr) => {
+      if (writeErr) {
+        console.error('Failed to delete channel:', writeErr);
+        return res.status(500).json({ error: 'Failed to delete channel.' });
+      }
+
+      res.status(200).json({ message: 'Channel deleted successfully.' });
+    });
+  });
+};
+
 
 
 
 module.exports = {
   getAllGroups,
   getGroupDetails,
-  createGroup,
   getGroupChannels,
-  deleteGroup,
-  leaveGroup,
   getUsersInGroup,
   getGroupAdmins,
-  createChannel
+  createGroup,
+  createChannel,
+  leaveGroup,
+  deleteGroup,
+  deleteChannel
 };

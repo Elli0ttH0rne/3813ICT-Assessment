@@ -20,6 +20,9 @@ router.post('/:groupName/channels', groupsController.createChannel);
 // Route to delete a specific group by its name
 router.delete('/:groupName', groupsController.deleteGroup);
 
+// Route to delete a specific channel from a group
+router.delete('/:groupName/channels/:channelName', groupsController.deleteChannel);
+
 // Route to leave a group
 router.post('/:groupName/leave', groupsController.leaveGroup);
 
