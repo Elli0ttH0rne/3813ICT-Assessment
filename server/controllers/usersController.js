@@ -22,8 +22,8 @@ const addUser = (req, res) => {
       return res.status(500).json({ error: 'Failed to read users data.' });
     }
 
-    // Check if the username already exists
-    if (users.find(user => user.username === newUser.username)) {
+    // Check for existing username
+    if (users.some(user => user.username === newUser.username)) {
       return res.status(400).json({ error: 'Username already exists.' });
     }
 
@@ -31,9 +31,9 @@ const addUser = (req, res) => {
 
     writeFile(usersFilePath, users, (err) => {
       if (err) {
-        return res.status(500).json({ error: 'Failed to add user.' });
+        return res.status(500).json({ error: 'Failed to save user.' });
       }
-      res.status(201).json({ message: 'User added successfully.' });
+      res.status(201).json({ message: 'User created successfully.' });
     });
   });
 };

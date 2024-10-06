@@ -31,16 +31,16 @@ export class RegisterComponent {
           alert('Username already exists');
           return;
         }
-
+  
         // Check if any fields are empty
         if (this.username === '' || this.email === '' || this.password === '') {
           alert('Please fill in all fields');
           return;
         }
-
+  
         // Generate a new user ID
-        const newUserId = this.generateUserId(users); // Pass users to the function
-
+        const newUserId = this.generateUserId(users);
+  
         const newUser = {
           userId: newUserId,
           username: this.username,
@@ -49,24 +49,34 @@ export class RegisterComponent {
           roles: ['user'],
           groups: []
         };
-
-        this.usersService.addUser(newUser);
-
-        localStorage.setItem('currentUser', JSON.stringify({
-          userId: newUser.userId,
-          username: newUser.username,
-          email: newUser.email,
-          roles: newUser.roles,
-          valid: true
-        }));
-
-        this.router.navigate(['/user-group']);
+  
+        // Add the new user to users.json via API request
+        this.usersService.addUser(newUser).subscribe({
+          next: () => {
+            // Store user information in localStorage
+            localStorage.setItem('currentUser', JSON.stringify({
+              userId: newUser.userId,
+              username: newUser.username,
+              email: newUser.email,
+              roles: newUser.roles,
+              valid: true
+            }));
+  
+            // Navigate to user group page after successful registration
+            this.router.navigate(['/user-group']);
+          },
+          error: (err) => {
+            console.error('Failed to add user:', err);
+            alert('Failed to register. Please try again.');
+          }
+        });
       },
       error: (err) => {
         console.error('Failed to load users:', err);
       }
     });
   }
+  
 
   // Generate a unique userId (e.g., 'u007')
   private generateUserId(users: any[]): string {
