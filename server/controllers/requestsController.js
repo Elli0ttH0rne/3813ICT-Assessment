@@ -124,16 +124,19 @@ const deleteRequest = (req, res) => {
       return res.status(500).json({ error: 'Failed to read requests data.' });
     }
 
-    // Filter out the request that matches the given username, groupName, and typeOfRequest
-    const updatedRequests = requests.filter(request => 
-      !(request.username === username && request.groupName === groupName && request.typeOfRequest === typeOfRequest)
+    // Find the index of the first matching request
+    const requestIndex = requests.findIndex(request => 
+      request.username === username && request.groupName === groupName && request.typeOfRequest === typeOfRequest
     );
 
-    if (updatedRequests.length === requests.length) {
+    if (requestIndex === -1) {
       return res.status(404).json({ error: 'Request not found.' });
     }
 
-    writeFile(requestsFilePath, updatedRequests, (err) => {
+    // Remove the found request from the array
+    requests.splice(requestIndex, 1);
+
+    writeFile(requestsFilePath, requests, (err) => {
       if (err) {
         return res.status(500).json({ error: 'Failed to delete request.' });
       }
@@ -141,6 +144,7 @@ const deleteRequest = (req, res) => {
     });
   });
 };
+
 
 
 const removePendingRequestsByGroup = (req, res) => {

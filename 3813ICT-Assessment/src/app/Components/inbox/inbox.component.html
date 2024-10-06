@@ -68,7 +68,7 @@
                 <span>{{ reportedUser.reportedUsername }} has been reported for "{{ reportedUser.reason }}" in the group {{ reportedUser.groupName }} by {{ reportedUser.username }}</span>
                 <div>
                   <button class="btn btn-danger btn-sm" (click)="banReportedUser(reportedUser)">Ban</button>
-                  <button class="btn btn-secondary btn-sm me-2" (click)="removeReportedUserRequest(reportedUser)">Dismiss</button>
+                  <button class="btn btn-secondary btn-sm me-2" (click)="denyRequest(reportedUser)">Dismiss</button>
                 </div>
               </li>
             </ul>
@@ -83,7 +83,7 @@
                 <span>{{ promotionRequest.username }} is requesting that {{ promotionRequest.promotionUser }} be promoted to Group Admin</span>
                 <div>
                   <button class="btn btn-success btn-sm me-2" (click)="approvePromotionRequest(promotionRequest)">Approve</button>
-                  <button class="btn btn-danger btn-sm" (click)="denyPromotionRequest(promotionRequest)">Deny</button>
+                  <button class="btn btn-danger btn-sm" (click)="denyRequest(promotionRequest)">Deny</button>
                 </div>
               </li>
             </ul>

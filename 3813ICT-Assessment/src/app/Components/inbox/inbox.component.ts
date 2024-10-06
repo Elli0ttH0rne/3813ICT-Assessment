@@ -97,60 +97,82 @@ export class InboxComponent implements OnInit {
   
 
   //******************************Group Request Methods******************************
-  approveRequest(request: any): void {
-    if (!request.username || !request.groupName) {
-      console.error('Username or group name is undefined');
-      return;
-    }
-  
-    // Confirm the action with the user
-    const confirmed = window.confirm(`Are you sure you want to approve the request from ${request.username} to join ${request.groupName}?`);
-    
-    if (confirmed) {
-      // Add the group to the user's groups array in users.json
-      this.groupsService.addGroupToUser(request.username, request.groupName).subscribe({
-        next: () => {
-          // Remove the approved request from the requests.json
-          this.requestsService.deleteRequestByDetails(request.username, request.groupName, request.typeOfRequest).subscribe({
-            next: () => {
-              this.joinRequests = this.joinRequests.filter(req => req !== request);
-              console.log(`Approved request from ${request.username} to join ${request.groupName}`);
-            },
-            error: (err) => {
-              console.error(`Failed to remove approved request from ${request.username}`, err);
-            }
-          });
-        },
-        error: (err) => {
-          console.error(`Failed to add group to user ${request.username}`, err);
-          alert('Failed to approve the request.');
-        }
-      });
-    }
+approveRequest(request: any): void {
+  if (!request.username || !request.groupName) {
+    console.error('Username or group name is undefined');
+    return;
   }
-  
-  denyRequest(request: any): void {
-    if (!request.username || !request.groupName || !request.typeOfRequest) {
-      console.error('Username, group name, or type of request is undefined');
-      return;
-    }
-  
-    // Confirm the action with the user
-    const confirmed = window.confirm(`Are you sure you want to deny the request from ${request.username}?`);
-    
-    if (confirmed) {
-      // Remove the denied request from the requests.json
-      this.requestsService.deleteRequestByDetails(request.username, request.groupName, request.typeOfRequest).subscribe({
-        next: () => {
-          this.joinRequests = this.joinRequests.filter(req => req !== request);
-          console.log(`Denied request from ${request.username}`);
-        },
-        error: (err) => {
-          console.error(`Failed to deny request from ${request.username}`, err);
-        }
-      });
-    }
+
+  // Confirm the action with the user
+  const confirmed = window.confirm(`Are you sure you want to approve the request from ${request.username} to join ${request.groupName}?`);
+
+  if (confirmed) {
+    // Add the group to the user's groups array in users.json
+    this.groupsService.addGroupToUser(request.username, request.groupName).subscribe({
+      next: () => {
+        // Remove the approved request from the requests.json
+        this.requestsService.deleteRequestByDetails(request.username, request.groupName, request.typeOfRequest).subscribe({
+          next: () => {
+            // Update the relevant request list based on the type of request
+            this.updateRequestList(request);
+            console.log(`Approved request from ${request.username} to join ${request.groupName}`);
+          },
+          error: (err) => {
+            console.error(`Failed to remove approved request from ${request.username}`, err);
+          }
+        });
+      },
+      error: (err) => {
+        console.error(`Failed to add group to user ${request.username}`, err);
+        alert('Failed to approve the request.');
+      }
+    });
   }
+}
+
+denyRequest(request: any): void {
+  if (!request || !request.username || !request.groupName || !request.typeOfRequest) {
+    console.error('Request, username, group name, or type of request is undefined');
+    return;
+  }
+
+  // Confirm the action with the user
+  const confirmed = window.confirm(`Are you sure you want to deny the request from ${request.username}?`);
+
+  if (confirmed) {
+    // Remove the denied request from the requests.json
+    this.requestsService.deleteRequestByDetails(request.username, request.groupName, request.typeOfRequest).subscribe({
+      next: () => {
+        // Update the relevant request list based on the type of request
+        this.updateRequestList(request);
+        console.log(`Denied request from ${request.username}`);
+      },
+      error: (err) => {
+        console.error(`Failed to deny request from ${request.username}`, err);
+      }
+    });
+  }
+}
+
+//******************************Request List Update Method******************************
+private updateRequestList(request: any): void {
+  switch (request.typeOfRequest) {
+    case 'join':
+      this.joinRequests = this.joinRequests.filter(req => req !== request);
+      break;
+    case 'report':
+      this.reportRequests = this.reportRequests.filter(req => req !== request);
+      break;
+    case 'promotion':
+      this.promotionRequests = this.promotionRequests.filter(req => req !== request);
+      break;
+    default:
+      console.error(`Unknown request type: ${request.typeOfRequest}`);
+  }
+}
+
+  
+  
 
   //******************************Report Request Methods******************************
   approvePromotionRequest(promotionRequest: any): void {
