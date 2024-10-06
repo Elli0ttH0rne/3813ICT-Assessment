@@ -120,6 +120,44 @@ const getGroupChannels = (req, res) => {
   });
 };
 
+// Add a group to the users groups 
+const addGroupToUser = (req, res) => {
+  const { username } = req.params;
+  const { groupName } = req.body;
+
+  if (!username || !groupName) {
+    return res.status(400).json({ error: 'Username and group name are required.' });
+  }
+
+  readFile(usersFilePath, (err, users) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to read user data.' });
+    }
+
+    const userIndex = users.findIndex(user => user.username === username);
+    if (userIndex === -1) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    if (!users[userIndex].groups) {
+      users[userIndex].groups = [];
+    }
+
+    if (!users[userIndex].groups.includes(groupName)) {
+      users[userIndex].groups.push(groupName);
+    } else {
+      return res.status(400).json({ error: 'User is already in this group.' });
+    }
+
+    writeFile(usersFilePath, users, (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to add group to user.' });
+      }
+      res.status(200).json({ message: 'Group added to user successfully.' });
+    });
+  });
+};
+
 // Leave a group
 const leaveGroup = (req, res) => {
   const { userId } = req.body;
@@ -367,5 +405,6 @@ module.exports = {
   leaveGroup,
   deleteGroup,
   deleteChannel,
-  removeUserFromGroup
+  removeUserFromGroup,
+  addGroupToUser
 };

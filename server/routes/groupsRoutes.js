@@ -23,6 +23,9 @@ router.delete('/:groupName', groupsController.deleteGroup);
 // Route to delete a specific channel from a group
 router.delete('/:groupName/channels/:channelName', groupsController.deleteChannel);
 
+// Route to add a group to a user's group array
+router.patch('/add-group-to-user/:username', groupsController.addGroupToUser);
+
 // Route to leave a group
 router.post('/:groupName/leave', groupsController.leaveGroup);
 

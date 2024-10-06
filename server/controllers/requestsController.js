@@ -113,14 +113,21 @@ const updateRequestStatus = (req, res) => {
 };
 
 const deleteRequest = (req, res) => {
-  const { id } = req.params;
+  const { username, groupName, typeOfRequest } = req.body;
+
+  if (!username || !groupName || !typeOfRequest) {
+    return res.status(400).json({ error: 'Username, group name, and type of request are required to delete a request.' });
+  }
 
   readFile(requestsFilePath, (err, requests) => {
     if (err) {
       return res.status(500).json({ error: 'Failed to read requests data.' });
     }
 
-    const updatedRequests = requests.filter(req => req.id !== id);
+    // Filter out the request that matches the given username, groupName, and typeOfRequest
+    const updatedRequests = requests.filter(request => 
+      !(request.username === username && request.groupName === groupName && request.typeOfRequest === typeOfRequest)
+    );
 
     if (updatedRequests.length === requests.length) {
       return res.status(404).json({ error: 'Request not found.' });
@@ -134,6 +141,7 @@ const deleteRequest = (req, res) => {
     });
   });
 };
+
 
 const removePendingRequestsByGroup = (req, res) => {
   const { groupName } = req.params;

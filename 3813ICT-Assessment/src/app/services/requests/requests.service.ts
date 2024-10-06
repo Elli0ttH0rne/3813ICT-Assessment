@@ -80,12 +80,14 @@ export class RequestsService {
   }
 
   //******************************Delete Requests******************************
-  deleteRequest(id: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`).pipe(
-      catchError(this.handleError(`deleteRequest(${id})`))
+  deleteRequestByDetails(username: string, groupName: string, typeOfRequest: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}`, {
+      body: { username, groupName, typeOfRequest }
+    }).pipe(
+      catchError(this.handleError(`deleteRequest(${username}, ${groupName}, ${typeOfRequest})`))
     );
   }
-
+  
   removePendingRequestsByGroup(groupName: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}?groupName=${groupName}`).pipe(
       catchError(this.handleError(`removePendingRequestsByGroup(${groupName})`))

@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs';
+import { catchError } from 'rxjs';
+import { of } from 'rxjs';
 
 // Define the structure of Group, Channel, and Admin for typing
 export interface Channel {
@@ -74,6 +76,16 @@ export class GroupsService {
   // Get group admins
   getGroupAdmins(groupName: string): Observable<Admin[]> {
     return this.http.get<Admin[]>(`${this.apiUrl}/${groupName}/admins`);
+  }
+
+  // Function to add a group to the user's groups array
+  addGroupToUser(username: string, groupName: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/add-group-to-user/${username}`, { groupName }).pipe(
+      catchError((error) => {
+        console.error(`Failed to add group to user: ${error.message}`);
+        return of(null);
+      })
+    );
   }
 
   // Leave a group

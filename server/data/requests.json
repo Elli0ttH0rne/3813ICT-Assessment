@@ -11,5 +11,11 @@
     "groupName": "Photography",
     "typeOfRequest": "promotion",
     "promotionUser": "user5"
+  },
+  {
+    "username": "groupAdmin1",
+    "groupName": "Photography",
+    "typeOfRequest": "promotion",
+    "promotionUser": "user1"
   }
 ]

@@ -14,8 +14,8 @@ router.get('/type', requestsController.getRequestsByType);
 // Route to update request status by ID
 router.patch('/:id', requestsController.updateRequestStatus);
 
-// Route to delete a request by ID
-router.delete('/:id', requestsController.deleteRequest);
+// Route to delete a request by details (username, groupName, typeOfRequest)
+router.delete('/', requestsController.deleteRequest);
 
 // Route to remove pending requests by group
 router.delete('/group/:groupName', requestsController.removePendingRequestsByGroup);
