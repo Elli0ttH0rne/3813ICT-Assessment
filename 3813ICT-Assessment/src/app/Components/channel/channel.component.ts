@@ -153,7 +153,7 @@ export class ChannelComponent implements OnInit {
         return;
       }
   
-      this.groupsService.kickUserFromGroup(this.groupName, user.userId).subscribe({
+      this.groupsService.kickUserFromGroup(this.groupName, user.username).subscribe({
         next: () => {
           alert('User removed successfully.');
           this.loadUsersInGroup();

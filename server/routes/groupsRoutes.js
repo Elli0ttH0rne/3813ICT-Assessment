@@ -36,6 +36,6 @@ router.get('/:groupName/users', groupsController.getUsersInGroup);
 router.get('/:groupName/admins', groupsController.getGroupAdmins);
 
 // Route to remove a user from a group
-router.delete('/groups/:groupName/users/:userId', groupsController.removeUserFromGroup);
+router.delete('/groups/:groupName/users/:username', groupsController.removeUserFromGroup);
 
 module.exports = router;

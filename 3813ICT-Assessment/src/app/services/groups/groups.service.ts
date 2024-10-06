@@ -94,8 +94,8 @@ export class GroupsService {
   }
 
   // Kick a user from a group
-  kickUserFromGroup(groupName: string, userId: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/groups/${groupName}/users/${userId}`);
+  kickUserFromGroup(groupName: string, username: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/groups/${groupName}/users/${username}`);
   }
   
 }

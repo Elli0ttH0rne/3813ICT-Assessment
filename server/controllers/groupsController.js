@@ -367,15 +367,15 @@ const deleteChannel = (req, res) => {
 
 // Function to remove a user from a group and update users.json
 const removeUserFromGroup = (req, res) => {
-  const { groupName, userId } = req.params;
+  const { groupName, username } = req.params;
 
   readFile(usersFilePath, (err, users) => {
     if (err) {
       return res.status(500).json({ error: 'Failed to read users data.' });
     }
 
-    // Find the user by ID and remove the group from the groups array
-    const user = users.find(user => user.userId === userId);
+    // Find the user by username and remove the group from the groups array
+    const user = users.find(user => user.username === username);
     if (!user) {
       return res.status(404).json({ error: 'User not found.' });
     }
@@ -391,6 +391,7 @@ const removeUserFromGroup = (req, res) => {
     });
   });
 };
+
 
 
 

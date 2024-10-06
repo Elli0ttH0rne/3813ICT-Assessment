@@ -172,8 +172,6 @@ private updateRequestList(request: any): void {
   }
 }
 
-  
-  
 
   //******************************Report Request Methods******************************
   approvePromotionRequest(promotionRequest: any): void {
@@ -208,6 +206,35 @@ private updateRequestList(request: any): void {
       });
     }
   }
+  
+  kickReportedUser(reportedUser: any): void {
+    if (!reportedUser.groupName || !reportedUser.reportedUsername) {
+      console.error('Group name or reported username is undefined');
+      return;
+    }
+  
+    // Confirm the action with the user
+    const confirmed = window.confirm(`Are you sure you want to kick ${reportedUser.reportedUsername} from the group ${reportedUser.groupName}?`);
+  
+    if (confirmed) {
+      // Call the kickUserFromGroup function from GroupsService
+      this.groupsService.kickUserFromGroup(reportedUser.groupName, reportedUser.reportedUsername).subscribe({
+        next: () => {
+          console.log(`Successfully kicked ${reportedUser.reportedUsername} from ${reportedUser.groupName}`);
+          // Remove the kicked user request from reportRequests
+          this.reportRequests = this.reportRequests.filter(
+            request => request.groupName !== reportedUser.groupName || request.reportedUsername !== reportedUser.reportedUsername
+          );
+          alert(`${reportedUser.reportedUsername} has been kicked from the group successfully.`);
+        },
+        error: (err) => {
+          console.error(`Failed to kick ${reportedUser.reportedUsername} from ${reportedUser.groupName}`, err);
+          alert('Failed to kick the user from the group.');
+        }
+      });
+    }
+  }
+  
   
   //******************************UI Methods******************************
   setActiveTab(tab: string): void {
