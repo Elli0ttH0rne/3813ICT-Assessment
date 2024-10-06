@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { RequestsService } from '../../services/requests/requests.service';
 import { GroupsService } from '../../services/groups/groups.service';
 import { AuthService } from '../../services/auth/auth.service';
+import { UsersService } from '../../services/users/users.service';
 
 @Component({
   selector: 'app-inbox',
@@ -26,7 +27,7 @@ export class InboxComponent implements OnInit {
     private router: Router, 
     private requestsService: RequestsService,
     private groupsService: GroupsService,
-    private authService: AuthService
+    private usersService: UsersService
   ) {}
 
   ngOnInit(): void {
@@ -180,13 +181,25 @@ private updateRequestList(request: any): void {
       console.error('Invalid promotion request');
       return;
     }
-
-    const confirmed = window.confirm('Are you sure you want to promote this user to Group Admin?');
+  
+    const confirmed = window.confirm(`Are you sure you want to promote ${promotionRequest.promotionUser} to Group Admin?`);
+  
     if (confirmed) {
-      this.authService.promoteToGroupAdmin(promotionRequest.promotionUser).subscribe({
+      // Call promoteToGroupAdmin in UsersService to promote the user
+      console.log(promotionRequest.promotionUser)
+      this.usersService.promoteToGroupAdmin(promotionRequest.promotionUser).subscribe({
         next: () => {
           alert('User promoted to Group Admin successfully.');
-          this.promotionRequests = this.promotionRequests.filter(req => req !== promotionRequest);
+          // Remove the promotion request after approval
+          this.requestsService.deleteRequestByDetails(promotionRequest.username, promotionRequest.groupName, promotionRequest.typeOfRequest).subscribe({
+            next: () => {
+              this.updateRequestList(promotionRequest);
+              console.log(`Approved promotion request for ${promotionRequest.promotionUser}`);
+            },
+            error: (err) => {
+              console.error('Failed to remove promotion request:', err);
+            }
+          });
         },
         error: (err) => {
           console.error('Failed to promote user:', err);
@@ -195,20 +208,7 @@ private updateRequestList(request: any): void {
       });
     }
   }
-
-  denyPromotionRequest(promotionRequest: any): void {
-    if (!promotionRequest || !promotionRequest.promotionUser) {
-      console.error('Invalid promotion request');
-      return;
-    }
-
-    const confirmed = window.confirm('Are you sure you want to deny this promotion request?');
-    if (confirmed) {
-      this.promotionRequests = this.promotionRequests.filter(req => req !== promotionRequest);
-      alert('Promotion request denied.');
-    }
-  }
-
+  
   //******************************UI Methods******************************
   setActiveTab(tab: string): void {
     this.activeTab = tab;

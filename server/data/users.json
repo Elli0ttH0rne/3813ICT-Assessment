@@ -71,7 +71,8 @@
     "password": "user5",
     "email": "user5@gmail.com",
     "roles": [
-      "user"
+      "user",
+      "groupAdmin"
     ],
     "groups": [
       "Cooking",
