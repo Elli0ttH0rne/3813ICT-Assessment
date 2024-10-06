@@ -20,4 +20,7 @@ router.delete('/:id', requestsController.deleteRequest);
 // Route to remove pending requests by group
 router.delete('/group/:groupName', requestsController.removePendingRequestsByGroup);
 
+// Route to remove pending requests by username
+router.delete('/user/:username', requestsController.removePendingRequestsByUsername);
+
 module.exports = router;

@@ -158,6 +158,28 @@ const removePendingRequestsByGroup = (req, res) => {
   });
 };
 
+const removePendingRequestsByUsername = (req, res) => {
+  const { username } = req.params;
+
+  readFile(requestsFilePath, (err, requests) => {
+    if (err) {
+      return res.status(500).json({ error: 'Failed to read requests data.' });
+    }
+
+    const updatedRequests = requests.filter(req => req.username !== username);
+
+    if (updatedRequests.length === requests.length) {
+      return res.status(404).json({ error: 'No pending requests found for the specified user.' });
+    }
+
+    writeFile(requestsFilePath, updatedRequests, (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to remove pending requests.' });
+      }
+      res.status(200).json({ message: 'Pending requests for the user removed successfully.' });
+    });
+  });
+};
 
 module.exports = {
   createRequest,
@@ -165,5 +187,6 @@ module.exports = {
   removePendingRequestsByGroup,
   deleteRequest,
   updateRequestStatus,
-  getRequestsByType
+  getRequestsByType,
+  removePendingRequestsByUsername
 };

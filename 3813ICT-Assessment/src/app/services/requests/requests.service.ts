@@ -92,6 +92,12 @@ export class RequestsService {
     );
   }
 
+  removePendingRequests(username: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/user/${username}`).pipe(
+      catchError(this.handleError(`removePendingRequests(${username})`))
+    );
+  }
+
   //******************************Request Count******************************
   getRequestCount(): Observable<number> {
     return this.http.get<any[]>(this.apiUrl).pipe(

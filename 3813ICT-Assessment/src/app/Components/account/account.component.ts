@@ -59,39 +59,43 @@ export class AccountComponent implements OnInit {
     this.router.navigate(['/']);
   }
 
-  /*deleteAccount(): void {
+  deleteAccount(): void {
     if (this.isGroupAdminOrSuperAdmin()) {
       alert('Group Admins and Super Admins cannot delete their accounts.');
       return;
     }
-
+  
     const confirmed = window.confirm('Are you sure you want to delete your account? This action cannot be undone.');
-
+  
     if (confirmed) {
-      this.usersService.deleteUser(this.username).subscribe({
+      // Delete the user's account
+      this.usersService.deleteUserByUsername(this.username).subscribe({
         next: () => {
-          // Remove pending requests after user deletion
+          // Remove any pending requests related to the user after account deletion
           this.requestsService.removePendingRequests(this.username).subscribe({
             next: () => {
-              console.log(`Pending requests for ${this.username} removed.`);
+              console.log(`Pending requests for ${this.username} removed successfully.`);
             },
             error: (err) => {
               console.error('Failed to remove pending requests:', err);
             }
           });
-
+  
+          // Step 3: Remove user from local storage and navigate to home page
           localStorage.removeItem('currentUser');
+          alert('Account deleted successfully.');
           this.router.navigate(['/']);
         },
         error: (err) => {
           console.error('Failed to delete user:', err);
+          alert('Failed to delete account. Please try again later.');
         }
       });
     } else {
       console.log('Account deletion cancelled');
     }
   }
-*/
+  
 
   //******************************Component Navigation******************************
   navigateToAccount(): void {

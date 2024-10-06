@@ -1,29 +1,5 @@
 [
   {
-    "username": "user1",
-    "groupName": "Music",
-    "typeOfRequest": "join"
-  },
-  {
-    "username": "user1",
-    "groupName": "Gaming",
-    "typeOfRequest": "join"
-  },
-  {
-    "username": "user1",
-    "groupName": "Cooking",
-    "typeOfRequest": "report",
-    "reportedUsername": "user5",
-    "reason": "Violation of group rules"
-  },
-  {
-    "username": "user1",
-    "groupName": "Cooking",
-    "typeOfRequest": "report",
-    "reportedUsername": "user15",
-    "reason": "Violation of group rules"
-  },
-  {
     "username": "groupAdmin1",
     "groupName": "Photography",
     "typeOfRequest": "report",

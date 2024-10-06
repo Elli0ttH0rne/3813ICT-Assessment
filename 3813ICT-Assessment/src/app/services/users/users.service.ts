@@ -36,7 +36,7 @@ export class UsersService {
 
   // Delete a user by username
   deleteUserByUsername(username: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/users/username/${username}`);
+    return this.http.delete(`${this.apiUrl}/username/${username}`);
   }
 
   // Promote a user to group admin by username
