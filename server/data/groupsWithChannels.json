@@ -1,0 +1,133 @@
+[
+    { 
+      "name": "Photography", 
+      "channels": [
+        { "name": "Camera Gear", "description": "Discuss camera equipment" },
+        { "name": "Photo Editing", "description": "Share editing tips" },
+        { "name": "Techniques", "description": "Learn and discuss techniques" }
+      ],
+      "admins": [
+        { "userId": "u021", "username": "groupAdmin1", "role": "creator" },
+        { "userId": "u022", "username": "groupAdmin2", "role": "admin" }
+      ],
+      "creatorId": "u021"
+    },
+    { 
+      "name": "Cooking", 
+      "channels": [
+        { "name": "Recipes", "description": "Share and discuss recipes" },
+        { "name": "Cooking Tips", "description": "Exchange cooking tips" },
+        { "name": "Kitchen Gadgets", "description": "Discuss kitchen gadgets" }
+      ],
+      "admins": [
+        { "userId": "u021", "username": "groupAdmin1", "role": "creator" },
+        { "userId": "u022", "username": "groupAdmin2", "role": "admin" }
+      ],
+      "creatorId": "u021"
+    },
+    { 
+      "name": "Gardening", 
+      "channels": [
+        { "name": "Plant Care", "description": "Discuss plant care" },
+        { "name": "Garden Design", "description": "Exchange design ideas" },
+        { "name": "Tools", "description": "Discuss gardening tools" }
+      ],
+      "admins": [
+        { "userId": "u021", "username": "groupAdmin1", "role": "creator" },
+        { "userId": "u022", "username": "groupAdmin2", "role": "admin" }
+      ],
+      "creatorId": "u021"
+    },
+    { 
+      "name": "Travel", 
+      "channels": [
+        { "name": "Destinations", "description": "Discuss travel destinations" },
+        { "name": "Travel Tips", "description": "Share travel tips" },
+        { "name": "Gear", "description": "Discuss travel gear" }
+      ],
+      "admins": [
+        { "userId": "u021", "username": "groupAdmin1", "role": "creator" },
+        { "userId": "u022", "username": "groupAdmin2", "role": "admin" }
+      ],
+      "creatorId": "u021"
+    },
+    { 
+      "name": "Fitness", 
+      "channels": [
+        { "name": "Workouts", "description": "Discuss workouts" },
+        { "name": "Nutrition", "description": "Share nutrition tips" },
+        { "name": "Gear", "description": "Discuss fitness gear" }
+      ],
+      "admins": [
+        { "userId": "u021", "username": "groupAdmin1", "role": "creator" },
+        { "userId": "u022", "username": "groupAdmin2", "role": "admin" }
+      ],
+      "creatorId": "u021"
+    },
+    { 
+      "name": "Music", 
+      "channels": [
+        { "name": "Instruments", "description": "Discuss instruments" },
+        { "name": "Music Theory", "description": "Share music theory knowledge" },
+        { "name": "Recording", "description": "Discuss recording techniques" }
+      ],
+      "admins": [
+        { "userId": "u021", "username": "groupAdmin1", "role": "admin" },
+        { "userId": "u022", "username": "groupAdmin2", "role": "creator" }
+      ],
+      "creatorId": "u022"
+    },
+    { 
+      "name": "Reading", 
+      "channels": [
+        { "name": "Book Recommendations", "description": "Share book recommendations" },
+        { "name": "Genres", "description": "Discuss different genres" },
+        { "name": "Authors", "description": "Discuss authors" }
+      ],
+      "admins": [
+        { "userId": "u021", "username": "groupAdmin1", "role": "admin" },
+        { "userId": "u022", "username": "groupAdmin2", "role": "creator" }
+      ],
+      "creatorId": "u022"
+    },
+    { 
+      "name": "Gaming", 
+      "channels": [
+        { "name": "Game Reviews", "description": "Share game reviews" },
+        { "name": "Tips and Tricks", "description": "Exchange gaming tips" },
+        { "name": "Hardware", "description": "Discuss gaming hardware" }
+      ],
+      "admins": [
+        { "userId": "u021", "username": "groupAdmin1", "role": "admin" },
+        { "userId": "u022", "username": "groupAdmin2", "role": "creator" }
+      ],
+      "creatorId": "u022"
+    },
+    { 
+      "name": "DIY", 
+      "channels": [
+        { "name": "Projects", "description": "Discuss DIY projects" },
+        { "name": "Tools", "description": "Exchange tool recommendations" },
+        { "name": "Techniques", "description": "Discuss techniques" }
+      ],
+      "admins": [
+        { "userId": "u021", "username": "groupAdmin1", "role": "admin" },
+        { "userId": "u022", "username": "groupAdmin2", "role": "creator" }
+      ],
+      "creatorId": "u022"
+    },
+    { 
+      "name": "Art", 
+      "channels": [
+        { "name": "Drawing", "description": "Discuss drawing techniques" },
+        { "name": "Painting", "description": "Share painting tips" },
+        { "name": "Digital Art", "description": "Discuss digital art" }
+      ],
+      "admins": [
+        { "userId": "u021", "username": "groupAdmin1", "role": "admin" },
+        { "userId": "u022", "username": "groupAdmin2", "role": "creator" }
+      ],
+      "creatorId": "u022"
+    }
+  ]
+  
