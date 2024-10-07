@@ -1,82 +1,161 @@
 [
-  { 
-    "name": "Photography", 
+  {
+    "name": "Photography",
     "admins": [
-      { "userId": "u021", "username": "groupAdmin1", "role": "creator" },
-      { "userId": "u022", "username": "groupAdmin2", "role": "admin" }
+      {
+        "userId": "u021",
+        "username": "groupAdmin1",
+        "role": "creator"
+      },
+      {
+        "userId": "u022",
+        "username": "groupAdmin2",
+        "role": "admin"
+      }
     ],
     "creatorId": "u021"
   },
-  { 
-    "name": "Cooking", 
+  {
+    "name": "Cooking",
     "admins": [
-      { "userId": "u021", "username": "groupAdmin1", "role": "creator" },
-      { "userId": "u022", "username": "groupAdmin2", "role": "admin" }
+      {
+        "userId": "u021",
+        "username": "groupAdmin1",
+        "role": "creator"
+      },
+      {
+        "userId": "u022",
+        "username": "groupAdmin2",
+        "role": "admin"
+      }
     ],
     "creatorId": "u021"
   },
-  { 
-    "name": "Gardening", 
+  {
+    "name": "Gardening",
     "admins": [
-      { "userId": "u021", "username": "groupAdmin1", "role": "creator" },
-      { "userId": "u022", "username": "groupAdmin2", "role": "admin" }
+      {
+        "userId": "u021",
+        "username": "groupAdmin1",
+        "role": "creator"
+      },
+      {
+        "userId": "u022",
+        "username": "groupAdmin2",
+        "role": "admin"
+      }
     ],
     "creatorId": "u021"
   },
-  { 
-    "name": "Travel", 
+  {
+    "name": "Travel",
     "admins": [
-      { "userId": "u021", "username": "groupAdmin1", "role": "creator" },
-      { "userId": "u022", "username": "groupAdmin2", "role": "admin" }
+      {
+        "userId": "u021",
+        "username": "groupAdmin1",
+        "role": "creator"
+      },
+      {
+        "userId": "u022",
+        "username": "groupAdmin2",
+        "role": "admin"
+      }
     ],
     "creatorId": "u021"
   },
-  { 
-    "name": "Fitness", 
+  {
+    "name": "Fitness",
     "admins": [
-      { "userId": "u021", "username": "groupAdmin1", "role": "creator" },
-      { "userId": "u022", "username": "groupAdmin2", "role": "admin" }
+      {
+        "userId": "u021",
+        "username": "groupAdmin1",
+        "role": "creator"
+      },
+      {
+        "userId": "u022",
+        "username": "groupAdmin2",
+        "role": "admin"
+      }
     ],
     "creatorId": "u021"
   },
-  { 
-    "name": "Music", 
+  {
+    "name": "Music",
     "admins": [
-      { "userId": "u021", "username": "groupAdmin1", "role": "admin" },
-      { "userId": "u022", "username": "groupAdmin2", "role": "creator" }
+      {
+        "userId": "u021",
+        "username": "groupAdmin1",
+        "role": "admin"
+      },
+      {
+        "userId": "u022",
+        "username": "groupAdmin2",
+        "role": "creator"
+      }
     ],
     "creatorId": "u022"
   },
-  { 
-    "name": "Reading", 
+  {
+    "name": "Reading",
     "admins": [
-      { "userId": "u021", "username": "groupAdmin1", "role": "admin" },
-      { "userId": "u022", "username": "groupAdmin2", "role": "creator" }
+      {
+        "userId": "u021",
+        "username": "groupAdmin1",
+        "role": "admin"
+      },
+      {
+        "userId": "u022",
+        "username": "groupAdmin2",
+        "role": "creator"
+      }
     ],
     "creatorId": "u022"
   },
-  { 
-    "name": "Gaming", 
+  {
+    "name": "Gaming",
     "admins": [
-      { "userId": "u021", "username": "groupAdmin1", "role": "admin" },
-      { "userId": "u022", "username": "groupAdmin2", "role": "creator" }
+      {
+        "userId": "u021",
+        "username": "groupAdmin1",
+        "role": "admin"
+      },
+      {
+        "userId": "u022",
+        "username": "groupAdmin2",
+        "role": "creator"
+      }
     ],
     "creatorId": "u022"
   },
-  { 
-    "name": "DIY", 
+  {
+    "name": "DIY",
     "admins": [
-      { "userId": "u021", "username": "groupAdmin1", "role": "admin" },
-      { "userId": "u022", "username": "groupAdmin2", "role": "creator" }
+      {
+        "userId": "u021",
+        "username": "groupAdmin1",
+        "role": "admin"
+      },
+      {
+        "userId": "u022",
+        "username": "groupAdmin2",
+        "role": "creator"
+      }
     ],
     "creatorId": "u022"
   },
-  { 
-    "name": "Art", 
-   
+  {
+    "name": "Art",
     "admins": [
-      { "userId": "u021", "username": "groupAdmin1", "role": "admin" },
-      { "userId": "u022", "username": "groupAdmin2", "role": "creator" }
+      {
+        "userId": "u021",
+        "username": "groupAdmin1",
+        "role": "admin"
+      },
+      {
+        "userId": "u022",
+        "username": "groupAdmin2",
+        "role": "creator"
+      }
     ],
     "creatorId": "u022"
   }

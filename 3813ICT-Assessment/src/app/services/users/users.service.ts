@@ -34,6 +34,10 @@ export class UsersService {
     return this.http.post(this.apiUrl, user);
   }
 
+  getSuperAdmins(): Observable<{ userId: string; username: string; role: string }[]> {
+    return this.http.get<{ userId: string; username: string; role: string }[]>(`${this.apiUrl}/users/superAdmins`);
+  }
+
   // Delete a user by username
   deleteUserByUsername(username: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/username/${username}`);

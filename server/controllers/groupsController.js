@@ -1,5 +1,7 @@
 const path = require('path');
+const fs = require('fs').promises;
 const { readFile, writeFile } = require('../helpers/fileHelper');
+const { getDB } = require('../db');
 
 const groupsFilePath = path.join(__dirname, '../data/groups.json');
 const usersFilePath = path.join(__dirname, '../data/users.json');
@@ -101,25 +103,6 @@ const createGroup = (req, res) => {
   });
 };
 
-
-// Get channels for a specific group
-const getGroupChannels = (req, res) => {
-  const { groupName } = req.params;
-
-  readFile(groupsFilePath, (err, groups) => {
-    if (err) {
-      return res.status(500).json({ error: 'Failed to read groups data.' });
-    }
-
-    const group = groups.find(g => g.name === groupName);
-    if (!group) {
-      return res.status(404).json({ error: 'Group not found.' });
-    }
-
-    res.json(group.channels); 
-  });
-};
-
 // Add a group to the users groups 
 const addGroupToUser = (req, res) => {
   const { username } = req.params;
@@ -192,14 +175,14 @@ const leaveGroup = (req, res) => {
 
 
 // Delete a group
-const deleteGroup = (req, res) => {
-  const { groupName } = req.params;
-  const { currentUserId, isSuperAdmin } = req.body;
+const deleteGroup = async (req, res) => {
+  try {
+    const { groupName } = req.params;
+    const { currentUserId, isSuperAdmin } = req.body;
 
-  readFile(groupsFilePath, (err, groups) => {
-    if (err) {
-      return res.status(500).json({ error: 'Failed to read groups data.' });
-    }
+    // Read the groups file
+    const groupsData = await fs.readFile(groupsFilePath, 'utf8');
+    const groups = JSON.parse(groupsData);
 
     // Find the group by name
     const groupIndex = groups.findIndex(g => g.name === groupName);
@@ -216,36 +199,33 @@ const deleteGroup = (req, res) => {
 
     // Remove the group from groups.json
     groups.splice(groupIndex, 1);
+    await fs.writeFile(groupsFilePath, JSON.stringify(groups, null, 2));
 
-    // Write the updated groups data back to groups.json
-    writeFile(groupsFilePath, groups, (writeErr) => {
-      if (writeErr) {
-        return res.status(500).json({ error: 'Failed to delete group.' });
-      }
+    // Now remove the group from all users' groups array in users.json
+    const usersData = await fs.readFile(usersFilePath, 'utf8');
+    const users = JSON.parse(usersData);
 
-      // Now remove the group from all users' groups array in users.json
-      readFile(usersFilePath, (userErr, users) => {
-        if (userErr) {
-          return res.status(500).json({ error: 'Failed to read users data.' });
-        }
-
-        // Update each user to remove the deleted group from their groups array
-        users.forEach(user => {
-          user.groups = user.groups.filter(group => group !== groupName);
-        });
-
-        // Write the updated users data back to users.json
-        writeFile(usersFilePath, users, (userWriteErr) => {
-          if (userWriteErr) {
-            return res.status(500).json({ error: 'Failed to update users data.' });
-          }
-
-          res.status(200).json({ message: `Group "${groupName}" deleted successfully.` });
-        });
-      });
+    // Update each user to remove the deleted group from their groups array
+    users.forEach(user => {
+      user.groups = user.groups.filter(group => group !== groupName);
     });
-  });
+
+    // Write the updated users data back to users.json
+    await fs.writeFile(usersFilePath, JSON.stringify(users, null, 2));
+
+    // Remove the channels from MongoDB as well
+    const db = getDB();
+    await db.collection('channels').deleteMany({ groupName });
+
+    // Send a success response after everything is deleted successfully
+    res.status(200).json({ message: `Group "${groupName}" deleted successfully.` });
+
+  } catch (err) {
+    console.error('Error while deleting group:', err);
+    res.status(500).json({ error: 'An error occurred while deleting the group.' });
+  }
 };
+
 
 // Get users in a specific group
 const getUsersInGroup = (req, res) => {
@@ -284,87 +264,6 @@ const getGroupAdmins = (req, res) => {
   });
 };
 
-const createChannel = (req, res) => {
-  console.log('Request body:', req.body);
-  const { groupName } = req.params;
-  const { channelName, channelDescription, currentId, isSuperAdmin } = req.body;
-
-  if (!channelName || !channelDescription) {
-    return res.status(400).json({ error: 'Channel name and description are required.' });
-  }
-
-  readFile(groupsFilePath, (err, groups) => {
-    if (err) {
-      console.error('Failed to read groups data:', err);
-      return res.status(500).json({ error: 'Failed to read groups data.' });
-    }
-
-    const group = groups.find(g => g.name === groupName);
-    if (!group) {
-      return res.status(404).json({ error: 'Group not found.' });
-    }
-
-    // Check if the current user is authorized to create a channel
-    if (group.creatorId !== currentId && !isSuperAdmin) {
-      return res.status(403).json({ error: 'Unauthorized to create a channel.' });
-    }
-
-    // Add the new channel
-    const newChannel = { name: channelName, description: channelDescription };
-    group.channels.push(newChannel);
-
-    // Write the updated groups data
-    writeFile(groupsFilePath, groups, (writeErr) => {
-      if (writeErr) {
-        console.error('Failed to create channel:', writeErr);
-        return res.status(500).json({ error: 'Failed to create channel.' });
-      }
-
-      res.status(201).json({ message: 'Channel created successfully.', channel: newChannel });
-    });
-  });
-};
-
-const deleteChannel = (req, res) => {
-  const { groupName, channelName } = req.params;
-  const { currentId, isSuperAdmin } = req.query; 
-
-  readFile(groupsFilePath, (err, groups) => {
-    if (err) {
-      console.error('Failed to read groups data:', err);
-      return res.status(500).json({ error: 'Failed to read groups data.' });
-    }
-
-    const group = groups.find(g => g.name === groupName);
-    if (!group) {
-      return res.status(404).json({ error: 'Group not found.' });
-    }
-
-    // Check if the current user is authorized to delete the channel (either creator or super admin)
-    if (group.creatorId !== currentId && isSuperAdmin !== 'true') {
-      return res.status(403).json({ error: 'Unauthorized to delete a channel.' });
-    }
-
-    const channelIndex = group.channels.findIndex(channel => channel.name === channelName);
-    if (channelIndex === -1) {
-      return res.status(404).json({ error: 'Channel not found.' });
-    }
-
-    // Remove the channel from the group
-    group.channels.splice(channelIndex, 1);
-
-    // Write the updated groups data
-    writeFile(groupsFilePath, groups, (writeErr) => {
-      if (writeErr) {
-        console.error('Failed to delete channel:', writeErr);
-        return res.status(500).json({ error: 'Failed to delete channel.' });
-      }
-
-      res.status(200).json({ message: 'Channel deleted successfully.' });
-    });
-  });
-};
-
 // Function to remove a user from a group and update users.json
 const removeUserFromGroup = (req, res) => {
   const { groupName, username } = req.params;
@@ -398,14 +297,11 @@ const removeUserFromGroup = (req, res) => {
 module.exports = {
   getAllGroups,
   getGroupDetails,
-  getGroupChannels,
   getUsersInGroup,
   getGroupAdmins,
   createGroup,
-  createChannel,
   leaveGroup,
   deleteGroup,
-  deleteChannel,
   removeUserFromGroup,
   addGroupToUser
 };

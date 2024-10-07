@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { RequestsService } from '../../services/requests/requests.service';
 import { GroupsService } from '../../services/groups/groups.service';
-import { AuthService } from '../../services/auth/auth.service';
 import { UsersService } from '../../services/users/users.service';
 
 @Component({
@@ -221,11 +220,18 @@ private updateRequestList(request: any): void {
       this.groupsService.kickUserFromGroup(reportedUser.groupName, reportedUser.reportedUsername).subscribe({
         next: () => {
           console.log(`Successfully kicked ${reportedUser.reportedUsername} from ${reportedUser.groupName}`);
-          // Remove the kicked user request from reportRequests
-          this.reportRequests = this.reportRequests.filter(
-            request => request.groupName !== reportedUser.groupName || request.reportedUsername !== reportedUser.reportedUsername
-          );
           alert(`${reportedUser.reportedUsername} has been kicked from the group successfully.`);
+  
+          // After successfully kicking the user, remove the report request from requests.json
+          this.requestsService.deleteRequestByDetails(reportedUser.username, reportedUser.groupName, reportedUser.typeOfRequest).subscribe({
+            next: () => {
+              this.updateRequestList(reportedUser);
+              console.log(`Removed report request for ${reportedUser.reportedUsername}`);
+            },
+            error: (err) => {
+              console.error('Failed to remove report request:', err);
+            }
+          });
         },
         error: (err) => {
           console.error(`Failed to kick ${reportedUser.reportedUsername} from ${reportedUser.groupName}`, err);
@@ -234,7 +240,6 @@ private updateRequestList(request: any): void {
       });
     }
   }
-  
   
   //******************************UI Methods******************************
   setActiveTab(tab: string): void {

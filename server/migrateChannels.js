@@ -4,7 +4,7 @@ const path = require('path');
 
 const migrateChannels = async () => {
   try {
-    const db = getDB(); // Get the already connected DB
+    const db = getDB();
     const channelsCollection = db.collection('channels');
 
     // Check if channels collection is empty

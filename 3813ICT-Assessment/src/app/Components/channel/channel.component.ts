@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth/auth.service';
 import { RequestsService } from '../../services/requests/requests.service';
 import { GroupsService, Admin } from '../../services/groups/groups.service';
 import { UsersService } from '../../services/users/users.service';
+import { ChannelsService } from '../../services/channels/channels.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -39,10 +39,10 @@ export class ChannelComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private authService: AuthService,
     private requestsService: RequestsService,
     private groupsService: GroupsService,
     private usersService: UsersService,
+    private channelsService: ChannelsService 
   ) {
     // Retrieve groupName and channelName from route parameters
     this.route.paramMap.subscribe(params => {
@@ -76,7 +76,7 @@ export class ChannelComponent implements OnInit {
     forkJoin([
       this.groupsService.getUsersInGroup(this.groupName!),
       this.groupsService.getGroupAdmins(this.groupName!),
-      this.authService.getSuperAdmins(),
+      this.usersService.getSuperAdmins(),
       this.groupsService.getGroupCreator(this.groupName!)
     ]).subscribe({
       next: ([users, admins, superAdmins, creatorId]) => {
@@ -268,15 +268,14 @@ export class ChannelComponent implements OnInit {
       });
     }
   }
-  
 
   //******************************Channel Management******************************
   deleteChannel(): void {
     const confirmed = window.confirm('Are you sure you want to delete this channel? This action cannot be undone.');
-  
+
     if (confirmed) {
       if (this.groupName && this.channelName) {
-        this.groupsService.deleteChannel(this.groupName, this.channelName, this.userID, this.isSuperAdmin).subscribe({
+        this.channelsService.deleteChannel(this.groupName, this.channelName).subscribe({
           next: () => {
             alert('Channel deleted successfully.');
             this.navigateToUserGroup();
@@ -289,7 +288,7 @@ export class ChannelComponent implements OnInit {
       }
     }
   }
-  
+
   toggleUserLists(): void {
     this.showUserLists = !this.showUserLists;
   }

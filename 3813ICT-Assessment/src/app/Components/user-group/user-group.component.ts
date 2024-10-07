@@ -2,10 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth/auth.service';
 import { FormsModule } from '@angular/forms';
 import { RequestsService } from '../../services/requests/requests.service';
-import { GroupsService, Channel } from '../../services/groups/groups.service';
+import { GroupsService } from '../../services/groups/groups.service';
+import { ChannelsService, Channel } from '../../services/channels/channels.service';
 import { forkJoin } from 'rxjs';
 
 @Component({
@@ -35,9 +35,9 @@ export class UserGroupComponent implements OnInit {
 
   constructor(
     private router: Router, 
-    private authService: AuthService,
     private requestsService: RequestsService,
-    private groupsService: GroupsService
+    private groupsService: GroupsService,
+    private channelsService: ChannelsService
   ) {}
 
   ngOnInit(): void {
@@ -69,7 +69,7 @@ export class UserGroupComponent implements OnInit {
           this.groups.forEach(group => {
   
             forkJoin([
-              this.groupsService.getGroupChannels(group),
+              this.channelsService.getChannelsByGroupName(group),
               this.groupsService.getGroupCreator(group)
             ]).subscribe({
               next: ([channels, creator]) => {
@@ -94,7 +94,7 @@ export class UserGroupComponent implements OnInit {
       // Fetch channels and group creators for each group the user is part of
       this.groups.forEach(group => {  
         forkJoin([
-          this.groupsService.getGroupChannels(group),
+          this.channelsService.getChannelsByGroupName(group),
           this.groupsService.getGroupCreator(group)
         ]).subscribe({
           next: ([channels, creator]) => {
@@ -158,19 +158,22 @@ export class UserGroupComponent implements OnInit {
   deleteGroup(group: string): void {
     const confirmed = window.confirm('Are you sure you want to delete this group? This action cannot be undone.');
     if (confirmed) {
+      // Make the delete request to the backend
       this.groupsService.deleteGroup(group, this.userID, this.roles.includes('superAdmin')).subscribe({
         next: () => {
-          alert('Group deleted successfully.');
-          // Remove the group from the local state
+          // If the request is successful, update the local state
           this.groups = this.groups.filter(g => g !== group);
           delete this.channels[group];
-  
+          
           // Update local storage if needed
           const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
           if (storedUser.groups) {
             storedUser.groups = storedUser.groups.filter(g => g !== group);
             localStorage.setItem('currentUser', JSON.stringify(storedUser));
           }
+  
+          // Alert the user about the successful deletion
+          alert('Group deleted successfully.');
         },
         error: (error) => {
           console.error('Failed to delete group:', error);
@@ -235,15 +238,16 @@ export class UserGroupComponent implements OnInit {
 
   createChannel(group: string): void {
     if (this.newChannelName.trim() && this.newChannelDescription.trim()) {
-      this.groupsService.createChannel(
+      this.channelsService.createChannel(
         group,
         this.newChannelName,
-        this.newChannelDescription,
-        this.userID,  
-        this.isSuperAdmin()
+        this.newChannelDescription
       ).subscribe({
         next: () => {
           // Update local channels and reset form
+          if (!this.channels[group]) {
+            this.channels[group] = [];
+          }
           this.channels[group].push({ name: this.newChannelName, description: this.newChannelDescription });
           this.showCreateChannelForGroup = null;
           this.newChannelName = '';
@@ -258,8 +262,6 @@ export class UserGroupComponent implements OnInit {
       alert('Please enter both channel name and description.');
     }
   }
-  
-  
 
   leaveGroup(groupName: string): void {
     const confirmed = window.confirm(`Are you sure you want to leave the group "${groupName}"?`);

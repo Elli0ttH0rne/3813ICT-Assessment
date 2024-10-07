@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { UsersService } from '../../services/users/users.service';
-import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-register',
