@@ -11,4 +11,13 @@ router.delete('/:groupName/:channelName', channelsController.deleteChannel);
 // Route to create a new channel
 router.post('/', channelsController.createChannel);
 
+// Route to get all chat messages for a channel
+router.get('/:groupName/:channelName/messages', channelsController.getChannelMessages);
+
+// Route to add a new chat message to a channel
+router.post('/:groupName/:channelName/messages', channelsController.addChannelMessage);
+
+// Route to delete a specific chat message from a channel
+router.delete('/messages/:groupName/:channelName/:messageId', channelsController.deleteChannelMessage);
+
 module.exports = router;

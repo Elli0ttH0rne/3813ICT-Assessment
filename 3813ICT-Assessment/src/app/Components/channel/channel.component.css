@@ -46,6 +46,60 @@
     font-size: 2.5rem; /* Increase icon size */
   }
   
+  .scrollable-message-container {
+    height: 400px; /* Set a fixed height */
+    overflow-y: auto; /* Make it scrollable */
+    scroll-behavior: smooth; /* Smooth scrolling */
+    padding: 10px 10px 20px; /* Add extra padding to the bottom */
+    border: 1px solid #ccc; /* Border to separate chat area */
+    border-radius: 5px;
+    background-color: #ffffff; /* White background for a clean look */
+  }
+  
+  .message-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px; /* Add spacing between messages */
+  }
+  
+  .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%; /* Circular avatar */
+    margin-right: 10px; /* Space between avatar and message content */
+    background-color: #5865f2; /* Placeholder color if no avatar */
+  }
+  
+  .message-content {
+    flex: 1;
+  }
+  
+  .message-header {
+    display: flex;
+    align-items: baseline;
+    margin-bottom: 3px;
+  }
+  
+  .username {
+    font-weight: bold;
+    color: #000000; /* Black color for usernames */
+    margin-right: 5px; /* Space between username and timestamp */
+  }
+  
+  .timestamp {
+    font-size: 0.8rem;
+    color: #999999; /* Light gray color for timestamps */
+  }
+  
+  .message-text {
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    max-width: 100%;
+    color: #333333; /* Darker text color for message content */
+    font-size: 1rem; /* Keep the text readable */
+  }
+  
+  
   .badge-notification {
     position: absolute;
     top: -10px; /* Adjust as needed */

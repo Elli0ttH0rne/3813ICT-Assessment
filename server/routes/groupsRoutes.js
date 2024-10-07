@@ -14,7 +14,6 @@ router.post('/', groupsController.createGroup);
 // Route to delete a specific group by its name
 router.delete('/:groupName', groupsController.deleteGroup);
 
-
 // Route to add a group to a user's group array
 router.patch('/add-group-to-user/:username', groupsController.addGroupToUser);
 

@@ -174,7 +174,7 @@ const leaveGroup = (req, res) => {
 };
 
 
-// Delete a group
+// Delete a group and its associated channels and messages
 const deleteGroup = async (req, res) => {
   try {
     const { groupName } = req.params;
@@ -213,18 +213,29 @@ const deleteGroup = async (req, res) => {
     // Write the updated users data back to users.json
     await fs.writeFile(usersFilePath, JSON.stringify(users, null, 2));
 
-    // Remove the channels from MongoDB as well
+    // Remove the channels and their messages from MongoDB
     const db = getDB();
-    await db.collection('channels').deleteMany({ groupName });
+    const channels = await db.collection('channels').find({ groupName }).toArray();
+
+    if (channels.length > 0) {
+      const channelNames = channels.map(channel => channel.name);
+
+      // Delete the channels
+      await db.collection('channels').deleteMany({ groupName });
+
+      // Delete all messages related to those channels
+      await db.collection('messages').deleteMany({ channelName: { $in: channelNames } });
+    }
 
     // Send a success response after everything is deleted successfully
-    res.status(200).json({ message: `Group "${groupName}" deleted successfully.` });
+    res.status(200).json({ message: `Group "${groupName}", all associated channels, and messages deleted successfully.` });
 
   } catch (err) {
     console.error('Error while deleting group:', err);
     res.status(500).json({ error: 'An error occurred while deleting the group.' });
   }
 };
+
 
 
 // Get users in a specific group

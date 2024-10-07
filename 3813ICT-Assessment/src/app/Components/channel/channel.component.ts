@@ -1,21 +1,31 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { RequestsService } from '../../services/requests/requests.service';
 import { GroupsService, Admin } from '../../services/groups/groups.service';
 import { UsersService } from '../../services/users/users.service';
 import { ChannelsService } from '../../services/channels/channels.service';
 import { forkJoin } from 'rxjs';
 
+interface Message {
+  _id?: string;
+  sender: string;
+  content: string;
+  timestamp: string;
+}
+
 @Component({
   selector: 'app-channel',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './channel.component.html',
   styleUrls: ['./channel.component.css']
 })
 export class ChannelComponent implements OnInit {
+  @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
+
   groupName: string | null = null;
   channelName: string | null = null;
 
@@ -35,6 +45,10 @@ export class ChannelComponent implements OnInit {
   isSuperAdmin: boolean = false;
   isGroupAdmin: boolean = false;
   showUserLists: boolean = false;
+
+  // Chat messages
+  messages: Message[] = [];
+  newMessageContent: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -62,6 +76,9 @@ export class ChannelComponent implements OnInit {
 
     if (this.groupName) {
       this.loadInitialData();
+      if (this.channelName) {
+        this.loadChatMessages(true);
+      }
     }
   }
 
@@ -114,6 +131,90 @@ export class ChannelComponent implements OnInit {
       });
     }
   }
+
+  private loadChatMessages(initialLoad: boolean = false): void {
+    if (this.groupName && this.channelName) {
+      this.channelsService.getChannelMessages(this.channelName).subscribe({
+        next: (messages) => {
+          this.messages = messages;
+          if (initialLoad) {
+            setTimeout(() => this.scrollToBottom(), 0);
+          }
+        },
+        error: (error) => {
+          console.error('Failed to load chat messages:', error);
+        }
+      });
+    }
+  }
+  
+  formatTimestamp(timestamp: string): string {
+    const date = new Date(timestamp);
+    return date.toLocaleString('en-US', { 
+      hour: 'numeric', 
+      minute: 'numeric', 
+      hour12: true 
+    });
+  }
+  
+
+  //******************************Chat Actions******************************
+  sendMessage(): void {
+    if (!this.newMessageContent.trim()) {
+      alert('Message cannot be empty.');
+      return;
+    }
+
+    if (this.groupName && this.channelName) {
+      const message: Message = {
+        sender: this.username,
+        content: this.newMessageContent,
+        timestamp: new Date().toISOString()
+      };
+
+      this.channelsService.addChannelMessage(this.channelName, message).subscribe({
+        next: () => {
+          this.messages.push(message);
+          this.newMessageContent = '';
+          this.scrollToBottom(); // Scroll to bottom after sending a message
+        },
+        error: (error) => {
+          console.error('Failed to send message:', error);
+          alert('Failed to send message.');
+        }
+      });
+    }
+  }
+
+  deleteMessage(messageId: string): void {
+    if (this.groupName && this.channelName) {
+      const confirmed = window.confirm('Are you sure you want to delete this message?');
+      if (confirmed) {
+        this.channelsService.deleteChannelMessage(this.groupName, this.channelName, messageId).subscribe({
+          next: () => {
+            this.messages = this.messages.filter(message => message._id !== messageId);
+            console.log('Message deleted successfully.');
+          },
+          error: (error) => {
+            console.error('Failed to delete message:', error);
+            alert('Failed to delete message.');
+          }
+        });
+      }
+    }
+  }
+
+  //******************************Scroll to Bottom******************************
+  private scrollToBottom(): void {
+    try {
+      setTimeout(() => {
+        this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
+      }, 100);
+    } catch (err) {
+      console.error('Error scrolling to bottom:', err);
+    }
+  }
+  
 
   //******************************Checks******************************
   isGroupAdminOrSuperAdmin(): boolean {
@@ -291,6 +392,10 @@ export class ChannelComponent implements OnInit {
 
   toggleUserLists(): void {
     this.showUserLists = !this.showUserLists;
+  }
+
+  getAvatarImg(sender: string): string {
+    return `https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg`;
   }
 
   //******************************Component Navigation******************************
