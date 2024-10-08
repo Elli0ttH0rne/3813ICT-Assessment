@@ -172,22 +172,21 @@ export class ChannelComponent implements OnInit {
       alert('Message cannot be empty.');
       return;
     }
-
+  
     if (this.groupName && this.channelName) {
       const message: Message = {
         sender: this.username,
         content: this.newMessageContent,
         timestamp: new Date().toISOString()
       };
-
+  
       // Send message to the server using Socket.IO
       this.socketService.sendMessage(message);
-
+  
+      // Save the message to the server 
       this.channelsService.addChannelMessage(this.channelName, message).subscribe({
         next: () => {
-          this.messages.push(message);
-          this.newMessageContent = '';
-          this.scrollToBottom(); // Scroll to bottom after sending a message
+          this.newMessageContent = ''; 
         },
         error: (error) => {
           console.error('Failed to send message:', error);
