@@ -30,6 +30,11 @@ export class SocketService {
     this.socket.emit('sendMessage', message);
   }
 
+  // Emit events to the server
+  emit(event: string, data: any): void {
+    this.socket.emit(event, data);
+  }
+
   // Listen for new messages from the server
   onMessageReceived(): Observable<Message> {
     return new Observable((observer) => {

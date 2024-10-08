@@ -13,6 +13,8 @@ const { connectDB } = require('./db');
 const app = express();
 const PORT = 3000;
 
+const users = {};
+
 // Create HTTP server and integrate with Socket.IO
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -36,17 +38,36 @@ app.use('/api/channels', channelsRoutes);
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
-  // Listen for a 'message' event from the client
-  socket.on('sendMessage', (message) => {
-    console.log('Message received:', message);
+  // Listen for join events and store the username
+  socket.on('joinChat', (username) => {
+    users[socket.id] = username; 
+    const joinMessage = {
+      sender: 'System',
+      content: `${username} has joined the chat`,
+      timestamp: new Date().toISOString()
+    };
 
-    // Emit the message to all connected clients
+    io.emit('newMessage', joinMessage);
+    console.log(`${username} has joined the chat`);
+  });
+
+  // Listen for a 'message' event from the client and broadcast it
+  socket.on('sendMessage', (message) => {
     io.emit('newMessage', message);
   });
 
-  // Handle user disconnects
+  // Listen for user disconnect and send a leave message
   socket.on('disconnect', () => {
-    console.log('A user disconnected:', socket.id);
+    const username = users[socket.id] || 'A user';
+    const leaveMessage = {
+      sender: 'System',
+      content: `${username} has left the chat`,
+      timestamp: new Date().toISOString()
+    };
+
+    io.emit('newMessage', leaveMessage);
+    delete users[socket.id];
+    console.log(`${username} disconnected`);
   });
 });
 

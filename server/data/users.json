@@ -12,7 +12,8 @@
       "Gardening",
       "Travel",
       "Fitness",
-      "Photography"
+      "Photography",
+      "e"
     ]
   },
   {
@@ -372,6 +373,8 @@
       "groupAdmin",
       "superAdmin"
     ],
-    "groups": []
+    "groups": [
+      "e"
+    ]
   }
 ]

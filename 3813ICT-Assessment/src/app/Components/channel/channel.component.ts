@@ -83,6 +83,9 @@ export class ChannelComponent implements OnInit {
       }
     }
 
+    // Emit the join event when the component loads
+    this.socketService.emit('joinChat', this.username);
+
     // Subscribe to real-time messages using Socket.IO
     this.socketService.onMessageReceived().subscribe((message: Message) => {
       this.messages.push(message);  
