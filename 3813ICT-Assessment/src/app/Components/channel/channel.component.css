@@ -1,151 +1,179 @@
 .card-body {
-    padding: 3rem; /* Increase padding */
-  }
-  
-  .card-header {
-    font-size: 1.5rem; /* Increase font size */
-    padding: 1.5rem; /* Increase padding */
-  }
-  
-  /* Style the list items */
-  .list-group-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 1.25rem; /* Increase font size */
-    padding: 1rem 1.5rem; /* Increase padding */
-  }
-  
-  /* Style the badges */
-  .badge {
-    margin-right: 1rem;
-    font-size: 1.5rem; /* Increase font size */
-    padding: 0.75rem 1.5rem; /* Increase padding */
-  }
-  
-  /* Style for the nested list items */
-  .list-group .list-group {
-    margin-top: 0.75rem; /* Adjust margin */
-    margin-left: 0; /* Remove left margin */
-    width: 100%; /* Ensure full width */
-  }
-  
-  .list-group .list-group-item {
-    width: 100%; /* Ensure full width */
-    font-size: 1.25rem; /* Increase font size */
-    padding: 0.75rem 1.5rem; /* Increase padding */
-  }
+  padding: 3rem;
+}
 
-  
-  .fa-inbox{
-    font-size: 2.5rem; /* Increase icon size */
-  }
-  
-  .fa-user-circle {
-    font-size: 2.5rem; /* Increase icon size */
-  }
-  
-  .scrollable-message-container {
-    height: 400px; /* Set a fixed height */
-    overflow-y: auto; /* Make it scrollable */
-    scroll-behavior: smooth; /* Smooth scrolling */
-    padding: 10px 10px 20px; /* Add extra padding to the bottom */
-    border: 1px solid #ccc; /* Border to separate chat area */
-    border-radius: 5px;
-    background-color: #ffffff; /* White background for a clean look */
-  }
-  
-  .message-item {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 10px; /* Add spacing between messages */
-  }
-  
-  .avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%; /* Circular avatar */
-    margin-right: 10px; /* Space between avatar and message content */
-    background-color: #5865f2; /* Placeholder color if no avatar */
-  }
-  
-  .message-content {
-    flex: 1;
-  }
-  
-  .message-header {
-    display: flex;
-    align-items: baseline;
-    margin-bottom: 3px;
-  }
-  
-  .username {
-    font-weight: bold;
-    color: #000000; /* Black color for usernames */
-    margin-right: 5px; /* Space between username and timestamp */
-  }
-  
-  .timestamp {
-    font-size: 0.8rem;
-    color: #999999; /* Light gray color for timestamps */
-  }
-  
-  .message-text {
-    word-wrap: break-word;
-    overflow-wrap: anywhere;
-    max-width: 100%;
-    color: #333333; /* Darker text color for message content */
-    font-size: 1rem; /* Keep the text readable */
-  }
-  
-  
-  .badge-notification {
-    position: absolute;
-    top: -10px; /* Adjust as needed */
-    right: -15px; /* Adjust as needed */
-    background-color: red; /* Change to desired color */
-    color: white; /* Text color */
-    font-size: 1.25rem; /* Adjust font size */
-    padding: 0.25em 0.5em;
-    border-radius: 50%;
-  }
+.card-header {
+  font-size: 1.5rem; 
+  padding: 1.5rem; 
+}
 
-  .message-item {
-    align-items: flex-start;
-  }
-  
-  .message-item.system-message {
-    justify-content: center;
-  }
-  
-  .system-message-text {
-    background-color: #f0f0f0;
-    color: #555;
-    padding: 8px;
-    border-radius: 8px;
-    font-style: italic;
-  }
-  
-  .user-message .message-content {
-    background-color: #e9f7fe;
-    padding: 10px;
-    border-radius: 8px;
-    max-width: 80%;
-  }
-  
-  .user-message .username {
-    font-weight: bold;
-  }
-  
-  .user-message .timestamp {
-    font-size: 0.8rem;
-    color: #888;
-  }
-  
-  .scrollable-message-container {
-    max-height: 500px;
-    overflow-y: auto;
-    padding: 15px;
-    border-bottom: 1px solid #ddd;
-  }
-  
+
+.list-group-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.25rem;
+  padding: 1rem 1.5rem;
+}
+
+
+.badge {
+  margin-right: 1rem;
+  font-size: 1.5rem; 
+  padding: 0.75rem 1.5rem; 
+}
+
+
+.list-group .list-group {
+  margin-top: 0.75rem; 
+  margin-left: 0; 
+  width: 100%;
+}
+
+.list-group .list-group-item {
+  width: 100%; 
+  font-size: 1.25rem;
+  padding: 0.75rem 1.5rem;
+}
+
+.fa-inbox {
+  font-size: 2.5rem; 
+}
+
+.fa-user-circle {
+  font-size: 2.5rem; 
+}
+
+.scrollable-message-container {
+  height: 400px; 
+  overflow-y: auto; 
+  scroll-behavior: smooth;
+  padding: 10px 10px 20px; 
+  border: 1px solid #ccc; 
+  border-radius: 5px;
+  background-color: #ffffff;
+}
+
+.message-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 10px; 
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #5865f2;
+}
+
+.message-content {
+  flex: 1;
+}
+
+.message-header {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 3px;
+}
+
+.username {
+  font-weight: bold;
+  color: #000000; 
+  margin-right: 5px;
+}
+
+.timestamp {
+  font-size: 0.8rem;
+  color: #999999;
+}
+
+.message-text {
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  color: #333333; 
+  font-size: 1rem; 
+}
+
+.badge-notification {
+  position: absolute;
+  top: -10px; 
+  right: -15px; 
+  background-color: red; 
+  color: white; 
+  font-size: 1.25rem; 
+  padding: 0.25em 0.5em;
+  border-radius: 50%;
+}
+
+/* System message styling */
+.message-item.system-message {
+  justify-content: center;
+}
+
+.system-message-text {
+  background-color: #f0f0f0;
+  color: #555;
+  padding: 8px;
+  border-radius: 8px;
+  font-style: italic;
+}
+
+/* User message styling */
+.user-message .message-content {
+  background-color: #e9f7fe;
+  padding: 10px;
+  border-radius: 8px;
+  max-width: 80%;
+}
+
+.user-message .username {
+  font-weight: bold;
+}
+
+.user-message .timestamp {
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.scrollable-message-container {
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Sent message (current user) styling */
+.message-item.sent-message {
+  justify-content: flex-end; 
+}
+
+.message-item.sent-message .avatar {
+  order: 2; 
+  margin-left: 10px; 
+  margin-right: 0; 
+}
+
+.message-item.sent-message .message-content {
+  background-color: #dcf8c6;
+  padding: 10px;
+  border-radius: 8px;
+  max-width: 80%;
+}
+
+
+.message-item.received-message {
+  justify-content: flex-start;
+}
+
+.message-item.received-message .avatar {
+  margin-right: 10px;
+}
+
+.message-item.received-message .message-content {
+  background-color: #e9f7fe; 
+  padding: 10px;
+  border-radius: 8px;
+  max-width: 80%;
+}

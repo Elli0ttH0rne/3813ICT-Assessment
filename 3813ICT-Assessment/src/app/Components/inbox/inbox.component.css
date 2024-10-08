@@ -1,59 +1,53 @@
-/* Ensure the card has proper padding */
 .card-body {
-    padding: 3rem; /* Increase padding */
-  }
-  
-  /* Style the card header */
-  .card-header {
-    font-size: 1.5rem; /* Increase font size */
-    padding: 1.5rem; /* Increase padding */
-  }
-  
-  /* Style the list items */
-  .list-group-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 1.25rem; /* Increase font size */
-    padding: 1rem 1.5rem; /* Increase padding */
-  }
-  
-  /* Style the badges */
-  .badge {
-    margin-right: 1rem;
-    font-size: 1.5rem; /* Increase font size */
-    padding: 0.75rem 1.5rem; /* Increase padding */
-  }
-  
-  /* Style for the nested list items */
-  .list-group .list-group {
-    margin-top: 0.75rem; /* Adjust margin */
-    margin-left: 0; /* Remove left margin */
-    width: 100%; /* Ensure full width */
-  }
-  
-  .list-group .list-group-item {
-    width: 100%; /* Ensure full width */
-    font-size: 1.25rem; /* Increase font size */
-    padding: 0.75rem 1.5rem; /* Increase padding */
-  }
-  
-  .fa-inbox{
-    font-size: 2.5rem; /* Increase icon size */
-  }
-  
-  /* Style the account icon */
-  .fa-user-circle {
-    font-size: 2.5rem; /* Increase icon size */
-  }
+  padding: 3rem;
+}
 
-  .badge-notification {
-    position: absolute;
-    top: -10px; /* Adjust as needed */
-    right: -15px; /* Adjust as needed */
-    background-color: red; /* Change to desired color */
-    color: white; /* Text color */
-    font-size: 1.25rem; /* Adjust font size */
-    padding: 0.25em 0.5em;
-    border-radius: 50%;
-  }
+.card-header {
+  font-size: 1.5rem;
+  padding: 1.5rem;
+}
+
+.list-group-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.25rem;
+  padding: 1rem 1.5rem;
+}
+
+.badge {
+  margin-right: 1rem;
+  font-size: 1.5rem;
+  padding: 0.75rem 1.5rem;
+}
+
+.list-group .list-group {
+  margin-top: 0.75rem;
+  margin-left: 0;
+  width: 100%;
+}
+
+.list-group .list-group-item {
+  width: 100%;
+  font-size: 1.25rem;
+  padding: 0.75rem 1.5rem;
+}
+
+.fa-inbox {
+  font-size: 2.5rem;
+}
+
+.fa-user-circle {
+  font-size: 2.5rem;
+}
+
+.badge-notification {
+  position: absolute;
+  top: -10px;
+  right: -15px;
+  background-color: red;
+  color: white;
+  font-size: 1.25rem;
+  padding: 0.25em 0.5em;
+  border-radius: 50%;
+}
