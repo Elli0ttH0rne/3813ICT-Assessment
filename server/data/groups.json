@@ -158,17 +158,5 @@
       }
     ],
     "creatorId": "u022"
-  },
-  {
-    "name": "e",
-    "channels": [],
-    "admins": [
-      {
-        "userId": "u023",
-        "username": "super",
-        "role": "creator"
-      }
-    ],
-    "creatorId": "u023"
   }
 ]

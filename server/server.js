@@ -13,7 +13,7 @@ const { connectDB } = require('./db');
 const app = express();
 const PORT = 3000;
 
-const users = {};
+const usersByChannel = {};
 
 // Create HTTP server and integrate with Socket.IO
 const server = http.createServer(app);
@@ -35,55 +35,96 @@ app.use('/api/users', usersRoutes);
 app.use('/api/channels', channelsRoutes);
 
 // Socket.IO logic
-// Socket.IO logic
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
-  // Listen for join events and store the username
-  socket.on('joinChat', (username) => {
-    users[socket.id] = username; 
+  // Handle user joining a chat
+  socket.on('joinChat', ({ username, channelName }) => {
+    if (!username || !channelName) {
+      console.error('Invalid joinChat event:', { username, channelName });
+      return;
+    }
+
+    // Add the user to the specific channel
+    if (!usersByChannel[channelName]) {
+      usersByChannel[channelName] = [];
+    }
+    usersByChannel[channelName].push({ socketId: socket.id, username });
+
     const joinMessage = {
       sender: 'System',
-      content: `${username} has joined the chat`,
+      content: `${username} has joined ${channelName}`,
       timestamp: new Date().toISOString()
     };
 
-    io.emit('newMessage', joinMessage);
-    console.log(`${username} has joined the chat`);
+    // Broadcast join message to the channel and add the user to the room
+    socket.join(channelName);
+    io.to(channelName).emit('newMessage', joinMessage);
+
+    console.log(`${username} has joined the channel: ${channelName}`);
   });
 
-  // Listen for a 'leaveChat' event when the user navigates away and emit a leave message
-  socket.on('leaveChat', (username) => {
-    const leaveMessage = {
-      sender: 'System',
-      content: `${username} has left the chat`,
-      timestamp: new Date().toISOString()
-    };
+  // Handle user leaving a chat
+  socket.on('leaveChat', ({ username, channelName }) => {
+    if (!username || !channelName) {
+      console.error('Invalid leaveChat event:', { username, channelName });
+      return;
+    }
 
-    io.emit('newMessage', leaveMessage);
-    console.log(`${username} has left the chat`);
+    if (usersByChannel[channelName]) {
+      usersByChannel[channelName] = usersByChannel[channelName].filter(user => user.socketId !== socket.id);
+
+      const leaveMessage = {
+        sender: 'System',
+        content: `${username} has left ${channelName}`,
+        timestamp: new Date().toISOString()
+      };
+
+      // Broadcast leave message and remove user from the room
+      io.to(channelName).emit('newMessage', leaveMessage);
+      socket.leave(channelName);
+
+      console.log(`${username} has left the channel: ${channelName}`);
+    }
   });
 
-  // Listen for a 'message' event from the client and broadcast it
-  socket.on('sendMessage', (message) => {
-    io.emit('newMessage', message);
+  // Handle sending messages
+  socket.on('sendMessage', ({ sender, content, timestamp, channelName }) => {
+    if (!sender || !content || !channelName) {
+      console.error('Invalid sendMessage event:', { sender, content, channelName });
+      return;
+    }
+
+    const message = { sender, content, timestamp };
+    io.to(channelName).emit('newMessage', message);
+    console.log(`Message from ${sender} to ${channelName}: ${content}`);
   });
 
-  // Listen for user disconnect and send a leave message
+  // Handle user disconnect
   socket.on('disconnect', () => {
-    const username = users[socket.id] || 'A user';
-    const leaveMessage = {
-      sender: 'System',
-      content: `${username} has left the chat`,
-      timestamp: new Date().toISOString()
-    };
+    for (const channelName in usersByChannel) {
+      const userIndex = usersByChannel[channelName].findIndex(user => user.socketId === socket.id);
+      if (userIndex !== -1) {
+        const user = usersByChannel[channelName][userIndex];
 
-    io.emit('newMessage', leaveMessage);
-    delete users[socket.id];
-    console.log(`${username} disconnected`);
+        // Remove user from the channel
+        usersByChannel[channelName].splice(userIndex, 1);
+
+        const leaveMessage = {
+          sender: 'System',
+          content: `${user.username} has disconnected from ${channelName}`,
+          timestamp: new Date().toISOString()
+        };
+
+        // Broadcast leave message to the channel
+        io.to(channelName).emit('newMessage', leaveMessage);
+        console.log(`User ${user.username} disconnected from channel ${channelName}`);
+      }
+    }
+
+    console.log(`A user with socket ID ${socket.id} has disconnected`);
   });
 });
-
 
 // Initialize MongoDB connection and migrate channel data if needed
 (async function startServer() {

@@ -76,20 +76,22 @@ export class ChannelComponent implements OnInit {
     this.isSuperAdmin = this.roles.includes('superAdmin');
     this.isGroupAdmin = this.roles.includes('groupAdmin');
 
-    if (this.groupName) {
+    if (this.groupName && this.channelName) {
       this.loadInitialData();
-      if (this.channelName) {
-        this.loadChatMessages(true);
-      }
-    }
+      this.loadChatMessages(true);
 
-    // Emit the join event when the component loads
-    this.socketService.emit('joinChat', this.username);
+      // Emit the join event when the component loads
+      this.socketService.emit('joinChat', { username: this.username, channelName: this.channelName });
+    }
 
     // Subscribe to real-time messages using Socket.IO
     this.socketService.onMessageReceived().subscribe((message: Message) => {
-      this.messages.push(message);  
-      this.scrollToBottom();       
+      if (message && message.sender && message.content) {
+        this.messages.push(message);  
+        this.scrollToBottom(); 
+      } else {
+        console.error('Invalid message received:', message);
+      }
     });
   }
 
@@ -167,7 +169,6 @@ export class ChannelComponent implements OnInit {
       hour12: true 
     });
   }
-  
 
   //******************************Chat Actions******************************
   sendMessage(): void {
@@ -175,7 +176,7 @@ export class ChannelComponent implements OnInit {
       alert('Message cannot be empty.');
       return;
     }
-  
+
     if (this.groupName && this.channelName) {
       const message: Message = {
         sender: this.username,
@@ -184,7 +185,10 @@ export class ChannelComponent implements OnInit {
       };
   
       // Send message to the server using Socket.IO
-      this.socketService.sendMessage(message);
+      this.socketService.emit('sendMessage', { ...message, channelName: this.channelName });
+  
+      // Push the message locally into the messages array
+      this.messages.push(message);
   
       // Save the message to the server 
       this.channelsService.addChannelMessage(this.channelName, message).subscribe({
@@ -227,7 +231,6 @@ export class ChannelComponent implements OnInit {
       console.error('Error scrolling to bottom:', err);
     }
   }
-  
 
   //******************************Checks******************************
   isGroupAdminOrSuperAdmin(): boolean {
@@ -310,21 +313,21 @@ export class ChannelComponent implements OnInit {
 
   //******************************Component Navigation******************************
   navigateToUserGroup(): void {
-    this.socketService.emit('leaveChat', this.username); 
+    this.socketService.emit('leaveChat', { username: this.username, channelName: this.channelName }); 
     setTimeout(() => {
       this.router.navigate(['/user-group']); 
     }, 100); 
   }
   
   navigateToAccount(): void {
-    this.socketService.emit('leaveChat', this.username); 
+    this.socketService.emit('leaveChat', { username: this.username, channelName: this.channelName }); 
     setTimeout(() => {
       this.router.navigate(['/account']); 
     }, 100);
   }
   
   navigateToInbox(): void {
-    this.socketService.emit('leaveChat', this.username); 
+    this.socketService.emit('leaveChat', { username: this.username, channelName: this.channelName }); 
     setTimeout(() => {
       this.router.navigate(['/inbox']); 
     }, 100);
