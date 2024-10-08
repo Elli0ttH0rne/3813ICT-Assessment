@@ -310,14 +310,23 @@ export class ChannelComponent implements OnInit {
 
   //******************************Component Navigation******************************
   navigateToUserGroup(): void {
-    this.router.navigate(['/user-group']);
+    this.socketService.emit('leaveChat', this.username); 
+    setTimeout(() => {
+      this.router.navigate(['/user-group']); 
+    }, 100); 
   }
-
+  
   navigateToAccount(): void {
-    this.router.navigate(['/account']);
+    this.socketService.emit('leaveChat', this.username); 
+    setTimeout(() => {
+      this.router.navigate(['/account']); 
+    }, 100);
   }
-
+  
   navigateToInbox(): void {
-    this.router.navigate(['/inbox']);
+    this.socketService.emit('leaveChat', this.username); 
+    setTimeout(() => {
+      this.router.navigate(['/inbox']); 
+    }, 100);
   }
 }

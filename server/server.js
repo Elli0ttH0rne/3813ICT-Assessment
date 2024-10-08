@@ -35,6 +35,7 @@ app.use('/api/users', usersRoutes);
 app.use('/api/channels', channelsRoutes);
 
 // Socket.IO logic
+// Socket.IO logic
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
@@ -49,6 +50,18 @@ io.on('connection', (socket) => {
 
     io.emit('newMessage', joinMessage);
     console.log(`${username} has joined the chat`);
+  });
+
+  // Listen for a 'leaveChat' event when the user navigates away and emit a leave message
+  socket.on('leaveChat', (username) => {
+    const leaveMessage = {
+      sender: 'System',
+      content: `${username} has left the chat`,
+      timestamp: new Date().toISOString()
+    };
+
+    io.emit('newMessage', leaveMessage);
+    console.log(`${username} has left the chat`);
   });
 
   // Listen for a 'message' event from the client and broadcast it
@@ -70,6 +83,7 @@ io.on('connection', (socket) => {
     console.log(`${username} disconnected`);
   });
 });
+
 
 // Initialize MongoDB connection and migrate channel data if needed
 (async function startServer() {
