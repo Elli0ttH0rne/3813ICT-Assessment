@@ -187,9 +187,6 @@ export class ChannelComponent implements OnInit {
       // Send message to the server using Socket.IO
       this.socketService.emit('sendMessage', { ...message, channelName: this.channelName });
   
-      // Push the message locally into the messages array
-      this.messages.push(message);
-  
       // Save the message to the server 
       this.channelsService.addChannelMessage(this.channelName, message).subscribe({
         next: () => {
