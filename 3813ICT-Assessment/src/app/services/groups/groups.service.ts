@@ -5,7 +5,6 @@ import { map } from 'rxjs';
 import { catchError } from 'rxjs';
 import { of } from 'rxjs';
 
-// Define the structure of Group, Channel, and Admin for typing
 export interface Channel {
   name: string;
   description: string;
@@ -15,6 +14,7 @@ export interface Admin {
   userId: string;
   username: string;
   role: string;
+  profilePicture?: string;
 }
 
 export interface Group {

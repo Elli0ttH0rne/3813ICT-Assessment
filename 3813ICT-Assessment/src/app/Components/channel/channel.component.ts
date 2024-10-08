@@ -9,12 +9,19 @@ import { UsersService } from '../../services/users/users.service';
 import { ChannelsService } from '../../services/channels/channels.service';
 import { SocketService } from '../../services/socket/socket.service'; 
 import { forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators'
 
 interface Message {
   _id?: string;
   sender: string;
   content: string;
   timestamp: string;
+}
+
+interface GroupUser {
+  userId: string;
+  username: string;
+  profilePicture?: string;
 }
 
 @Component({
@@ -36,7 +43,7 @@ export class ChannelComponent implements OnInit {
   roles: string[] = [];
 
   // Group and user information
-  usersInGroup: { userId: string; username: string }[] = [];
+  usersInGroup: (GroupUser | Admin)[] = []; 
   groupAdmins: Admin[] = [];
   groupCreatorId: string = ''; 
   requestCount: number = 0;
@@ -109,17 +116,39 @@ export class ChannelComponent implements OnInit {
       this.usersService.getSuperAdmins(),
       this.groupsService.getGroupCreator(this.groupName!)
     ]).subscribe({
-      next: ([users, admins, superAdmins, creatorId]) => {
-        this.usersInGroup = users;
-        this.groupAdmins = [...admins, ...superAdmins];
+      next: async ([users, admins, superAdmins, creatorId]) => {
         this.groupCreatorId = creatorId;  
         this.isCreator = this.userID === this.groupCreatorId || this.isSuperAdmin;  
+
+        // Fetch profile pictures for each user
+        const userPictureRequests = users.map(user =>
+          this.usersService.getUserProfilePicture(user.username).pipe(
+            map(response => ({ ...user, profilePicture: response.imageUrl } as GroupUser))
+          )
+        );
+
+        // Fetch profile pictures for each admin
+        const adminPictureRequests = [...admins, ...superAdmins].map(admin =>
+          this.usersService.getUserProfilePicture(admin.username).pipe(
+            map(response => ({ ...admin, profilePicture: response.imageUrl } as Admin))
+          )
+        );
+
+        // Wait for all requests to complete
+        this.usersInGroup = await forkJoin(userPictureRequests).toPromise();
+        const adminPictures = await forkJoin(adminPictureRequests).toPromise();
+        this.groupAdmins = adminPictures;
+
+        // Combine both user arrays
+        this.usersInGroup.push(...this.groupAdmins);
       },
       error: (error) => {
         console.error('Failed to load initial data:', error);
       }
     });
-  }
+}
+
+
 
   private loadRequestCount(): void {
     this.requestsService.getRequestCount().subscribe({
@@ -305,7 +334,12 @@ export class ChannelComponent implements OnInit {
   }
 
   getAvatarImg(sender: string): string {
-    return `https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg`;
+    const user = this.usersInGroup.find(u => u.username === sender);
+    
+    // Return the user's profile picture if available, otherwise return the default image
+    return user && user.profilePicture
+      ? user.profilePicture
+      : 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg';
   }
 
   //******************************Component Navigation******************************
