@@ -7,6 +7,7 @@ import { RequestsService } from '../../services/requests/requests.service';
 import { GroupsService, Admin } from '../../services/groups/groups.service';
 import { UsersService } from '../../services/users/users.service';
 import { ChannelsService } from '../../services/channels/channels.service';
+import { SocketService } from '../../services/socket/socket.service'; 
 import { forkJoin } from 'rxjs';
 
 interface Message {
@@ -56,7 +57,8 @@ export class ChannelComponent implements OnInit {
     private requestsService: RequestsService,
     private groupsService: GroupsService,
     private usersService: UsersService,
-    private channelsService: ChannelsService 
+    private channelsService: ChannelsService,
+    private socketService: SocketService
   ) {
     // Retrieve groupName and channelName from route parameters
     this.route.paramMap.subscribe(params => {
@@ -80,6 +82,12 @@ export class ChannelComponent implements OnInit {
         this.loadChatMessages(true);
       }
     }
+
+    // Subscribe to real-time messages using Socket.IO
+    this.socketService.onMessageReceived().subscribe((message: Message) => {
+      this.messages.push(message);  
+      this.scrollToBottom();       
+    });
   }
 
   //******************************Data Loading******************************
@@ -172,6 +180,9 @@ export class ChannelComponent implements OnInit {
         timestamp: new Date().toISOString()
       };
 
+      // Send message to the server using Socket.IO
+      this.socketService.sendMessage(message);
+
       this.channelsService.addChannelMessage(this.channelName, message).subscribe({
         next: () => {
           this.messages.push(message);
@@ -262,109 +273,6 @@ export class ChannelComponent implements OnInit {
         error: (error) => {
           console.error('Failed to remove user:', error);
           alert('Failed to remove user.');
-        }
-      });
-    }
-  }
-
-  kickUserFromGroupAndReport(username: string): void {
-    if (username === this.username) {
-      alert('You cannot remove yourself from the group.');
-      return;
-    }
-
-    const confirmed = window.confirm('Are you sure you want to remove this user from the group and report them?');
-    if (confirmed) {
-      this.kickUserFromGroup(username);
-      this.reportUser(username);
-    }
-  }
-
-  requestPromotionToGroupAdmin(username: string): void {
-    if (username === this.username) {
-      alert('You cannot request a promotion for yourself.');
-      return;
-    }
-  
-    const confirmed = window.confirm('Are you sure you want to request this user to be promoted to Group Admin?');
-    if (confirmed && this.groupName) {
-      this.requestsService.createRequest(
-        this.username,  // The user making the request
-        this.groupName,
-        'promotion',
-        undefined,  // No reported user in case of promotion
-        undefined,  // No reason required for promotion
-        username // The user to be promoted
-      ).subscribe({
-        next: () => {
-          alert('Promotion request sent successfully.');
-        },
-        error: (error) => {
-          console.error('Failed to create promotion request:', error);
-          alert('Failed to create promotion request.');
-        }
-      });
-    }
-  }
-  
-  deleteUsersAccount(username: string): void {
-    if (!this.isSuperAdmin) {
-      alert('Only Super Admins can delete user accounts.');
-      return;
-    }
-  
-    const confirmed = window.confirm('Are you sure you want to delete this user\'s account? This action cannot be undone.');
-    if (confirmed) {
-      this.usersService.deleteUserByUsername(username).subscribe({
-        next: () => {
-          alert('User account deleted successfully.');
-          this.loadUsersInGroup(); // Reload users in group after deletion
-        },
-        error: (error) => {
-          console.error('Failed to delete user account:', error);
-          alert('Failed to delete user account.');
-        }
-      });
-    }
-  }
-
-  promoteToGroupAdmin(username: string): void {
-    if (!this.isSuperAdmin) {
-      alert('Only Super Admins can promote users to Group Admin.');
-      return;
-    }
-  
-    const confirmed = window.confirm('Are you sure you want to promote this user to Group Admin?');
-    if (confirmed) {
-      this.usersService.promoteToGroupAdmin(username).subscribe({
-        next: () => {
-          alert('User has been promoted to Group Admin successfully.');
-          this.loadUsersInGroup(); // Reload users to update roles
-        },
-        error: (error) => {
-          console.error('Failed to promote user to Group Admin:', error);
-          alert('Failed to promote user to Group Admin.');
-        }
-      });
-    }
-  }
-  
-  promoteToSuperAdmin(username: string): void {
-    if (!this.isSuperAdmin) {
-      alert('Only Super Admins can promote users to Super Admin.');
-      return;
-    }
-  
-    const confirmed = window.confirm('Are you sure you want to promote this user to Super Admin?');
-    if (confirmed) {
-      this.usersService.promoteToSuperAdmin(username).subscribe({
-        next: () => {
-          alert('User has been promoted to Super Admin successfully.');
-          this.loadUsersInGroup(); // Reload users to update roles
-        },
-        error: (error) => {
-          console.error('Failed to promote user to Super Admin:', error);
-          alert('Failed to promote user to Super Admin.');
         }
       });
     }
