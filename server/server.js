@@ -1,14 +1,18 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const http = require('http'); // Import http to use with socket.io
-const { Server } = require('socket.io'); // Import socket.io
+const http = require('http');
+const { Server } = require('socket.io');
+const path = require('path');
 const groupsRoutes = require('./routes/groupsRoutes');
 const requestsRoutes = require('./routes/requestsRoutes');
 const usersRoutes = require('./routes/usersRoutes');
 const channelsRoutes = require('./routes/channelsRoutes');
-const migrateChannels = require('./migrateChannels'); 
+const migrateChannels = require('./migrateChannels');
 const { connectDB } = require('./db');
+const { getDB } = require('./db'); 
+const fs = require('fs');
+
 
 const app = express();
 const PORT = 3000;
@@ -27,12 +31,16 @@ const io = new Server(server, {
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static files for profile pictures
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
-app.use('/api/groups', groupsRoutes);
-app.use('/api/requests', requestsRoutes);
+app.use('/api/groups', groupsRoutes);  
+app.use('/api/requests', requestsRoutes);  
 app.use('/api/users', usersRoutes);
-app.use('/api/channels', channelsRoutes);
+app.use('/api/channels', channelsRoutes); 
 
 // Socket.IO logic
 io.on('connection', (socket) => {

@@ -18,6 +18,13 @@
         <div class="card-body">
           <p><strong>Username:</strong> {{ username }}</p>
           <p><strong>Email:</strong> {{ email }}</p>
+
+          <div class="profile-section">
+            <img [src]="profilePicture" alt="Profile Picture" class="profile-image" />
+            <input type="file" (change)="onFileSelected($event)" />
+            <button class="btn btn-primary" (click)="uploadProfilePicture()">Upload</button>
+          </div>
+          
           <div class="d-flex justify-content-between mt-5">
             <button class="btn btn-danger" (click)="logout()">Log Out</button>
             <button class="btn btn-danger" (click)="deleteAccount()">Delete Account</button>

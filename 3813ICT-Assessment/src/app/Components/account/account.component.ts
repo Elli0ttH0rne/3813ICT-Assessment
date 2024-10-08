@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { RequestsService } from '../../services/requests/requests.service';
 import { UsersService } from '../../services/users/users.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-account',
@@ -19,11 +20,14 @@ export class AccountComponent implements OnInit {
   email: string = '';
   userId: string = '';
   requestCount: number = 0;
+  selectedFile: File | null = null;
+  profilePicture: string = 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg'; 
 
   constructor(
     private router: Router, 
     private requestsService: RequestsService, 
     private usersService: UsersService,
+    private http: HttpClient 
   ) {}
 
   ngOnInit(): void {
@@ -45,6 +49,46 @@ export class AccountComponent implements OnInit {
         }
       });
     }
+
+    // Load user profile picture from the database if available
+    this.usersService.getUserProfilePicture(this.username).subscribe({
+      next: (response: { imageUrl: string }) => {
+        this.profilePicture = response.imageUrl || this.profilePicture;
+      },
+      error: (err) => {
+        console.error('Failed to load profile picture:', err);
+      }
+    });
+    
+  }
+
+  // Handle file selection
+  onFileSelected(event: any): void {
+    this.selectedFile = event.target.files[0];
+  }
+
+  // Upload profile picture to server
+  uploadProfilePicture(): void {
+    if (!this.selectedFile) {
+      alert('Please select a file to upload.');
+      return;
+    }
+  
+    const formData = new FormData();
+    formData.append('image', this.selectedFile); 
+    formData.append('username', this.username);   
+  
+    this.http.post('http://localhost:3000/api/users/upload-profile-picture', formData)
+      .subscribe({
+        next: (response: any) => {
+          alert('Profile picture uploaded successfully.');
+          this.profilePicture = response.imageUrl;
+        },
+        error: (err) => {
+          console.error('Failed to upload profile picture:', err);
+          alert('Failed to upload profile picture.');
+        }
+      });
   }
 
   //******************************Checks******************************
@@ -81,7 +125,7 @@ export class AccountComponent implements OnInit {
             }
           });
   
-          // Step 3: Remove user from local storage and navigate to home page
+          // Remove user from local storage and navigate to home page
           localStorage.removeItem('currentUser');
           alert('Account deleted successfully.');
           this.router.navigate(['/']);
@@ -95,7 +139,6 @@ export class AccountComponent implements OnInit {
       console.log('Account deletion cancelled');
     }
   }
-  
 
   //******************************Component Navigation******************************
   navigateToAccount(): void {

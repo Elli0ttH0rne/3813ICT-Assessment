@@ -1,6 +1,28 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const usersController = require('../controllers/usersController');
+
+const uploadDir = './uploads/profile-pictures';
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// Multer storage configuration
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, './uploads/profile-pictures');
+    },
+    filename: (req, file, cb) => {
+      console.log('Request body:', req.body); // Check if username is available here
+      const fileName = `${req.body.username}-${Date.now()}${path.extname(file.originalname)}`;
+      cb(null, fileName);
+    }
+  });
+
+const upload = multer({ storage: storage });
 
 // Route to get all users
 router.get('/', usersController.getAllUsers);
@@ -23,5 +45,10 @@ router.patch('/promote/groupAdmin/:username', usersController.promoteToGroupAdmi
 // Promote user to Super Admin
 router.patch('/promote/superAdmin/:username', usersController.promoteToSuperAdmin);
 
+// Route to upload profile picture
+router.post('/upload-profile-picture', upload.single('image'), usersController.uploadProfilePicture);
+
+// Route to get profile picture URL
+router.get('/profile-picture/:username', usersController.getProfilePicture);
 
 module.exports = router;

@@ -1,7 +1,15 @@
 const path = require('path');
 const { readFile, writeFile } = require('../helpers/fileHelper');
+const fs = require('fs');
+const { getDB } = require('../db')
 
 const usersFilePath = path.join(__dirname, '../data/users.json');
+const uploadsDir = path.join(__dirname, '../uploads/profile-pictures');
+
+// Ensure the uploads directory exists
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 // Get all users
 const getAllUsers = (req, res) => {
@@ -93,7 +101,6 @@ const getSuperAdmins = (req, res) => {
   });
 };
 
-
 // Promote user to Group Admin
 const promoteToGroupAdmin = (req, res) => {
   const { username } = req.params;
@@ -148,7 +155,49 @@ const promoteToSuperAdmin = (req, res) => {
   });
 };
 
+// Upload profile picture and update the user's profile picture in MongoDB
+const uploadProfilePicture = async (req, res) => {
+  const { username } = req.body;
+  const imageUrl = `http://localhost:3000/uploads/profile-pictures/${req.file.filename}`; // Full URL
 
+  try {
+    const db = getDB(); 
+    const profilePicturesCollection = db.collection('profilePictures');
+    
+    const result = await profilePicturesCollection.updateOne(
+      { username }, // Find by username
+      { $set: { profilePicture: imageUrl } }, // Set the profilePicture field with full URL
+      { upsert: true } // Insert new entry if it doesn't exist
+    );
+
+    res.status(200).json({ imageUrl, message: 'Profile picture uploaded successfully.' });
+  } catch (error) {
+    console.error('Failed to upload profile picture:', error);
+    res.status(500).send('Error uploading profile picture.');
+  }
+};
+
+
+// Get the user's profile picture from MongoDB
+const getProfilePicture = async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    const db = getDB(); 
+    const profilePicturesCollection = db.collection('profilePictures');
+
+    const userProfile = await profilePicturesCollection.findOne({ username });
+
+    if (!userProfile || !userProfile.profilePicture) {
+      return res.status(404).json({ imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg' });
+    }
+
+    res.status(200).json({ imageUrl: userProfile.profilePicture });
+  } catch (error) {
+    console.error('Failed to get profile picture:', error);
+    res.status(500).send('Error retrieving profile picture.');
+  }
+};
 
 module.exports = {
   getAllUsers,
@@ -157,5 +206,7 @@ module.exports = {
   deleteUserByUsername,
   getSuperAdmins,
   promoteToGroupAdmin,
-  promoteToSuperAdmin
+  promoteToSuperAdmin,
+  uploadProfilePicture,
+  getProfilePicture
 };
