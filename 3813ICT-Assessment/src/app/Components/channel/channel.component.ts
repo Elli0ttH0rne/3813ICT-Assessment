@@ -75,18 +75,28 @@ export class ChannelComponent implements OnInit {
     this.roles = storedUser.roles || [];
     this.isSuperAdmin = this.roles.includes('superAdmin');
     this.isGroupAdmin = this.roles.includes('groupAdmin');
-
+  
     if (this.groupName) {
       this.loadInitialData();
       if (this.channelName) {
         this.loadChatMessages(true);
       }
     }
-
+  
+    // Make sure to unsubscribe before resubscribing to avoid duplicate subscriptions
+    this.socketService.disconnect();
+  
     // Subscribe to real-time messages using Socket.IO
     this.socketService.onMessageReceived().subscribe((message: Message) => {
-      this.messages.push(message);  
-      this.scrollToBottom();       
+      this.messages.push(message);
+      this.scrollToBottom();
+    });
+  
+    // Subscribe to the messageDeleted event
+    this.socketService.on('messageDeleted').subscribe((data: { groupName: string, channelName: string, messageId: string }) => {
+      if (data.groupName === this.groupName && data.channelName === this.channelName) {
+        this.messages = this.messages.filter(message => message._id !== data.messageId);
+      }
     });
   }
 

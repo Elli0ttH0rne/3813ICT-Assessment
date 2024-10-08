@@ -25,6 +25,15 @@ export class SocketService {
     this.socket = io(this.serverUrl);
   }
 
+  // Listen for custom events
+  on(eventName: string): Observable<any> {
+    return new Observable((observer) => {
+      this.socket.on(eventName, (data: any) => {
+        observer.next(data);
+      });
+    });
+  }
+
   // Send a message to the server
   sendMessage(message: Message): void {
     this.socket.emit('sendMessage', message);
