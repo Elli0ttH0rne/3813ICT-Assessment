@@ -109,3 +109,43 @@
     padding: 0.25em 0.5em;
     border-radius: 50%;
   }
+
+  .message-item {
+    align-items: flex-start;
+  }
+  
+  .message-item.system-message {
+    justify-content: center;
+  }
+  
+  .system-message-text {
+    background-color: #f0f0f0;
+    color: #555;
+    padding: 8px;
+    border-radius: 8px;
+    font-style: italic;
+  }
+  
+  .user-message .message-content {
+    background-color: #e9f7fe;
+    padding: 10px;
+    border-radius: 8px;
+    max-width: 80%;
+  }
+  
+  .user-message .username {
+    font-weight: bold;
+  }
+  
+  .user-message .timestamp {
+    font-size: 0.8rem;
+    color: #888;
+  }
+  
+  .scrollable-message-container {
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+  }
+  

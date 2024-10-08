@@ -89,24 +89,37 @@
         <div class="chat-container">
           <div #scrollContainer class="scrollable-message-container">
             <div class="message-list mb-3">
-              <div *ngFor="let message of messages" class="message-item d-flex mb-2">
-                <img class="avatar me-2" [src]="getAvatarImg(message.sender)" alt="avatar">
-                <div class="message-content">
-                  <div class="message-header">
-                    <span class="username">{{ message.sender }}</span>
-                    <span class="timestamp">{{ formatTimestamp(message.timestamp) }}</span>
+              <div *ngFor="let message of messages" 
+                   [ngClass]="{'system-message': message.sender === 'system', 'user-message': message.sender !== 'system'}" 
+                   class="message-item d-flex mb-2">
+        
+                <!-- Conditional rendering for user messages -->
+                <ng-container *ngIf="message.sender !== 'System'; else systemMessage">
+                  <img class="avatar me-2" [src]="getAvatarImg(message.sender)" alt="avatar">
+                  <div class="message-content">
+                    <div class="message-header">
+                      <span class="username">{{ message.sender }}</span>
+                      <span class="timestamp">{{ formatTimestamp(message.timestamp) }}</span>
+                    </div>
+                    <div class="message-text">{{ message.content }}</div>
                   </div>
-                  <div class="message-text">{{ message.content }}</div>
-                </div>
-                <!-- Delete button for group admins and super admins -->
-                <ng-container *ngIf="isGroupAdminOrSuperAdmin()">
-                  <i class="fas fa-trash-alt text-danger ms-2" style="cursor: pointer;" (click)="deleteMessage(message._id)"></i>
+                  <!-- Delete button for group admins and super admins -->
+                  <ng-container *ngIf="isGroupAdminOrSuperAdmin()">
+                    <i class="fas fa-trash-alt text-danger ms-2" style="cursor: pointer;" (click)="deleteMessage(message._id)"></i>
+                  </ng-container>
                 </ng-container>
+        
+                <!-- System message template -->
+                <ng-template #systemMessage>
+                  <div class="system-message-text w-100 text-center">
+                    <em>{{ message.content }}</em>
+                  </div>
+                </ng-template>
+        
               </div>
             </div>
           </div>
-          
-          
+        
           <div class="message-input d-flex p-3 border-top">
             <input #messageInput type="text" class="form-control me-2" [(ngModel)]="newMessageContent" placeholder="Type your message here..." (keydown.enter)="sendMessage()" />
             <button class="btn btn-primary" (click)="sendMessage()">Send</button>
