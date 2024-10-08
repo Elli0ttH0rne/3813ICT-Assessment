@@ -158,17 +158,27 @@ const promoteToSuperAdmin = (req, res) => {
 // Upload profile picture and update the user's profile picture in MongoDB
 const uploadProfilePicture = async (req, res) => {
   const { username } = req.body;
-  const imageUrl = `http://localhost:3000/uploads/profile-pictures/${req.file.filename}`; // Full URL
+  const imageUrl = `http://localhost:3000/uploads/profile-pictures/${req.file.filename}`; 
 
   try {
     const db = getDB(); 
     const profilePicturesCollection = db.collection('profilePictures');
     
-    const result = await profilePicturesCollection.updateOne(
-      { username }, // Find by username
-      { $set: { profilePicture: imageUrl } }, // Set the profilePicture field with full URL
-      { upsert: true } // Insert new entry if it doesn't exist
-    );
+    // Check if there is an existing entry for the user
+    const existingEntry = await profilePicturesCollection.findOne({ username });
+
+    if (existingEntry) {
+      // If an entry exists, delete the previous profile picture file
+      const existingImagePath = existingEntry.profilePicture.replace('http://localhost:3000', '');
+      fs.unlinkSync(`.${existingImagePath}`); // Delete the file from the filesystem
+      console.log(`Deleted existing profile picture file for ${username} at path: ${existingImagePath}`);
+
+      // Delete the previous entry in MongoDB
+      await profilePicturesCollection.deleteOne({ username });
+    }
+
+    // Insert the new profile picture
+    await profilePicturesCollection.insertOne({ username, profilePicture: imageUrl });
 
     res.status(200).json({ imageUrl, message: 'Profile picture uploaded successfully.' });
   } catch (error) {
@@ -176,7 +186,6 @@ const uploadProfilePicture = async (req, res) => {
     res.status(500).send('Error uploading profile picture.');
   }
 };
-
 
 // Get the user's profile picture from MongoDB
 const getProfilePicture = async (req, res) => {
