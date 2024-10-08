@@ -3,10 +3,11 @@
 }
 
 .card-header {
-  font-size: 1.5rem; 
+  font-size: 1.8rem; /* Increased size for better visibility */
   padding: 1.5rem; 
+  background-color: #f8f9fa; /* Light background for header */
+  border-bottom: 1px solid #ddd; /* Subtle border */
 }
-
 
 .list-group-item {
   display: flex;
@@ -14,15 +15,19 @@
   justify-content: space-between;
   font-size: 1.25rem;
   padding: 1rem 1.5rem;
+  transition: background-color 0.3s; /* Smooth background transition */
 }
 
+.list-group-item:hover {
+  background-color: #f0f8ff; /* Light hover effect */
+}
 
 .badge {
   margin-right: 1rem;
   font-size: 1.5rem; 
-  padding: 0.75rem 1.5rem; 
+  background-color: #007bff; /* Badge color */
+  color: white; /* Badge text color */
 }
-
 
 .list-group .list-group {
   margin-top: 0.75rem; 
@@ -36,12 +41,10 @@
   padding: 0.75rem 1.5rem;
 }
 
-.fa-inbox {
-  font-size: 2.5rem; 
-}
-
+.fa-inbox,
 .fa-user-circle {
   font-size: 2.5rem; 
+  color: inherit; 
 }
 
 .scrollable-message-container {
@@ -52,6 +55,7 @@
   border: 1px solid #ccc; 
   border-radius: 5px;
   background-color: #ffffff;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1); 
 }
 
 .message-item {
@@ -61,14 +65,17 @@
 }
 
 .avatar {
-  width: 32px;
-  height: 32px;
+  width: 48px; 
+  height: 48px;
   border-radius: 50%;
-  background-color: #5865f2;
+  background-color: #5865f2; 
+  border: 2px solid #ffffff; 
+  box-shadow: 0 0 5px rgba(0,0,0,0.2); 
 }
 
 .message-content {
   flex: 1;
+  margin-left: 10px; 
 }
 
 .message-header {
@@ -161,7 +168,6 @@
   border-radius: 8px;
   max-width: 80%;
 }
-
 
 .message-item.received-message {
   justify-content: flex-start;
