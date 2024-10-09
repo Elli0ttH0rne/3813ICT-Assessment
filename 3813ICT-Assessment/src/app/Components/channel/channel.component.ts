@@ -84,6 +84,8 @@ export class ChannelComponent implements OnInit {
     this.username = storedUser.username || '';
     this.roles = storedUser.roles || [];
   
+    this.isSuperAdmin = this.roles.includes('superAdmin');
+
     if (this.groupName && this.channelName) {
       this.loadChatMessages(true);
   
