@@ -8,11 +8,11 @@
             <span class="me-2">{{ username }}</span>
             <ng-container *ngIf="isGroupAdminOrSuperAdmin()">
               <div class="position-relative">
-                <i class="fas fa-inbox fa-2x me-2" style="cursor: pointer;" (click)="navigateToInbox()"></i>
+                <i class="fas fa-inbox fa-2x me-2" style="cursor: pointer;" (click)="navigateToInbox()" aria-label="Inbox"></i>
                 <span class="badge badge-notification" *ngIf="requestCount > 0">{{ requestCount }}</span>
               </div>
             </ng-container>
-            <i class="fas fa-user-circle fa-2x me-2" style="cursor: pointer;" (click)="navigateToAccount()"></i>
+            <i class="fas fa-user-circle fa-2x me-2" style="cursor: pointer;" (click)="navigateToAccount()" aria-label="Account"></i>
           </div>
         </div>
         <div class="card-body">
@@ -21,38 +21,38 @@
           
           <!-- Form to create a new group, visible when showCreateGroup is true -->
           <div *ngIf="showCreateGroup" class="mb-3">
-            <div class="mb-3">
-              <input 
-                type="text" 
-                class="form-control" 
-                placeholder="Enter new group name" 
-                [(ngModel)]="newGroupName" 
-                [ngModelOptions]="{standalone: true}">
+            <input 
+              type="text" 
+              class="form-control mb-2" 
+              placeholder="Enter new group name" 
+              [(ngModel)]="newGroupName" 
+              [ngModelOptions]="{standalone: true}">
+            <div class="d-flex">
+              <button class="btn btn-primary me-2" (click)="createGroup()">Create</button>
+              <button class="btn btn-secondary" (click)="cancelCreateGroup()">Cancel</button>
             </div>
-            <button class="btn btn-primary" (click)="createGroup()">Create</button>
-            <button class="btn btn-secondary" (click)="cancelCreateGroup()">Cancel</button>
           </div>
           
           <!-- Existing groups list -->
           <ul class="list-group mb-3">
-            <li class="list-group-item" *ngFor="let group of groups; let i = index">
-              <div class="d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                  <i class="fas fa-caret-down me-2" (click)="toggleGroup(i)" style="cursor: pointer;"></i>
-                  <div class="d-flex flex-column flex-grow-1" (click)="toggleGroup(i)" style="cursor: pointer;">
-                    <span class="badge" [ngClass]="getBadgeClass(i)">{{ group }}</span>
-                  </div>
+            <li class="list-group-item position-relative" *ngFor="let group of groups; let i = index">
+              <div class="d-flex justify-content-between align-items-center" (click)="toggleGroup(i)" style="cursor: pointer;">
+                <div class="d-flex align-items-center flex-grow-1">
+                  <i class="fas fa-caret-down me-2" aria-hidden="true"></i>
+                  <span class="badge" [ngClass]="getBadgeClass(i)">{{ group }}</span>
                 </div>
-                
-                <ng-container *ngIf="isUserOrGroupAdmin() && !isGroupCreator(group) && !isSuperAdmin()">
-                  <button class="btn btn-warning btn-sm ms-2 me-3" (click)="leaveGroup(group)">Leave Group</button>
+              </div>
+          
+              <div class="position-absolute" style="right: 10px;">
+                <ng-container *ngIf="canDeleteGroup(group) && !openGroups[i]">
+                  <button class="btn btn-danger btn-sm" (click)="deleteGroup(group); $event.stopPropagation()">Delete Group</button>
                 </ng-container>
-
-                <ng-container *ngIf="canDeleteGroup(group)">
-                  <button class="btn btn-danger btn-sm ms-2 me-3" (click)="deleteGroup(group)">Delete Group</button>
+          
+                <ng-container *ngIf="isUserOrGroupAdmin() && !isGroupCreator(group) && !isSuperAdmin() && !openGroups[i]">
+                  <button class="btn btn-warning btn-sm" (click)="leaveGroup(group); $event.stopPropagation()" style="margin-top: 5px;">Leave Group</button>
                 </ng-container>
               </div>
-              
+          
               <ul *ngIf="openGroups[i]" class="list-group mt-2">
                 <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let channel of channels[group]">
                   <div class="flex-grow-1">
@@ -63,36 +63,34 @@
                 </li>
           
                 <div *ngIf="showCreateChannelForGroup === group" class="mb-3 create-channel-form">
-                  <div class="mb-3">
-                    <input 
-                      type="text" 
-                      class="form-control" 
-                      placeholder="Enter new channel name" 
-                      [(ngModel)]="newChannelName" 
-                      [ngModelOptions]="{standalone: true}">
-                  </div>
-                  <div class="mb-3">
-                    <textarea 
-                      class="form-control" 
-                      placeholder="Enter channel description" 
-                      [(ngModel)]="newChannelDescription" 
-                      [ngModelOptions]="{standalone: true}"></textarea>
-                  </div>
+                  <input 
+                    type="text" 
+                    class="form-control mb-2" 
+                    placeholder="Enter new channel name" 
+                    [(ngModel)]="newChannelName" 
+                    [ngModelOptions]="{standalone: true}">
+                  <textarea 
+                    class="form-control mb-2" 
+                    placeholder="Enter channel description" 
+                    [(ngModel)]="newChannelDescription" 
+                    [ngModelOptions]="{standalone: true}"></textarea>
                   <div class="d-flex justify-content-between">
                     <button class="btn btn-primary" (click)="createChannel(group)">Create</button>
                     <button class="btn btn-secondary" (click)="cancelCreateChannel()">Cancel</button>
                   </div>
                 </div>
-                
-                <div class="mt-4" *ngIf="isGroupCreator(group)">
+          
+                <!-- Add Channel button, visible to group creators or super admins -->
+                <div class="mt-4" *ngIf="isGroupCreator(group) || isSuperAdmin()">
                   <button class="btn btn-info mb-3" (click)="showCreateChannelForm(group)">Add Channel</button>
                 </div>
               </ul>
             </li>
           </ul>
+          
 
           <ng-container *ngIf="isUserOrGroupAdmin() && !isSuperAdmin()">
-            <i class="fas fa-plus fa-2x" style="cursor: pointer;" (click)="navigateToAllGroups()"></i>
+            <i class="fas fa-plus fa-2x" style="cursor: pointer;" (click)="navigateToAllGroups()" aria-label="Add Group"></i>
           </ng-container>
         </div>
       </div>
