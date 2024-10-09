@@ -78,38 +78,32 @@ const getChannelMessages = async (req, res) => {
   };
   
   // Add a new chat message to a channel
-const addChannelMessage = async (req, res) => {
-  const { groupName, channelName } = req.params;
-  const { sender, content } = req.body;
-  let imageUrl = null;
-
-  if (!groupName || !channelName || !sender || (!content && !req.file)) {
-    return res.status(400).json({ error: 'Group name, channel name, sender, and content or image are required.' });
-  }
-
-  // If an image was uploaded, store its URL
-  if (req.file) {
-    imageUrl = `http://localhost:3000/uploads/messages/${req.file.filename}`;
-  }
-
-  try {
-    const db = getDB();
-    const messageData = {
-      groupName,
-      channelName,
-      sender,
-      content: content || '', 
-      imageUrl,               
-      timestamp: new Date()
-    };
-
-    await db.collection('messages').insertOne(messageData);
-    res.status(201).json({ message: 'Message added successfully.', messageData });
-  } catch (error) {
-    console.error('Failed to add message:', error);
-    res.status(500).json({ error: 'Failed to add message.' });
-  }
-};
+  const addChannelMessage = async (req, res) => {
+    const { groupName, channelName } = req.params;
+    const { sender, content } = req.body;
+  
+    if (!groupName || !channelName || !sender || (!content && !req.file)) {
+      return res.status(400).json({ error: 'Group name, channel name, sender, and content or image are required.' });
+    }
+  
+    try {
+      const db = getDB();
+      const messageData = {
+        groupName,
+        channelName,
+        sender,
+        content: content || null,
+        imageUrl: req.file ? `/uploads/messages/${req.file.filename}` : null,
+        timestamp: new Date()
+      };
+  
+      await db.collection('messages').insertOne(messageData);
+      res.status(201).json({ message: 'Message added successfully.' });
+    } catch (error) {
+      console.error('Failed to add message:', error);
+      res.status(500).json({ error: 'Failed to add message.' });
+    }
+  };
   
   // Delete a chat message from a channel
   const deleteChannelMessage = async (req, res) => {

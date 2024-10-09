@@ -34,9 +34,10 @@ export class ChannelsService {
     return this.http.post(`${this.apiUrl}/${groupName}/${channelName}/messages`, formData);
   }
   
-  getChannelMessages(channelName: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/channels/${channelName}/messages`);
+  getChannelMessages(groupName: string, channelName: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/${groupName}/${channelName}/messages`);
   }
+  
   deleteChannelMessage(groupName: string, channelName: string, messageId: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/messages/${groupName}/${channelName}/${messageId}`);
   }

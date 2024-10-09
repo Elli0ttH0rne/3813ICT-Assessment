@@ -76,32 +76,28 @@ export class ChannelComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Retrieve currentUser information from local storage
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.userID = storedUser.userId || ''; 
     this.username = storedUser.username || '';
     this.roles = storedUser.roles || [];
-    this.isSuperAdmin = this.roles.includes('superAdmin');
-    this.isGroupAdmin = this.roles.includes('groupAdmin');
-
+  
     if (this.groupName && this.channelName) {
-      this.loadInitialData();
+      // Load existing chat messages for the group and channel
       this.loadChatMessages(true);
-
-      // Emit the join event when the component loads
+  
+      // Emit the join event
       this.socketService.emit('joinChat', { username: this.username, channelName: this.channelName });
     }
-
-    // Subscribe to real-time messages using Socket.IO
+  
+    // Subscribe to new messages via Socket.IO
     this.socketService.onMessageReceived().subscribe((message: Message) => {
       if (message && message.sender && message.content) {
         this.messages.push(message);  
         this.scrollToBottom(); 
-      } else {
-        console.error('Invalid message received:', message);
       }
     });
   }
+  
 
   //******************************Data Loading******************************
   private loadInitialData(): void {
@@ -175,9 +171,9 @@ export class ChannelComponent implements OnInit {
     }
   }
 
-  private loadChatMessages(initialLoad: boolean = false): void {
+  loadChatMessages(initialLoad: boolean = false): void {
     if (this.groupName && this.channelName) {
-      this.channelsService.getChannelMessages(this.channelName).subscribe({
+      this.channelsService.getChannelMessages(this.groupName, this.channelName).subscribe({
         next: (messages) => {
           this.messages = messages;
           if (initialLoad) {
@@ -209,40 +205,49 @@ export class ChannelComponent implements OnInit {
   }
 
   //******************************Chat Actions******************************
-  // Modified sendMessage() to handle both text and image
-sendMessage(): void {
-  if (!this.newMessageContent.trim() && !this.selectedFile) {
-    alert('Message cannot be empty or blank.');
-    return;
-  }
-
-  if (this.groupName && this.channelName) {
-    const formData = new FormData();
-    
-    // Add message content if available
-    formData.append('content', this.newMessageContent || '');
-    
-    // Add the selected image file to formData
-    if (this.selectedFile) {
-      formData.append('image', this.selectedFile);
+  sendMessage(): void {
+    if (!this.newMessageContent.trim() && !this.selectedFile) {
+      alert('Message cannot be empty or blank.');
+      return;
     }
-
-    formData.append('sender', this.username); 
-
-    // Send formData to the server
-    this.channelsService.addChannelMessage(this.groupName, this.channelName, formData).subscribe({
-      next: () => {
-        this.newMessageContent = ''; 
-        this.selectedFile = null; 
-        alert('Message sent successfully.');
-      },
-      error: (error) => {
-        console.error('Failed to send message:', error);
-        alert('Failed to send message.');
+  
+    if (this.groupName && this.channelName) {
+      const formData = new FormData();
+      
+      // Add content and file to the form data
+      formData.append('content', this.newMessageContent || '');
+      if (this.selectedFile) {
+        formData.append('image', this.selectedFile);
       }
-    });
+  
+      formData.append('sender', this.username); 
+      formData.append('groupName', this.groupName); 
+      formData.append('channelName', this.channelName); 
+  
+      // Send formData to the server
+      this.channelsService.addChannelMessage(this.groupName, this.channelName, formData).subscribe({
+        next: () => {
+          this.newMessageContent = ''; 
+          this.selectedFile = null; 
+        },
+        error: (error) => {
+          console.error('Failed to send message:', error);
+          alert('Failed to send message.');
+        }
+      });
+      
+      // Emit message via Socket.IO
+      const socketMessage = {
+        sender: this.username,
+        content: this.newMessageContent || '',
+        timestamp: new Date().toISOString(),
+        groupName: this.groupName, 
+        channelName: this.channelName, 
+        imageUrl: this.selectedFile ? `/uploads/messages/${this.selectedFile.name}` : null
+      };
+      this.socketService.emit('sendMessage', socketMessage);
+    }
   }
-}
 
   deleteMessage(messageId: string): void {
     if (this.groupName && this.channelName) {
