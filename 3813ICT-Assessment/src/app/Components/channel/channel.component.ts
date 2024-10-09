@@ -58,6 +58,7 @@ export class ChannelComponent implements OnInit {
   messages: Message[] = [];
   newMessageContent: string = '';
   selectedFile: File | null = null;
+  selectedFileName: string | null = null; 
 
   constructor(
     private route: ActivatedRoute,
@@ -195,7 +196,11 @@ export class ChannelComponent implements OnInit {
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      this.selectedFile = file;
+      this.selectedFile = file; 
+      this.selectedFileName = file.name; 
+    } else {
+      this.selectedFile = null; 
+      this.selectedFileName = null; 
     }
   }
 
@@ -221,13 +226,14 @@ export class ChannelComponent implements OnInit {
         content: this.newMessageContent || '',
         timestamp: new Date().toISOString(),
         channelName: this.channelName,
-        imageUrl: this.selectedFile ? `/uploads/messages/${this.selectedFile.name}` : null  // Ensure the correct relative path
+        imageUrl: this.selectedFile ? `/uploads/messages/${this.selectedFile.name}` : null 
       };
 
       this.channelsService.addChannelMessage(this.groupName, this.channelName, formData).subscribe({
         next: () => {
           this.newMessageContent = '';
           this.selectedFile = null;
+          this.selectedFileName = null; 
         },
         error: (error) => {
           console.error('Failed to send message:', error);
@@ -272,6 +278,8 @@ export class ChannelComponent implements OnInit {
   isGroupAdminOrSuperAdmin(): boolean {
     return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
   }
+
+
 
   //******************************User Actions******************************
   reportUser(reportedUsername: string): void {
