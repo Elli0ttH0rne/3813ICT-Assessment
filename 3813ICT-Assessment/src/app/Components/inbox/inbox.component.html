@@ -2,51 +2,33 @@
   <div class="row justify-content-center">
     <div class="col-md-8">
       <div class="card shadow-lg">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <div class="card-header d-flex justify-content-between align-items-center">
           <h1 class="card-title">Your Groups</h1>
           <div class="d-flex align-items-center">
             <span class="me-2">{{ username }}</span>
             <ng-container *ngIf="isGroupAdminOrSuperAdmin()">
               <div class="position-relative">
-                <i class="fas fa-inbox fa-2x me-2" style="cursor: pointer;" (click)="navigateToInbox()"></i>
+                <i class="fas fa-inbox fa-2x me-2" (click)="navigateToInbox()"></i>
                 <span class="badge badge-notification" *ngIf="requestCount > 0">{{ requestCount }}</span>
               </div>
             </ng-container>
-            <i class="fas fa-user-circle fa-2x me-2" style="cursor: pointer;" (click)="navigateToAccount()"></i>
+            <i class="fas fa-user-circle fa-2x me-2" (click)="navigateToAccount()"></i>
           </div>
         </div>
         <div class="card-body">
-          <!-- Tabs for Inbox -->
           <ul class="nav nav-tabs mb-3">
             <li class="nav-item">
-              <a
-                class="nav-link"
-                [class.active]="activeTab === 'joinRequests'"
-                (click)="setActiveTab('joinRequests')">
-                Group Join Requests
-              </a>
+              <a class="nav-link" [class.active]="activeTab === 'joinRequests'" (click)="setActiveTab('joinRequests')">Group Join Requests</a>
             </li>
             <li class="nav-item" *ngIf="isSuperAdmin()">
-              <a
-                class="nav-link"
-                [class.active]="activeTab === 'reportedUsers'"
-                (click)="setActiveTab('reportedUsers')">
-                Reported Users
-              </a>
+              <a class="nav-link" [class.active]="activeTab === 'reportedUsers'" (click)="setActiveTab('reportedUsers')">Reported Users</a>
             </li>
             <li class="nav-item" *ngIf="isSuperAdmin()">
-              <a
-                class="nav-link"
-                [class.active]="activeTab === 'promotionRequests'"
-                (click)="setActiveTab('promotionRequests')">
-                User Promotion Requests
-              </a>
+              <a class="nav-link" [class.active]="activeTab === 'promotionRequests'" (click)="setActiveTab('promotionRequests')">User Promotion Requests</a>
             </li>
           </ul>
 
           <!-- Tab Content -->
-
-          <!-- Group Join Requests Tab Content -->
           <div *ngIf="activeTab === 'joinRequests'">
             <p *ngIf="joinRequests.length === 0">No group join requests available.</p>
             <ul class="list-group" *ngIf="joinRequests.length > 0">
@@ -60,7 +42,6 @@
             </ul>
           </div>
 
-          <!-- Reported Users Tab Content -->
           <div *ngIf="activeTab === 'reportedUsers'">
             <p *ngIf="reportRequests.length === 0">No reported users available.</p>
             <ul class="list-group" *ngIf="reportRequests.length > 0">
@@ -74,8 +55,6 @@
             </ul>
           </div>
 
-
-          <!-- Promotion Requests Tab Content -->
           <div *ngIf="activeTab === 'promotionRequests'">
             <p *ngIf="promotionRequests.length === 0">No promotion requests available.</p>
             <ul class="list-group" *ngIf="promotionRequests.length > 0">
@@ -88,11 +67,10 @@
               </li>
             </ul>
           </div>
+        </div>
 
-
-        <!-- Card Footer with Back Button -->
         <div class="card-footer d-flex justify-content-start">
-          <i class="fas fa-arrow-left fa-2x" style="cursor: pointer;" (click)="navigateToUserGroup()"></i>
+          <i class="fas fa-arrow-left fa-2x" (click)="navigateToUserGroup()"></i>
         </div>
       </div>
     </div>

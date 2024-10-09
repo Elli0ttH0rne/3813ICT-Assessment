@@ -50,6 +50,16 @@ body, html {
   background-color: #7289da; 
   color: white;
 }
+.badge-notification {
+  position: absolute;
+  top: -10px; 
+  right: -15px; 
+  background-color: red; 
+  color: white; 
+  font-size: 1.25rem; 
+  padding: 0.25em 0.5em; 
+  border-radius: 50%;
+}
 
 .fa-inbox,
 .fa-user-circle {
@@ -157,3 +167,4 @@ input[type="file"] {
 .btn-danger:hover {
   background-color: #ff1a1a; 
 }
+
