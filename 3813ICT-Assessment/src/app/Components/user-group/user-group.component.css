@@ -1,4 +1,3 @@
-/* Global Styles */
 body, html {
   background-color: #2c2f33;
   margin: 0;
@@ -7,7 +6,6 @@ body, html {
   font-family: 'Arial', sans-serif;
 }
 
-/* Card Styles */
 .card {
   background-color: #2c2f33;
   border: none;
@@ -15,7 +13,6 @@ body, html {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* Header Styles */
 .card-header {
   font-size: 1.8rem;
   padding: 1.5rem;
@@ -25,17 +22,6 @@ body, html {
   border-top-right-radius: 8px;
 }
 
-/* Channel Description Styles */
-.channel-description {
-  font-size: 1rem;
-  color: #b9bbbe;
-  margin-top: 5px;
-  max-width: 300px;
-  overflow-wrap: break-word;
-  white-space: normal;
-}
-
-/* Card Body Styles */
 .card-body {
   padding: 1.5rem;
   font-size: 1.1rem;
@@ -43,54 +29,27 @@ body, html {
   color: #ffffff;
 }
 
-/* List Group Styles */
-.list-group-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 1.25rem;
-  padding: 1rem 1.5rem;
-  background-color: #2f3136;
-  color: #ffffff;
-  transition: background-color 0.3s, transform 0.2s;
+.create-group-form .form-control {
+  width: 100%;
   border-radius: 5px;
-  position: relative;
+  background-color: #40444b;
+  color: #ffffff;
+  border: 1px solid #7289da;
 }
 
-.list-group-item:hover {
-  background-color: #3a3c40;
-  transform: scale(1.02);
+.create-group-form .form-control:focus {
+  border-color: #5865f2;
+  box-shadow: 0 0 5px rgba(88, 101, 242, 0.5);
 }
 
-/* Badge Styles */
-.badge {
-  margin-right: 1rem;
-  font-size: 1.5rem;
-  padding: 0.75rem 1.5rem;
-  background-color: #7289da;
-  color: white;
-  border-radius: 12px;
+.create-group-form .form-control::placeholder {
+  color: #b9bbbe; 
 }
 
-/* Notification Icon Styles */
-.fa-inbox, .fa-user-circle {
-  font-size: 2.5rem;
-  color: #ffffff; 
+.create-group-form {
+  margin-top: 20px;
 }
 
-/* Notification Badge Styles */
-.badge-notification {
-  position: absolute;
-  top: -10px;
-  right: -15px;
-  background-color: red;
-  color: white; 
-  font-size: 1.25rem; 
-  padding: 0.25em 0.5em; 
-  border-radius: 50%;
-}
-
-/* Create Channel Form Styles */
 .create-channel-form .form-control {
   width: 100%;
   border-radius: 5px;
@@ -104,41 +63,103 @@ body, html {
   box-shadow: 0 0 5px rgba(88, 101, 242, 0.5);
 }
 
-/* Button Styles */
+.create-channel-form .form-control::placeholder {
+  color: #b9bbbe; 
+}
+
+.create-channel-form, .create-group-form {
+  margin-top: 20px;
+}
+
 .btn {
   border-radius: 5px;
   transition: background-color 0.3s;
 }
 
-.create-channel-form button {
+.create-channel-form button, .create-group-form button {
   margin-top: 10px;
 }
 
-.create-channel-form .btn-primary {
+.create-channel-form .btn-primary, .create-group-form .btn-primary {
   background-color: #5865f2;
   border: none;
 }
 
-.create-channel-form .btn-primary:hover {
+.create-channel-form .btn-primary:hover, .create-group-form .btn-primary:hover {
   background-color: #7289da;
 }
 
-.create-channel-form .btn-secondary {
+.create-channel-form .btn-secondary, .create-group-form .btn-secondary {
   background-color: #40444b;
   border: none;
 }
 
-.create-channel-form .btn-secondary:hover {
+.create-channel-form .btn-secondary:hover, .create-group-form .btn-secondary:hover {
   background-color: #5b5c61;
 }
 
-/* Additional Styles */
 .list-group-item {
-  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.25rem;
+  padding: 1rem 1.5rem;
+  background-color: #2f3136;
+  color: #ffffff;
+  transition: background-color 0.3s, transform 0.2s;
+  border-radius: 5px;
+  position: relative;
+  width: calc(100% - 20px);
+  overflow: hidden;
+}
+
+.channel-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.channel-name {
+  margin-bottom: 5px;
 }
 
 .channel-description {
+  color: #b9bbbe;
+  margin: 0;
   font-size: 0.9rem;
+}
+
+.join-channel-button {
+  margin-top: 10px;
+  align-self: flex-start;
+}
+
+.list-group-item:hover {
+  background-color: #3a3c40;
+  transform: scale(1.02);
+}
+
+.badge {
+  margin-right: 1rem;
+  font-size: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #7289da;
+  color: white;
+  border-radius: 12px;
+}
+
+.fa-inbox, .fa-user-circle {
+  font-size: 2.5rem;
+  color: #ffffff; 
+}
+
+.badge-notification {
+  position: absolute;
+  top: -10px;
+  right: -15px;
+  background-color: red;
+  color: white; 
+  font-size: 1.25rem; 
+  padding: 0.25em 0.5em; 
+  border-radius: 50%;
 }
 
 .list-group-item > div:last-child {
