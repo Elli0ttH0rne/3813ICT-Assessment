@@ -76,28 +76,28 @@ export class ChannelComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadInitialData();
+
     const storedUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
     this.userID = storedUser.userId || ''; 
     this.username = storedUser.username || '';
     this.roles = storedUser.roles || [];
   
     if (this.groupName && this.channelName) {
-      // Load existing chat messages for the group and channel
       this.loadChatMessages(true);
   
-      // Emit the join event
+      // Emit the join event when the component loads
       this.socketService.emit('joinChat', { username: this.username, channelName: this.channelName });
+      
+      // Subscribe to real-time messages using Socket.IO
+      this.socketService.onMessageReceived().subscribe((message: any) => {
+        if (message) {
+          this.messages.push(message);
+          this.scrollToBottom();
+        }
+      });
     }
-  
-    // Subscribe to new messages via Socket.IO
-    this.socketService.onMessageReceived().subscribe((message: Message) => {
-      if (message && message.sender && message.content) {
-        this.messages.push(message);  
-        this.scrollToBottom(); 
-      }
-    });
   }
-  
 
   //******************************Data Loading******************************
   private loadInitialData(): void {
@@ -105,7 +105,7 @@ export class ChannelComponent implements OnInit {
     if (this.isGroupAdminOrSuperAdmin()) {
       this.loadRequestCount();
     }
-
+  
     // Load users, admins, and creator of the group
     forkJoin([
       this.groupsService.getUsersInGroup(this.groupName!),
@@ -115,37 +115,32 @@ export class ChannelComponent implements OnInit {
     ]).subscribe({
       next: async ([users, admins, superAdmins, creatorId]) => {
         this.groupCreatorId = creatorId;  
-        this.isCreator = this.userID === this.groupCreatorId || this.isSuperAdmin;  
-
-        // Fetch profile pictures for each user
-        const userPictureRequests = users.map(user =>
+        this.isCreator = this.userID === this.groupCreatorId || this.isSuperAdmin;
+  
+        // Combine users and admins but keep the types separate
+        const groupUsers = users.map(user =>
           this.usersService.getUserProfilePicture(user.username).pipe(
             map(response => ({ ...user, profilePicture: response.imageUrl } as GroupUser))
           )
         );
-
-        // Fetch profile pictures for each admin
+  
         const adminPictureRequests = [...admins, ...superAdmins].map(admin =>
           this.usersService.getUserProfilePicture(admin.username).pipe(
             map(response => ({ ...admin, profilePicture: response.imageUrl } as Admin))
           )
         );
-
+  
         // Wait for all requests to complete
-        this.usersInGroup = await forkJoin(userPictureRequests).toPromise();
-        const adminPictures = await forkJoin(adminPictureRequests).toPromise();
-        this.groupAdmins = adminPictures;
-
-        // Combine both user arrays
-        this.usersInGroup.push(...this.groupAdmins);
+        this.usersInGroup = await forkJoin(groupUsers).toPromise();
+        this.groupAdmins = await forkJoin(adminPictureRequests).toPromise();
+  
+        // Now 'usersInGroup' has only GroupUser objects and 'groupAdmins' has only Admin objects
       },
       error: (error) => {
         console.error('Failed to load initial data:', error);
       }
     });
-}
-
-
+  }
 
   private loadRequestCount(): void {
     this.requestsService.getRequestCount().subscribe({
@@ -207,47 +202,42 @@ export class ChannelComponent implements OnInit {
   //******************************Chat Actions******************************
   sendMessage(): void {
     if (!this.newMessageContent.trim() && !this.selectedFile) {
-      alert('Message cannot be empty or blank.');
+      alert('Message cannot be empty.');
       return;
     }
   
     if (this.groupName && this.channelName) {
       const formData = new FormData();
-      
-      // Add content and file to the form data
+      formData.append('sender', this.username);
+      formData.append('channelName', this.channelName);
       formData.append('content', this.newMessageContent || '');
+  
       if (this.selectedFile) {
         formData.append('image', this.selectedFile);
       }
   
-      formData.append('sender', this.username); 
-      formData.append('groupName', this.groupName); 
-      formData.append('channelName', this.channelName); 
-  
-      // Send formData to the server
+      const socketMessage = {
+        sender: this.username,
+        content: this.newMessageContent || '',
+        timestamp: new Date().toISOString(),
+        channelName: this.channelName,
+        imageUrl: this.selectedFile ? `/uploads/messages/${this.selectedFile.name}` : null  // Ensure the correct relative path
+      };
+
       this.channelsService.addChannelMessage(this.groupName, this.channelName, formData).subscribe({
         next: () => {
-          this.newMessageContent = ''; 
-          this.selectedFile = null; 
+          this.newMessageContent = '';
+          this.selectedFile = null;
         },
         error: (error) => {
           console.error('Failed to send message:', error);
           alert('Failed to send message.');
         }
       });
-      
-      // Emit message via Socket.IO
-      const socketMessage = {
-        sender: this.username,
-        content: this.newMessageContent || '',
-        timestamp: new Date().toISOString(),
-        groupName: this.groupName, 
-        channelName: this.channelName, 
-        imageUrl: this.selectedFile ? `/uploads/messages/${this.selectedFile.name}` : null
-      };
-      this.socketService.emit('sendMessage', socketMessage);
     }
   }
+  
+  
 
   deleteMessage(messageId: string): void {
     if (this.groupName && this.channelName) {

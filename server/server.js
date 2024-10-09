@@ -33,6 +33,11 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use('/api/channels', (req, res, next) => {
+  req.io = io; 
+  next();
+}, channelsRoutes);
+
 // Serve static files for profile pictures
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -96,16 +101,19 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle sending messages
-  socket.on('sendMessage', ({ sender, content, timestamp, channelName }) => {
-    if (!sender || !content || !channelName) {
-      console.error('Invalid sendMessage event:', { sender, content, channelName });
-      return;
+  // Handle sending messages via Socket.IO
+  socket.on('sendMessage', ({ sender, content, imageUrl, timestamp, channelName }) => {
+    if (!sender || (!content && !imageUrl) || !channelName) {
+        console.error('Invalid sendMessage event:', { sender, content, imageUrl, channelName });
+        return;
     }
 
-    const message = { sender, content, timestamp };
+    // Make sure the full image URL is sent
+    const message = { sender, content, imageUrl, timestamp, channelName };
+    
+    // Emit the message to all users in the channel
     io.to(channelName).emit('newMessage', message);
-    console.log(`Message from ${sender} to ${channelName}: ${content}`);
+    console.log(`Message from ${sender} to ${channelName}:`, message);
   });
 
   // Handle user disconnect
