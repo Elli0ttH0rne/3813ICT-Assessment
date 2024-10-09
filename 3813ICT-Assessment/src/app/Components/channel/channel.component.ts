@@ -57,6 +57,7 @@ export class ChannelComponent implements OnInit {
   // Chat messages
   messages: Message[] = [];
   newMessageContent: string = '';
+  selectedFile: File | null = null;
 
   constructor(
     private route: ActivatedRoute,
@@ -199,35 +200,49 @@ export class ChannelComponent implements OnInit {
     });
   }
 
-  //******************************Chat Actions******************************
-  sendMessage(): void {
-    if (!this.newMessageContent.trim()) {
-      alert('Message cannot be empty.');
-      return;
-    }
-
-    if (this.groupName && this.channelName) {
-      const message: Message = {
-        sender: this.username,
-        content: this.newMessageContent,
-        timestamp: new Date().toISOString()
-      };
-  
-      // Send message to the server using Socket.IO
-      this.socketService.emit('sendMessage', { ...message, channelName: this.channelName });
-  
-      // Save the message to the server 
-      this.channelsService.addChannelMessage(this.channelName, message).subscribe({
-        next: () => {
-          this.newMessageContent = ''; 
-        },
-        error: (error) => {
-          console.error('Failed to send message:', error);
-          alert('Failed to send message.');
-        }
-      });
+  // Method to handle file selection
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
     }
   }
+
+  //******************************Chat Actions******************************
+  // Modified sendMessage() to handle both text and image
+sendMessage(): void {
+  if (!this.newMessageContent.trim() && !this.selectedFile) {
+    alert('Message cannot be empty or blank.');
+    return;
+  }
+
+  if (this.groupName && this.channelName) {
+    const formData = new FormData();
+    
+    // Add message content if available
+    formData.append('content', this.newMessageContent || '');
+    
+    // Add the selected image file to formData
+    if (this.selectedFile) {
+      formData.append('image', this.selectedFile);
+    }
+
+    formData.append('sender', this.username); 
+
+    // Send formData to the server
+    this.channelsService.addChannelMessage(this.groupName, this.channelName, formData).subscribe({
+      next: () => {
+        this.newMessageContent = ''; 
+        this.selectedFile = null; 
+        alert('Message sent successfully.');
+      },
+      error: (error) => {
+        console.error('Failed to send message:', error);
+        alert('Failed to send message.');
+      }
+    });
+  }
+}
 
   deleteMessage(messageId: string): void {
     if (this.groupName && this.channelName) {

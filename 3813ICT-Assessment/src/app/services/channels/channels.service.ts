@@ -30,8 +30,8 @@ export class ChannelsService {
     return this.http.delete(`${this.apiUrl}/${groupName}/${channelName}`);
   }
 
-  addChannelMessage(channelName: string, message: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/channels/${channelName}/messages`, message);
+  addChannelMessage(groupName: string, channelName: string, formData: FormData): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${groupName}/${channelName}/messages`, formData);
   }
   
   getChannelMessages(channelName: string): Observable<any[]> {

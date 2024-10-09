@@ -92,18 +92,23 @@
               <div *ngFor="let message of messages" 
                    [ngClass]="{'sent-message': message.sender === username, 'received-message': message.sender !== username}" 
                    class="message-item d-flex mb-2">
-            
+                
                 <!-- Conditional rendering for user messages -->
                 <ng-container *ngIf="message.sender !== 'System'; else systemMessage">
                   <img class="avatar" [ngClass]="{'me-2': message.sender !== username, 'ms-2': message.sender === username}" 
                        [src]="getAvatarImg(message.sender)" alt="avatar">
-            
+              
                   <div class="message-content">
                     <div class="message-header">
                       <span class="username">{{ message.sender }}</span>
                       <span class="timestamp">{{ formatTimestamp(message.timestamp) }}</span>
                     </div>
-                    <div class="message-text">{{ message.content }}</div>
+                    
+                    <!-- Display text content if available -->
+                    <div *ngIf="message.content" class="message-text">{{ message.content }}</div>
+                    
+                    <!-- Display image if available -->
+                    <img *ngIf="message.imageUrl" [src]="message.imageUrl" alt="Image message" class="message-image mt-2" style="max-width: 200px; border-radius: 8px;">
                   </div>
             
                   <!-- Delete button for admins -->
@@ -120,9 +125,16 @@
                 </ng-template>
               </div>
             </div>
+            
           </div>
           <div class="message-input d-flex p-3 border-top">
+            <!-- Input field for message -->
             <input #messageInput type="text" class="form-control me-2" [(ngModel)]="newMessageContent" placeholder="Type your message here..." (keydown.enter)="sendMessage()" />
+
+            <!-- Input field for image -->
+            <input type="file" (change)="onFileSelected($event)" class="form-control me-2" />
+
+            <!-- Button to send the message -->
             <button class="btn btn-primary" (click)="sendMessage()">Send</button>
           </div>
         </div>
