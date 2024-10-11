@@ -3,10 +3,7 @@
 ## Git Repository Structure
 
 ### Repository Organization
-
-The repository includes all essential files for running the project, excluding node modules. Within the `src` folder, the `app` directory houses a critical file named `main.ts`, responsible for managing the project's routing and paths. The `app` folder also contains two key subdirectories: `components` and `services`. The `components` directory stores all Angular components required for the frontend, while the `services` directory contains files that handle backend functionality.
-
-
+The repository includes all essential files for running the project, excluding the node modules. The `3813ICT-Assessment` directory contains the Angular project files for the frontend component. Within the `src` folder inside `3813ICT-Assessment`, the `app` directory houses a critical file named `main.ts`, which manages the Angular project's routing and paths. The `app` folder also contains two key subdirectories: `components` and `services`. The `components` directory stores all Angular components required for the frontend, while the `services` directory contains the service files that handle HTTP posts to the Node server as well as the socket functions.
 ### Git Workflow
 
 #### Branching Strategy
@@ -14,11 +11,12 @@ To ensure a stable main version of the project, I employed branching extensively
 
 
 #### Commit Frequency
-I committed changes to the branch I was working on whenever a feature or function was functional or nearing completion. This practice guaranteed that my cloud version was always up-to-date, providing a safeguard against potential issues with my local version.
+To ensure a stable main version of the project, I employed branching extensively. For each new feature, I created a dedicated branch with a descriptive name. Once the feature was completed, I merged the branch back into the `main` branch. Direct modifications to the `main` branch were infrequent and only done when absolutely necessary.
 
 ## Data Structures
+
 ### User Data Structure
-User data was managed within the `user.service.ts` file. The `defaultUsers` array contains objects representing all users, which are loaded into the browser's local storage when the application starts. Each object includes the following six attributes:
+User data is stored within the `users.json` file. The `users.json` file contains objects representing all the users of the application. When a new user is created, an extra object is added to the end of the file. Each user object contains the following six attributes:
 * `userId`: A unique identifier for each user (e.g., u001).
 * `username`: A unique username selected by the user.
 * `password`: A password chosen by the user for account login.
@@ -27,49 +25,60 @@ User data was managed within the `user.service.ts` file. The `defaultUsers` arra
 * `groups`: An array listing the names of the groups the user belongs to.
 
 ### Group Data Structure
-Group data is managed within the `groups.service.ts` file. The `defaultGroups` array contains objects representing all groups, which are loaded into the browser's local storage upon application start. Each object includes the following three attributes:
+Group data is stored within the `groups.json` file. The `groups.json` file contains objects representing all the groups in the project. When a new group is created, a new object is added to the bottom of the file with the new group's information stored inside. Each object includes the following three attributes:
 * `name`: The name of the group.
-* `channels`: An array of channels within the group, with each channel including its name and description.
 * `admins`: An array of objects containing information about each group admin, including `userId`, `username`, and `role` (either creator or admin).
+* `creatorId`: This id refers to the `userId` of the admin that created the group.
 
 ### Request Data Structure
-Request data is managed within the `requests.service.ts` file. Initially, three empty arrays are established to handle different types of requests in the project:
-* `defaultGroupRequests`: Stores requests from users who wish to join a group they are not yet part of.
-* `defaultReportRequests`: Stores requests generated when a user reports another user.
-* `promotionRequests`: Stores requests created by group admins when they want to promote a user to group admin.
+The request data is stored within the `requests.json` file, which contains objects representing all the requests made by users and group admins. When a new request is created, it is added to the file with its details stored inside the corresponding object. Each request object includes the following attributes:
+* `username` (mandatory): This value corresponds to the user who created the request.
+* `groupName` (mandatory): This value corresponds to the group in which the request has been made or is for joining.
+* `typeOfRequest` (mandatory): This value can have one of three possible values—`report`, `promotion`, or `join`. A `report` request means that a user has reported another user within a group. A `promotion` request means that a current group admin is requesting that another user be promoted to group admin. A `join` request means a user is requesting to join a group.
+* `reportedUsername` (mandatory for report requests): This value stores the username of the user who has been reported.
+* `reason` (mandatory for report requests): This value stores a string corresponding to the reason for the report.
+* `promotionUser` (mandatory for promotion requests): This value stores the username of the user that a group admin wishes to promote to group admin.
+
+### Channels collection (MongoDB)
+
+### Messages Collection (MongoDB)
+
+### profilePictures (MongoDB)
 
 
 ## Angular Architecture
+
 ### Components
-The solution currently includes seven components that make up the entire frontend of the project. These components are:
-
-* `account`: This component allows users to view their username and email. It also provides two buttons: one for logging out and another for deleting their account.
-
-* `all-group-list`: Displays all existing groups, allowing users to request to join any group they are not already part of. These requests must be approved by a group admin.
-
-* `channel`: Displays the details of the selected channel within a group.
-
-* `inbox`: This component is visible only to group admins and super admins. Group admins can use it to view and manage pending group requests. Super admins have access to additional tabs: one for report requests, where they can see users who have been reported, and another for promotion requests, where they can manage requests to promote users to group admins.
-
-* `login`: Enables users to log in by entering their credentials, which are checked against the data stored in local storage to verify their validity.
-
+This project contains seven core components that make up the entire frontend of the project. These components are:
+* `account`: This component allows users to view their account details (username and email) and upload a profile picture. It also provides two buttons: one for logging out and another for deleting their account.
+* `all-group-list`: Displays all existing groups, allowing users to request to join any group they are not already part of. These requests must be approved by a group admin. This component isn’t shown to super admins as they can already see all the groups in the program in the `user-group` component.
+* `channel`: This component allows users to chat with other members of the group in real time through the use of sockets. The user can send messages via both text and images. When a message is sent in the chat box, the profile picture of the user is displayed next to the message as well as the time the message was sent. Super admins also have a delete button next to each message they can use to remove a message.
+* `inbox`: This component is visible only to group admins and super admins. Group admins can use it to view and manage pending group requests. Super admins have access to two additional tabs: one for report requests, where they can see users who have been reported in channels, and another for promotion requests, where they can manage requests to promote users to group admins.
+* `login`: Enables users to log in by entering their credentials, which are checked against the data stored in the `user.json` file.
 * `register`: Allows users to create an account by entering a unique username, email, and password.
-
 * `user-group`: This screen is displayed after a user logs in. It shows the groups that the user has joined. Group admins have additional options to create and delete groups and channels, but they can only modify groups they have created. Super admins have the same abilities but can modify any group without needing to be the creator.
 
 ### Services
 Within this project, four services were created to manage data and provide methods for performing various actions on that data. These services are:
+* `channels.service.ts
+* `groups.service.ts`:
+* `requests.service.ts`: 
+* `sockets.service.ts`: 
+* `users.service.ts`: 
 
-* `auth.service.ts`: This service contains functions used to promote users to group admin or super admin roles.
+### Models
+#### channel.component.ts
+* `message`: 
+* `GroupUser`:
 
-* `groups.service.ts`: This service manages the data for all default groups and provides the necessary methods to support the functionality of the solution.
+#### channel.services.ts
+* `Channel`:
 
-* `requests.service`.ts: This service holds the arrays for different types of requests, such as group join requests, report requests, and promotion requests. It also includes methods for creating, approving, rejecting, and deleting these requests.
-
-* `users.service.ts`: This service handles methods related to retrieving user information, as well as creating and deleting users.
+#### groups.services.ts
+* `Admin`:
+* `Group`:
 
 ## REST API, Node Server Architecture and Server Side Routes
-Unfortunetly my solution doesn't utilise the REST API, Node Server or any Server Side Routes. My solution has it's data stored inside the browsers local storage on launch and utilisies services to modify and retrieve the data. I realised too late that the solution required these components and was unable to make any major modifications in the remaining time.
 
 ## How data was changed and how the angular components were updated
 To effectively manage and update the data within the application, I developed specific methods within the relevant services. These methods were responsible for modifying the stored data, ensuring that any changes were reflected throughout the application.
