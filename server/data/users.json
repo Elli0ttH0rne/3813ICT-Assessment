@@ -11,7 +11,8 @@
       "Cooking",
       "Gardening",
       "Travel",
-      "Fitness"
+      "Fitness",
+      "w"
     ]
   },
   {
@@ -370,6 +371,8 @@
       "groupAdmin",
       "superAdmin"
     ],
-    "groups": []
+    "groups": [
+      "w"
+    ]
   }
 ]

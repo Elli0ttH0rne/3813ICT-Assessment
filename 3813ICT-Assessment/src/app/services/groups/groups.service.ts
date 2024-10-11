@@ -5,10 +5,6 @@ import { map } from 'rxjs';
 import { catchError } from 'rxjs';
 import { of } from 'rxjs';
 
-export interface Channel {
-  name: string;
-  description: string;
-}
 
 export interface Admin {
   userId: string;
@@ -19,7 +15,6 @@ export interface Admin {
 
 export interface Group {
   name: string;
-  channels: Channel[];
   admins: Admin[];
   creatorId: string;
 }
@@ -47,10 +42,6 @@ export class GroupsService {
   // Create a new group
   createGroup(groupName: string, creatorUsername: string, creatorId: string): Observable<any> {
     return this.http.post(this.apiUrl, { groupName, creatorUsername, creatorId });
-  }
-
-  createChannel(groupName: string, channelName: string, channelDescription: string, currentId: string, isSuperAdmin: boolean): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${groupName}/channels`, { channelName, channelDescription, currentId, isSuperAdmin });
   }
 
   // Delete a specific group
