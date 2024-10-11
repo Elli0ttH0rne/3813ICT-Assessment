@@ -57,7 +57,7 @@ This project contains seven core components that make up the entire frontend of 
 * `user-group`: This screen is displayed after a user logs in. It shows the groups that the user has joined. Group admins have additional options to create and delete groups and channels, but they can only modify groups they have created. Super admins have the same abilities but can modify any group without needing to be the creator.
 
 ### Services
-Within this project, four services were created to manage data and provide methods for performing various actions on that data. These services are:
+Within this project, five services were created to manage data and provide methods for performing various actions on that data. These services are:
 * `channels.service.ts`:
 * `groups.service.ts`:
 * `requests.service.ts`: 
