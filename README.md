@@ -1,11 +1,10 @@
 # 3813ICT Assessment Phase 1
 
 ## Git Repository Structure
-
 ### Repository Organization
 The repository includes all essential files for running the project, excluding the node modules. The `3813ICT-Assessment` directory contains the Angular project files for the frontend component. Within the `src` folder inside `3813ICT-Assessment`, the `app` directory houses a critical file named `main.ts`, which manages the Angular project's routing and paths. The `app` folder also contains two key subdirectories: `components` and `services`. The `components` directory stores all Angular components required for the frontend, while the `services` directory contains the service files that handle HTTP posts to the Node server as well as the socket functions.
-### Git Workflow
 
+### Git Workflow
 #### Branching Strategy
 To ensure a stable main version of the project, I employed branching extensively. For each new feature, I created a dedicated branch with a descriptive name. Once the feature was completed, I merged the branch back into the main branch. Direct modifications to the main branch were infrequent and only done when absolutely necessary.
 
@@ -14,7 +13,6 @@ To ensure a stable main version of the project, I employed branching extensively
 To ensure a stable main version of the project, I employed branching extensively. For each new feature, I created a dedicated branch with a descriptive name. Once the feature was completed, I merged the branch back into the `main` branch. Direct modifications to the `main` branch were infrequent and only done when absolutely necessary.
 
 ## Data Structures
-
 ### User Data Structure
 User data is stored within the `users.json` file. The `users.json` file contains objects representing all the users of the application. When a new user is created, an extra object is added to the end of the file. Each user object contains the following six attributes:
 * `userId`: A unique identifier for each user (e.g., u001).
@@ -60,7 +58,7 @@ This project contains seven core components that make up the entire frontend of 
 
 ### Services
 Within this project, four services were created to manage data and provide methods for performing various actions on that data. These services are:
-* `channels.service.ts
+* `channels.service.ts`:
 * `groups.service.ts`:
 * `requests.service.ts`: 
 * `sockets.service.ts`: 
