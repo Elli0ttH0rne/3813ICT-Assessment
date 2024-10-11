@@ -58,6 +58,7 @@ export class ChannelComponent implements OnInit {
   messages: Message[] = [];
   newMessageContent: string = '';
   selectedFile: File | null = null;
+  selectedFileName: string | null = null; 
 
   constructor(
     private route: ActivatedRoute,
@@ -83,6 +84,8 @@ export class ChannelComponent implements OnInit {
     this.username = storedUser.username || '';
     this.roles = storedUser.roles || [];
   
+    this.isSuperAdmin = this.roles.includes('superAdmin');
+
     if (this.groupName && this.channelName) {
       this.loadChatMessages(true);
   
@@ -116,6 +119,7 @@ export class ChannelComponent implements OnInit {
       next: async ([users, admins, superAdmins, creatorId]) => {
         this.groupCreatorId = creatorId;  
         this.isCreator = this.userID === this.groupCreatorId || this.isSuperAdmin;
+        this.isGroupAdmin = this.roles.includes('groupAdmin')
   
         // Combine users and admins but keep the types separate
         const groupUsers = users.map(user =>
@@ -195,7 +199,11 @@ export class ChannelComponent implements OnInit {
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      this.selectedFile = file;
+      this.selectedFile = file; 
+      this.selectedFileName = file.name; 
+    } else {
+      this.selectedFile = null; 
+      this.selectedFileName = null; 
     }
   }
 
@@ -221,13 +229,14 @@ export class ChannelComponent implements OnInit {
         content: this.newMessageContent || '',
         timestamp: new Date().toISOString(),
         channelName: this.channelName,
-        imageUrl: this.selectedFile ? `/uploads/messages/${this.selectedFile.name}` : null  // Ensure the correct relative path
+        imageUrl: this.selectedFile ? `/uploads/messages/${this.selectedFile.name}` : null 
       };
 
       this.channelsService.addChannelMessage(this.groupName, this.channelName, formData).subscribe({
         next: () => {
           this.newMessageContent = '';
           this.selectedFile = null;
+          this.selectedFileName = null; 
         },
         error: (error) => {
           console.error('Failed to send message:', error);
@@ -273,6 +282,8 @@ export class ChannelComponent implements OnInit {
     return this.roles.includes('groupAdmin') || this.roles.includes('superAdmin');
   }
 
+
+
   //******************************User Actions******************************
   reportUser(reportedUsername: string): void {
     if (reportedUsername === this.username) {
@@ -314,6 +325,34 @@ export class ChannelComponent implements OnInit {
         error: (error) => {
           console.error('Failed to remove user:', error);
           alert('Failed to remove user.');
+        }
+      });
+    }
+  }
+
+  
+  requestPromotionToGroupAdmin(username: string): void {
+    if (username === this.username) {
+      alert('You cannot request a promotion for yourself.');
+      return;
+    }
+  
+    const confirmed = window.confirm('Are you sure you want to request this user to be promoted to Group Admin?');
+    if (confirmed && this.groupName) {
+      this.requestsService.createRequest(
+        this.username,  // The user making the request
+        this.groupName,
+        'promotion',
+        undefined,  // No reported user in case of promotion
+        undefined,  // No reason required for promotion
+        username // The user to be promoted
+      ).subscribe({
+        next: () => {
+          alert('Promotion request sent successfully.');
+        },
+        error: (error) => {
+          console.error('Failed to create promotion request:', error);
+          alert('Failed to create promotion request.');
         }
       });
     }

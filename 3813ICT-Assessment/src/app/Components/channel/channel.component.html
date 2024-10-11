@@ -81,7 +81,7 @@
           </div>
 
           <!-- Conditional Delete Button -->
-          <div *ngIf="isCreator">
+          <div *ngIf="isCreator || isSuperAdmin">
             <button class="btn btn-danger" (click)="deleteChannel()">Delete Channel</button>
           </div>
         </div>
@@ -130,10 +130,14 @@
           <div class="message-input d-flex p-3 border-top">
             <!-- Input field for message -->
             <input #messageInput type="text" class="form-control me-2" [(ngModel)]="newMessageContent" placeholder="Type your message here..." (keydown.enter)="sendMessage()" />
-
-            <!-- Input field for image -->
-            <input type="file" (change)="onFileSelected($event)" class="form-control me-2" />
-
+          
+            <!-- Custom button for file input -->
+            <label class="custom-file-button" for="fileInput">Choose File</label>
+            <input id="fileInput" type="file" (change)="onFileSelected($event)" />
+          
+            <!-- Display the file name after selection -->
+            <span class="file-name" *ngIf="selectedFile">{{ selectedFileName }}</span>
+          
             <!-- Button to send the message -->
             <button class="btn btn-primary" (click)="sendMessage()">Send</button>
           </div>
