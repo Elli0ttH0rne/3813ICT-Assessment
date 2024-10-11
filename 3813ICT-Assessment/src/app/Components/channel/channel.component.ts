@@ -119,6 +119,7 @@ export class ChannelComponent implements OnInit {
       next: async ([users, admins, superAdmins, creatorId]) => {
         this.groupCreatorId = creatorId;  
         this.isCreator = this.userID === this.groupCreatorId || this.isSuperAdmin;
+        this.isGroupAdmin = this.roles.includes('groupAdmin')
   
         // Combine users and admins but keep the types separate
         const groupUsers = users.map(user =>
@@ -324,6 +325,34 @@ export class ChannelComponent implements OnInit {
         error: (error) => {
           console.error('Failed to remove user:', error);
           alert('Failed to remove user.');
+        }
+      });
+    }
+  }
+
+  
+  requestPromotionToGroupAdmin(username: string): void {
+    if (username === this.username) {
+      alert('You cannot request a promotion for yourself.');
+      return;
+    }
+  
+    const confirmed = window.confirm('Are you sure you want to request this user to be promoted to Group Admin?');
+    if (confirmed && this.groupName) {
+      this.requestsService.createRequest(
+        this.username,  // The user making the request
+        this.groupName,
+        'promotion',
+        undefined,  // No reported user in case of promotion
+        undefined,  // No reason required for promotion
+        username // The user to be promoted
+      ).subscribe({
+        next: () => {
+          alert('Promotion request sent successfully.');
+        },
+        error: (error) => {
+          console.error('Failed to create promotion request:', error);
+          alert('Failed to create promotion request.');
         }
       });
     }
