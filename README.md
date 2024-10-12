@@ -2,10 +2,10 @@
 
 ## Git Repository Structure
 ### Repository Organization
-The repository includes all essential files for running the project, excluding the node modules.
+This repository includes all essential files for running the chat application project, excluding the node modules which can be installed using npm install (or npm i).
 #### 3813ICT-Assessment
 The `3813ICT-Assessment` directory contains the Angular project files for the frontend component. Within the `src` folder inside `3813ICT-Assessment`, the `app` directory houses a critical file named `main.ts`, which manages the Angular project's routing and paths. The `app` folder also contains two key subdirectories: `components` and `services`. The `components` directory stores all Angular components required for the frontend, while the `services` directory contains the service files that handle HTTP posts to the Node server as well as the socket functions.
-### Server Directory Structure
+#### Server Directory Structure
 The server directory is organized to separate concerns and handle different aspects of the application backend. Below is an overview of the key folders and files:
 - **controllers/**: This directory contains files responsible for handling the logic of various routes and managing the interaction between the routes and the data stored in the `data` folder.
   - `channelsController.js`: Handles channel-related logic, such as managing channels within groups.
