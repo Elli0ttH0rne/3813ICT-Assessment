@@ -535,6 +535,67 @@ By adhering to REST API principles, the server-side logic becomes more intuitive
     - Error: `{ "error": "Failed to get profile picture." }`
   - **Purpose**: Retrieves the profile picture URL for a specific user from MongoDB. If no picture exists, it returns a default image URL.
 
+## Testing
+### Angular Unit Testing
+To run these tests, cd into `3813ICT-Assessment` and run ng test. You will need to do npm i to install any dependencies.
+#### Components
+* account component:**
+    * should create the AccountComponent
+    * should alert if no file is selected during profile picture upload
+    * should upload profile picture and update the component state on success
+    * should handle error during profile picture upload
+* login component:**
+    * should create the login component
+    * should navigate to /user-group on successful login
+    * should alert "Invalid credentials" if username or password is incorrect
+    * should alert an error if getValidUsers fails
+* **register component:**
+    *   
+  
+
+#### Services
+* **channels services:**
+    *  should be created
+    *  should fetch channels by group name
+    *  should create a new channel
+    *  should delete a channel
+    *  should add a message to a channel
+    *  should fetch messages for a channel
+    *  should delete a message from a channel
+* **groups.service.ts:** 
+    *  should be created
+    *  should fetch all groups
+    *  should fetch the group creator
+    *  should create a new group
+    *  should delete a group
+    *  should fetch users in a group
+    *  should fetch admins of a group
+    *  should add a group to a user
+    *  should leave a group
+    *  should kick a user from a group
+* **requests.service.ts:**
+    *  should be created
+    *  should create a join request
+    *  should create a report request
+    *  should fetch all requests
+    *  should fetch requests by type
+    *  should update the request status
+    *  should delete a request by details
+    *  should return the request count
+
+### Mocha + Chai testing on Node Server
+to run these tests cd into server and enter npm test. You will need to run npm i to install dependencies.
+* **channels.test.js:**
+    *  should return all channels for a given group name
+    *  should create a new channel
+    *  should delete a channel and its messages
+    *  should return all messages for a given channel
+    *  should add a new message to the channel
+    *  should delete a specific message by messageId
+* **groups.test.js:** none
+* **request.test.js:** none
+* **users.test.js:** none
+ 
 ## How Data Was Changed and Updated
 Whenever a user action required data modification—such as updating user roles, adding a new group, or processing a request—these methods would first perform the necessary changes to the data stored in local storage or the database via API calls. After updating the data, the methods would then trigger a refresh of the Angular components to update the views. Additionally, real-time updates, such as new messages in the chat, were handled using Socket.IO to ensure seamless user experience without manual refreshes.
 
