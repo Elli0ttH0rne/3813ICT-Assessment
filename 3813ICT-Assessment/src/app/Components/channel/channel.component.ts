@@ -378,6 +378,36 @@ export class ChannelComponent implements OnInit {
     }
   }
 
+  deleteUsersAccount(username: string): void {
+    const confirmed = window.confirm('Are you sure you want to delete this account? This action cannot be undone.');
+  
+    if (confirmed) {
+      // Delete the specified user's account
+      this.usersService.deleteUserByUsername(username).subscribe({
+        next: () => {
+          // Remove any pending requests related to the user after account deletion
+          this.requestsService.removePendingRequests(username).subscribe({
+            next: () => {
+              console.log(`Pending requests for ${username} removed successfully.`);
+            },
+            error: (err) => {
+              console.error('Failed to remove pending requests:', err);
+            }
+          });
+  
+          alert('Account deleted successfully.');;
+        },
+        error: (err) => {
+          console.error('Failed to delete user:', err);
+          alert('Failed to delete account. Please try again later.');
+        }
+      });
+    } else {
+      console.log('Account deletion cancelled');
+    }
+  }
+  
+
   toggleUserLists(): void {
     this.showUserLists = !this.showUserLists;
   }
