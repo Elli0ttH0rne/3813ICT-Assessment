@@ -77,66 +77,84 @@ const getChannelMessages = async (req, res) => {
     }
   };
   
-// Add a new chat message to a channel
-const addChannelMessage = async (req, res) => {
-  const { groupName, channelName } = req.params;
-  const { sender, content } = req.body;
-  const imageUrl = req.file ? `http://localhost:3000/uploads/messages/${req.file.filename}` : null;
-
-  if (!groupName || !channelName || !sender || (!content && !imageUrl)) {
-    return res.status(400).json({ error: 'Group name, channel name, sender, and content or image URL are required.' });
-  }
-
-  try {
-    const db = getDB();
-    const messageData = {
-      groupName,
-      channelName,
-      sender,
-      content,
-      imageUrl, 
-      timestamp: new Date(),
-    };
-
-    // Save the message to MongoDB
-    const result = await db.collection('messages').insertOne(messageData);
-
-    // Emit the message with the correct URL to Socket.IO
-    const fullMessage = { ...messageData, _id: result.insertedId };
-    
-    // Use req.io to emit the message through Socket.IO
-    req.io.to(channelName).emit('newMessage', fullMessage);
-
-    res.status(201).json({ message: 'Message added successfully.' });
-  } catch (error) {
-    console.error('Failed to add message:', error);
-    res.status(500).json({ error: 'Failed to add message.' });
-  }
-};
+  const addChannelMessage = async (req, res) => {
+    const { groupName, channelName } = req.params;
+    const { sender, content } = req.body;
+    const imageUrl = req.file ? `http://localhost:3000/uploads/messages/${req.file.filename}` : null;
   
-  // Delete a chat message from a channel
-  const deleteChannelMessage = async (req, res) => {
-    const { groupName, channelName, messageId } = req.params;
-  
-    // Validate messageId
-    if (!ObjectId.isValid(messageId)) {
-      return res.status(400).json({ error: 'Invalid message ID' });
+    // Ensure required fields are present
+    if (!groupName || !channelName || !sender || (!content && !imageUrl)) {
+      return res.status(400).json({ error: 'Group name, channel name, sender, and content or image URL are required.' });
     }
   
     try {
       const db = getDB();
-      const result = await db.collection('messages').deleteOne({ _id: new ObjectId(messageId) });
+      
+      const messageData = {
+        groupName,
+        channelName,
+        sender,
+        content: content || '',  // Ensure content is always a string
+        imageUrl,
+        timestamp: new Date(),
+      };
   
-      if (result.deletedCount === 0) {
-        return res.status(404).json({ error: 'Message not found' });
+      // Save the message to MongoDB
+      const result = await db.collection('messages').insertOne(messageData);
+  
+      // Emit the message with the correct URL to Socket.IO
+      const fullMessage = { ...messageData, _id: result.insertedId };
+  
+      // Check if Socket.IO is properly set up and the socket exists
+      if (req.io) {
+        req.io.to(channelName).emit('newMessage', fullMessage);
+      } else {
+        console.warn('Socket.IO is not initialized or req.io is missing.');
       }
   
-      res.status(200).json({ message: 'Message deleted successfully' });
+      // Send success response
+      res.status(201).json({ message: 'Message added successfully.' });
     } catch (error) {
-      console.error('Failed to delete message:', error);
-      res.status(500).json({ error: 'Failed to delete message' });
+      console.error('Failed to add message:', error);  // Log error details
+      res.status(500).json({ error: 'Failed to add message.' });
     }
   };
+  
+  
+  // Delete a chat message from a channel
+const deleteChannelMessage = async (req, res) => {
+  const { groupName, channelName, messageId } = req.params;
+
+  // Validate messageId
+  if (!ObjectId.isValid(messageId)) {
+    return res.status(400).json({ error: 'Invalid message ID' });
+  }
+
+  try {
+    const db = getDB();
+
+    // Ensure the message exists before attempting to delete it
+    const message = await db.collection('messages').findOne({ _id: new ObjectId(messageId), groupName, channelName });
+
+    if (!message) {
+      return res.status(404).json({ error: 'Message not found in the specified group or channel' });
+    }
+
+    // Delete the message
+    const result = await db.collection('messages').deleteOne({ _id: new ObjectId(messageId) });
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    // Return success response
+    res.status(200).json({ message: 'Message deleted successfully.' });
+  } catch (error) {
+    console.error('Failed to delete message:', error);
+    res.status(500).json({ error: 'Failed to delete message due to a server error.' });
+  }
+};
+
   
 
 module.exports = {

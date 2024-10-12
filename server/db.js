@@ -23,7 +23,12 @@ const getDB = () => {
   return db;
 };
 
+const setDB = (database) => {
+  db = database;
+};
+
 module.exports = {
   connectDB,
   getDB,
+  setDB
 };
