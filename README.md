@@ -44,7 +44,10 @@ To ensure a stable main version of the project, I employed branching extensively
 To ensure a stable main version of the project, I employed branching extensively. For each new feature, I created a dedicated branch with a descriptive name. Once the feature was completed, I merged the branch back into the `main` branch. Direct modifications to the `main` branch were infrequent and only done when absolutely necessary.
 
 ## Data Structures
-### User Data Structure
+### JSON File Strucutre
+
+
+#### User Data Structure
 User data is stored within the `users.json` file. The `users.json` file contains objects representing all the users of the application. When a new user is created, an extra object is added to the end of the file. Each user object contains the following six attributes:
 * `userId`: A unique identifier for each user (e.g., u001).
 * `username`: A unique username selected by the user.
@@ -53,13 +56,13 @@ User data is stored within the `users.json` file. The `users.json` file contains
 * `roles`: An array that stores the user's roles (e.g., user, groupAdmin, superAdmin).
 * `groups`: An array listing the names of the groups the user belongs to.
 
-### Group Data Structure
+#### Group Data Structure
 Group data is stored within the `groups.json` file. The `groups.json` file contains objects representing all the groups in the project. When a new group is created, a new object is added to the bottom of the file with the new group's information stored inside. Each object includes the following three attributes:
 * `name`: The name of the group.
 * `admins`: An array of objects containing information about each group admin, including `userId`, `username`, and `role` (either creator or admin).
 * `creatorId`: This id refers to the `userId` of the admin that created the group.
 
-### Request Data Structure
+#### Request Data Structure
 The request data is stored within the `requests.json` file, which contains objects representing all the requests made by users and group admins. When a new request is created, it is added to the file with its details stored inside the corresponding object. Each request object includes the following attributes:
 * `username` (mandatory): This value corresponds to the user who created the request.
 * `groupName` (mandatory): This value corresponds to the group in which the request has been made or is for joining.
@@ -68,12 +71,31 @@ The request data is stored within the `requests.json` file, which contains objec
 * `reason` (mandatory for report requests): This value stores a string corresponding to the reason for the report.
 * `promotionUser` (mandatory for promotion requests): This value stores the username of the user that a group admin wishes to promote to group admin.
 
-### Channels collection (MongoDB)
+### Mongo DB Collections
 
-### Messages Collection (MongoDB)
 
-### profilePictures (MongoDB)
+#### Channels collection 
 
+* _id:
+* groupName:
+* name:
+* description:
+
+#### Messages Collection
+
+* _id:
+* groupName:
+* channelName:
+* sender:
+* content:
+* imageUrl:
+* timestamp
+
+#### profilePictures
+
+* _id:
+* username:
+* profilePicture:
 
 ## Angular Architecture
 
@@ -96,16 +118,30 @@ Within this project, five services were created to manage data and provide metho
 * `users.service.ts`: 
 
 ### Models
-#### channel.component.ts
-* `message`: 
-* `GroupUser`:
-
-#### channel.services.ts
-* `Channel`:
-
-#### groups.services.ts
-* `Admin`:
-* `Group`:
+* channel.component.ts
+  * `message`:
+    *  _id:
+    *  groupName:
+    *  name:
+    *  description:
+  * `GroupUser`:
+    * userId:
+    * username:
+    * profilePicture:
+* channel.services.ts
+  * `Channel`:
+    *  name:
+    *  description:
+* groups.services.ts
+  * `Admin`:
+    * userId:
+    * username:
+    * role:
+    * profilePicture:
+  * `Group`:
+    * name:
+    * admins:
+    * creatorId:
 
 ## REST API, Node Server Architecture and Server Side Routes
 
