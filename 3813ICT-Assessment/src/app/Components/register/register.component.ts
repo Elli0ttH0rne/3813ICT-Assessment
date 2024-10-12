@@ -25,12 +25,6 @@ export class RegisterComponent {
   handleSubmit() {
     this.usersService.getValidUsers().subscribe({
       next: (users) => {
-        // Check if the username already exists
-        if (users.some(user => user.username === this.username)) {
-          alert('Username already exists');
-          return;
-        }
-  
         // Check if any fields are empty
         if (this.username === '' || this.email === '' || this.password === '') {
           alert('Please fill in all fields');
