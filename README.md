@@ -258,6 +258,248 @@ The server directory is organized to separate concerns and handle different aspe
     - Error: `{ "error": "Message not found." }`
   - **Purpose**: Deletes a specific message from the specified channel.
  
+#### groupsRoutes.js
+
+* **GET `/`**
+  - **HTTP Method**: GET
+  - **Parameters**: None
+  - **Return**:
+    - Success: An array of all group objects.
+    - Error: `{ "error": "Failed to read groups data." }`
+  - **Purpose**: Fetches a list of all groups.
+
+* **GET `/:groupName`**
+  - **HTTP Method**: GET
+  - **Parameters**:
+    - `:groupName` (URL parameter): The name of the group whose details are being fetched.
+  - **Return**:
+    - Success: The details of the specified group.
+    - Error: `{ "error": "Group with name \"<groupName>\" not found." }` or other error messages.
+  - **Purpose**: Fetches the details of a specific group by its name.
+
+* **POST `/`**
+  - **HTTP Method**: POST
+  - **Parameters**:
+    - `groupName` (body parameter): The name of the new group.
+    - `creatorUsername` (body parameter): The username of the group’s creator.
+    - `creatorId` (body parameter): The user ID of the group’s creator.
+  - **Return**:
+    - Success: `{ "message": "New group created successfully." }`
+    - Error: `{ "error": "Group already exists." }` or other error messages.
+  - **Purpose**: Creates a new group and adds it to the `groups.json` file and updates the creator’s group array in `users.json`.
+
+* **DELETE `/:groupName`**
+  - **HTTP Method**: DELETE
+  - **Parameters**:
+    - `:groupName` (URL parameter): The name of the group to be deleted.
+  - **Return**:
+    - Success: `{ "message": "Group, all associated channels, and messages deleted successfully." }`
+    - Error: `{ "error": "Group not found." }` or other error messages.
+  - **Purpose**: Deletes a group by name, removes all associated channels and messages, and updates users’ group arrays.
+
+* **PATCH `/add-group-to-user/:username`**
+  - **HTTP Method**: PATCH
+  - **Parameters**:
+    - `:username` (URL parameter): The username of the user to whom the group will be added.
+    - `groupName` (body parameter): The name of the group to be added.
+  - **Return**:
+    - Success: `{ "message": "Group added to user successfully." }`
+    - Error: `{ "error": "User is already in this group." }` or other error messages.
+  - **Purpose**: Adds a specified group to a user's `groups` array if they are not already part of the group.
+
+* **POST `/:groupName/leave`**
+  - **HTTP Method**: POST
+  - **Parameters**:
+    - `:groupName` (URL parameter): The name of the group to leave.
+    - `userId` (body parameter): The ID of the user leaving the group.
+  - **Return**:
+    - Success: `{ "message": "Successfully left the group <groupName>." }`
+    - Error: `{ "error": "User not found." }` or other error messages.
+  - **Purpose**: Removes a group from a user's `groups` array when the user leaves the group.
+
+* **GET `/:groupName/users`**
+  - **HTTP Method**: GET
+  - **Parameters**:
+    - `:groupName` (URL parameter): The name of the group whose users are being fetched.
+  - **Return**:
+    - Success: An array of users in the specified group.
+    - Error: `{ "error": "Failed to read users data." }`
+  - **Purpose**: Fetches a list of all users in a specific group.
+
+* **GET `/:groupName/admins`**
+  - **HTTP Method**: GET
+  - **Parameters**:
+    - `:groupName` (URL parameter): The name of the group whose admins are being fetched.
+  - **Return**:
+    - Success: An array of admin objects for the specified group.
+    - Error: `{ "error": "Group not found." }`
+  - **Purpose**: Fetches a list of all admins in a specific group.
+
+* **DELETE `/groups/:groupName/users/:username`**
+  - **HTTP Method**: DELETE
+  - **Parameters**:
+    - `:groupName` (URL parameter): The name of the group from which the user will be removed.
+    - `:username` (URL parameter): The username of the user to remove from the group.
+  - **Return**:
+    - Success: `{ "message": "User removed from group successfully." }`
+    - Error: `{ "error": "User not found." }` or other error messages.
+  - **Purpose**: Removes a specified user from the group by updating the `groups` array in `users.json`.
+
+#### requestsRoutes.js
+
+* **POST `/`**
+  - **HTTP Method**: POST
+  - **Parameters**:
+    - `username` (body parameter): The username of the user making the request.
+    - `groupName` (body parameter): The name of the group related to the request.
+    - `typeOfRequest` (body parameter): The type of request, which must be one of "join", "report", or "promotion".
+    - `reportedUsername` (body parameter, for report requests): The username of the reported user.
+    - `reason` (body parameter, for report requests): The reason for the report.
+    - `promotionUser` (body parameter, for promotion requests): The username of the user to be promoted.
+  - **Return**:
+    - Success: `{ "message": "Request created successfully." }`
+    - Error: `{ "error": "Duplicate request already exists." }` or other error messages.
+  - **Purpose**: Creates a new request for joining a group, reporting a user, or promoting a user to admin.
+
+* **GET `/`**
+  - **HTTP Method**: GET
+  - **Parameters**: None
+  - **Return**:
+    - Success: An array of all request objects.
+    - Error: `{ "error": "Failed to read requests data." }`
+  - **Purpose**: Retrieves all requests.
+
+* **GET `/type`**
+  - **HTTP Method**: GET
+  - **Parameters**:
+    - `type` (query parameter): The type of request to filter by (either "join", "report", or "promotion").
+  - **Return**:
+    - Success: An array of request objects filtered by the specified type.
+    - Error: `{ "error": "Request type is required." }` or other error messages.
+  - **Purpose**: Retrieves all requests of a specific type.
+
+* **PATCH `/:id`**
+  - **HTTP Method**: PATCH
+  - **Parameters**:
+    - `:id` (URL parameter): The ID of the request to update.
+    - `status` (body parameter): The new status for the request.
+  - **Return**:
+    - Success: `{ "message": "Request status updated successfully." }`
+    - Error: `{ "error": "Request not found." }` or other error messages.
+  - **Purpose**: Updates the status of a request by its ID.
+
+* **DELETE `/`**
+  - **HTTP Method**: DELETE
+  - **Parameters**:
+    - `username` (body parameter): The username of the user who made the request.
+    - `groupName` (body parameter): The name of the group associated with the request.
+    - `typeOfRequest` (body parameter): The type of request to be deleted (either "join", "report", or "promotion").
+  - **Return**:
+    - Success: `{ "message": "Request deleted successfully." }`
+    - Error: `{ "error": "Request not found." }` or other error messages.
+  - **Purpose**: Deletes a request based on the username, group name, and request type.
+
+* **DELETE `/group/:groupName`**
+  - **HTTP Method**: DELETE
+  - **Parameters**:
+    - `:groupName` (URL parameter): The name of the group whose pending requests are being removed.
+  - **Return**:
+    - Success: `{ "message": "Pending requests removed successfully." }`
+    - Error: `{ "error": "No pending requests found for the specified group." }`
+  - **Purpose**: Removes all pending requests for a specific group.
+
+* **DELETE `/user/:username`**
+  - **HTTP Method**: DELETE
+  - **Parameters**:
+    - `:username` (URL parameter): The username of the user whose pending requests are being removed.
+  - **Return**:
+    - Success: `{ "message": "Pending requests for the user removed successfully." }`
+    - Error: `{ "error": "No pending requests found for the specified user." }`
+  - **Purpose**: Removes all pending requests for a specific user.
+
+#### usersRoutes.js
+
+* **GET `/`**
+  - **HTTP Method**: GET
+  - **Parameters**: None
+  - **Return**:
+    - Success: An array of all user objects.
+    - Error: `{ "error": "Failed to read users data." }`
+  - **Purpose**: Fetches a list of all users.
+
+* **POST `/`**
+  - **HTTP Method**: POST
+  - **Parameters**:
+    - `username` (body parameter): The username of the new user.
+    - `password` (body parameter): The password for the new user.
+    - Other user-specific fields as required.
+  - **Return**:
+    - Success: `{ "message": "User created successfully." }`
+    - Error: `{ "error": "Username already exists." }` or other error messages.
+  - **Purpose**: Creates a new user and adds them to the `users.json` file.
+
+* **PUT `/save`**
+  - **HTTP Method**: PUT
+  - **Parameters**:
+    - An array of user objects (body parameter).
+  - **Return**:
+    - Success: `{ "message": "Users saved successfully." }`
+    - Error: `{ "error": "Failed to save users." }`
+  - **Purpose**: Saves the updated list of users to the `users.json` file.
+
+* **DELETE `/username/:username`**
+  - **HTTP Method**: DELETE
+  - **Parameters**:
+    - `:username` (URL parameter): The username of the user to delete.
+  - **Return**:
+    - Success: `{ "message": "User deleted successfully." }`
+    - Error: `{ "error": "User not found." }`
+  - **Purpose**: Deletes a user by their username.
+
+* **GET `/superAdmins`**
+  - **HTTP Method**: GET
+  - **Parameters**: None
+  - **Return**:
+    - Success: An array of super admin objects.
+    - Error: `{ "error": "Failed to read users data." }`
+  - **Purpose**: Retrieves a list of all users with the `superAdmin` role.
+
+* **PATCH `/promote/groupAdmin/:username`**
+  - **HTTP Method**: PATCH
+  - **Parameters**:
+    - `:username` (URL parameter): The username of the user to promote to group admin.
+  - **Return**:
+    - Success: `{ "message": "User promoted to Group Admin successfully." }`
+    - Error: `{ "error": "User not found." }`
+  - **Purpose**: Promotes a user to the `groupAdmin` role.
+
+* **PATCH `/promote/superAdmin/:username`**
+  - **HTTP Method**: PATCH
+  - **Parameters**:
+    - `:username` (URL parameter): The username of the user to promote to super admin.
+  - **Return**:
+    - Success: `{ "message": "User promoted to Super Admin successfully." }`
+    - Error: `{ "error": "User not found." }`
+  - **Purpose**: Promotes a user to the `superAdmin` role.
+
+* **POST `/upload-profile-picture`**
+  - **HTTP Method**: POST
+  - **Parameters**:
+    - `username` (body parameter): The username of the user uploading the profile picture.
+    - `image` (file parameter): The image file of the user's profile picture.
+  - **Return**:
+    - Success: `{ "imageUrl": "<URL of uploaded profile picture>", "message": "Profile picture uploaded successfully." }`
+    - Error: `{ "error": "Failed to upload profile picture." }`
+  - **Purpose**: Uploads a user's profile picture, saves it in the `uploads/profile-pictures` directory, and stores the URL in MongoDB.
+
+* **GET `/profile-picture/:username`**
+  - **HTTP Method**: GET
+  - **Parameters**:
+    - `:username` (URL parameter): The username of the user whose profile picture is being fetched.
+  - **Return**:
+    - Success: `{ "imageUrl": "<URL of the user's profile picture>" }`
+    - Error: `{ "error": "Failed to get profile picture." }`
+  - **Purpose**: Retrieves the profile picture URL for a specific user from MongoDB. If no picture exists, it returns a default image URL.
 
 ## How Data Was Changed and Updated
 Whenever a user action required data modification—such as updating user roles, adding a new group, or processing a request—these methods would first perform the necessary changes to the data stored in local storage or the database via API calls. After updating the data, the methods would then trigger a refresh of the Angular components to update the views. Additionally, real-time updates, such as new messages in the chat, were handled using Socket.IO to ensure seamless user experience without manual refreshes.
