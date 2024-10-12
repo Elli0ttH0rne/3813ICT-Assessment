@@ -2,8 +2,8 @@
 
 ## Table of Contents
 1. [Git Repository Structure](#git-repository-structure)
-   - [Repository organisation](#repository-organisation)
-   - [3813ICT-Assessment](#3813ict-organisation)
+   - [Repository Organisation](#repository-organisation)
+   - [3813ICT-Assessment](#3813ict-assessment)
    - [Server](#server)
 2. [Git Workflow](#git-workflow)
    - [Branching Strategy](#branching-strategy)
@@ -30,7 +30,6 @@
      - [requestsRoutes.js](#requestsroutesjs)
      - [usersRoutes.js](#usersroutesjs)
 7. [How Data Was Changed and Updated](#how-data-was-changed-and-updated)
-
 
 
 ## Git Repository Structure
