@@ -2,7 +2,38 @@
 
 ## Git Repository Structure
 ### Repository Organization
-The repository includes all essential files for running the project, excluding the node modules. The `3813ICT-Assessment` directory contains the Angular project files for the frontend component. Within the `src` folder inside `3813ICT-Assessment`, the `app` directory houses a critical file named `main.ts`, which manages the Angular project's routing and paths. The `app` folder also contains two key subdirectories: `components` and `services`. The `components` directory stores all Angular components required for the frontend, while the `services` directory contains the service files that handle HTTP posts to the Node server as well as the socket functions.
+The repository includes all essential files for running the project, excluding the node modules.
+#### 3813ICT-Assessment
+The `3813ICT-Assessment` directory contains the Angular project files for the frontend component. Within the `src` folder inside `3813ICT-Assessment`, the `app` directory houses a critical file named `main.ts`, which manages the Angular project's routing and paths. The `app` folder also contains two key subdirectories: `components` and `services`. The `components` directory stores all Angular components required for the frontend, while the `services` directory contains the service files that handle HTTP posts to the Node server as well as the socket functions.
+### Server Directory Structure
+The server directory is organized to separate concerns and handle different aspects of the application backend. Below is an overview of the key folders and files:
+- **controllers/**: This directory contains files responsible for handling the logic of various routes and managing the interaction between the routes and the data stored in the `data` folder.
+  - `channelsController.js`: Handles channel-related logic, such as managing channels within groups.
+  - `groupsController.js`: Manages logic for group-related actions like creating or deleting groups.
+  - `requestsController.js`: Handles logic for user requests, such as group join requests, promotion requests, and report requests.
+  - `usersController.js`: Manages user-related logic, such as adding users to groups or promoting a user.
+- **data/**: This directory stores JSON files that represent the database for the application. These files are used to store data such as groups, users, and requests.
+  - `groups.json`: Stores all group-related data.
+  - `groupsWithChannels.json`: Stores group data, including channel information.
+  - `requests.json`: Stores all user requests, including join, promotion, and report requests.
+  - `users.json`: Stores user-related data, such as username, roles, and group memberships.
+  - Backup files (`groups-backup.json`, `users-backup.json`) provide backup versions of the `groups` and `users` data.
+
+- **helpers/**: Contains utility functions that assist with server operations. 
+  - `fileHelper.js`: A file used to read and write file operations on a JSON file.
+- **routes/**: Contains the route definitions for different parts of the application, specifying how incoming requests are handled and directing them to the appropriate controllers.
+  - `channelsRoutes.js`: Defines routes related to channel operations.
+  - `groupsRoutes.js`: Defines routes for group-related actions.
+  - `requestsRoutes.js`: Defines routes for handling user and admin requests.
+  - `usersRoutes.js`: Defines routes for user management actions.
+- **uploads/**: This folder contains directories for storing uploaded images such as:
+  - `messages/`: Stores any image sent in a channel
+  - `profile-pictures/`: Stores the images for user’s profile pictures
+- **migrateChannels.js**: This script is responsible for migrating the channel data inside the `groupsWithChannels.json` into the MongoDB for initial project setup.
+- **server.js**: The entry point for the Node.js server. It initializes the server, sets up middleware, and connects the routes to the appropriate controllers.
+- **db.js**: Responsible for setting up and managing the connection to MongoDB database 
+- **package.json & package-lock.json**: These files list the project dependencies and manage version control for those dependencies.
+
 
 ### Git Workflow
 #### Branching Strategy
