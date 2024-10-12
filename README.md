@@ -30,6 +30,10 @@
      - [requestsRoutes.js](#requestsroutesjs)
      - [usersRoutes.js](#usersroutesjs)
 7. [How Data Was Changed and Updated](#how-data-was-changed-and-updated)
+8. [Testing](#testing)
+   - [Angular Unit Testing](#angular-unit-testing)
+   - [Mocha + Chai Testing on Node Server](#mocha--chai-testing-on-node-server)
+
 
 
 ## Git Repository Structure
@@ -549,9 +553,6 @@ To run these tests, cd into `3813ICT-Assessment` and run ng test. You will need 
     * should navigate to /user-group on successful login
     * should alert "Invalid credentials" if username or password is incorrect
     * should alert an error if getValidUsers fails
-* **register component:**
-    *   
-  
 
 #### Services
 * **channels services:**
