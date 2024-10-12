@@ -2,12 +2,34 @@
 
 ## Table of Contents
 1. [Git Repository Structure](#git-repository-structure)
+   - [Repository Organization](#repository-organization)
+   - [Server](#server)
 2. [Git Workflow](#git-workflow)
+   - [Branching Strategy](#branching-strategy)
+   - [Commit Frequency](#commit-frequency)
 3. [JSON File Structure](#json-file-structure)
+   - [User Data Structure](#user-data-structure)
+   - [Group Data Structure](#group-data-structure)
+   - [Request Data Structure](#request-data-structure)
 4. [MongoDB Collection Structure](#mongodb-collection-structure)
+   - [Channels Collection](#channels-collection)
+   - [Messages Collection](#messages-collection)
+   - [Profile Pictures Collection](#profile-pictures-collection)
 5. [Angular Architecture](#angular-architecture)
-6. [Node Server Architecture](#node-server-architecture)
+   - [Components](#components)
+   - [Services](#services)
+   - [Models](#models)
+6. [REST API, Node Server Architecture, and Server-Side Routes](#rest-api-node-server-architecture-and-server-side-routes)
+   - [Node Server Architecture](#node-server-architecture)
+   - [Server Directory Structure](#server-directory-structure)
+   - [REST API](#rest-api)
+   - [Server-Side Routes](#server-side-routes)
+     - [channelRoutes.js](#channelroutesjs)
+     - [groupsRoutes.js](#groupsroutesjs)
+     - [requestsRoutes.js](#requestsroutesjs)
+     - [usersRoutes.js](#usersroutesjs)
 7. [How Data Was Changed and Updated](#how-data-was-changed-and-updated)
+
 
 
 ## Git Repository Structure
@@ -190,7 +212,19 @@ The server directory is organized to separate concerns and handle different aspe
 - **db.js**: Responsible for setting up and managing the connection to MongoDB database 
 - **package.json & package-lock.json**: These files list the project dependencies and manage version control for those dependencies.
 
-### Server-Side Routes
+### REST API
+In this project, I utilized the REST API architecture to handle communication between the Angular frontend and the Node.js server. By following REST principles, each route corresponds to a specific HTTP method—`GET`, `POST`, `PATCH`, `DELETE`—and operates on distinct resources such as users, groups, and channels. This structuring ensures the server routes are easy to maintain and scale.
+
+Each resource is represented by a clear URL endpoint, and actions such as retrieving data, creating new records, updating existing entries, and deleting resources are managed through these API endpoints. For example:
+
+- **GET** requests are used to fetch data, like retrieving a list of groups or fetching all messages in a channel.
+- **POST** requests are used to create new data, such as creating a new group or sending a chat message.
+- **PATCH** requests are used to update existing data, such as promoting a user to an admin role or adding a group to a user's list.
+- **DELETE** requests are used to remove data, like deleting a user or removing a channel from a group.
+
+By adhering to REST API principles, the server-side logic becomes more intuitive, stateless, and scalable, allowing each API route to manage a specific function effectively and enabling clear communication between the client and server.
+
+### Server Side Routes
 
 #### channelRoutes.js
   
