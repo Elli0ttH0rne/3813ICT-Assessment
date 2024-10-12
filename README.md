@@ -1,5 +1,15 @@
 # 3813ICT Assessment Phase 1
 
+## Table of Contents
+1. [Git Repository Structure](#git-repository-structure)
+2. [Git Workflow](#git-workflow)
+3. [JSON File Structure](#json-file-structure)
+4. [MongoDB Collection Structure](#mongodb-collection-structure)
+5. [Angular Architecture](#angular-architecture)
+6. [Node Server Architecture](#node-server-architecture)
+7. [How Data Was Changed and Updated](#how-data-was-changed-and-updated)
+
+
 ## Git Repository Structure
 ### Repository Organization
 This repository includes all essential files for running the chat application project, excluding the node modules which can be installed using npm install (or npm i).
@@ -7,7 +17,8 @@ This repository includes all essential files for running the chat application pr
 The `3813ICT-Assessment` directory contains the Angular project files for the frontend component. Within the `src` folder inside `3813ICT-Assessment`, the `app` directory houses a critical file named `main.ts`, which manages the Angular project's routing and paths. The `app` folder also contains two key subdirectories: `components` and `services`. The `components` directory stores all Angular components required for the frontend, while the `services` directory contains the service files that handle HTTP posts to the Node server as well as the socket functions. Each component and services will be broken down and explained in this Angular Achitecture section.
 
 #### Server
-(chatgpt write something here)
+The server is responsible for handling API requests and managing the backend logic. It serves as the intermediary between the Angular frontend and the MongoDB database. The server uses Node.js and Express to define routes for handling actions such as creating groups, managing user requests, and handling real-time chat functionality via sockets. It also manages data persistence by storing and retrieving information from the MongoDB database or JSON files during the project setup.
+
 
 ### Git Workflow
 #### Branching Strategy
@@ -95,13 +106,14 @@ This project contains seven core components that make up the entire frontend of 
 * **register**: Allows users to create an account by entering a unique username, email, and password.
 * **user-group**: This screen is displayed after a user logs in. It shows the groups that the user has joined. Group admins have additional options to create and delete groups and channels, but they can only modify groups they have created. Super admins have the same abilities but can modify any group without needing to be the creator.
 
+
 ### Services
 Within this project, five services were created to manage data and provide methods for performing various actions on that data. These services are:
-* `channels.service.ts`:
-* `groups.service.ts`:
-* `requests.service.ts`: 
-* `sockets.service.ts`: 
-* `users.service.ts`: 
+* `channels.service.ts`: Manages the channel-related operations, such as fetching channels, creating channels, and handling chat functionality.
+* `groups.service.ts`: Responsible for handling group-related operations, including creating and deleting groups.
+* `requests.service.ts`: Manages user requests, such as join requests, promotion requests, and report requests.
+* `sockets.service.ts`: Provides functionality for handling real-time communication using sockets for the chat feature.
+* `users.service.ts`: Handles operations related to user data, such as fetching user information, updating profiles, and managing user roles.
 
 ### Models
 * channel.component.ts
@@ -168,6 +180,5 @@ The server directory is organized to separate concerns and handle different aspe
 
 
 ## How data was changed and how the angular components were updated
-To effectively manage and update the data within the application, I developed specific methods within the relevant services. These methods were responsible for modifying the stored data, ensuring that any changes were reflected throughout the application.
+Whenever a user action required data modification—such as updating user roles, adding a new group, or processing a request—these methods would first perform the necessary changes to the data stored in local storage or the database via API calls. After updating the data, the methods would then trigger a refresh of the Angular components to update the views. Additionally, real-time updates, such as new messages in the chat, were handled using Socket.IO to ensure seamless user experience without manual refreshes.
 
-Whenever a user action required data modification—such as updating user roles, adding a new group, or processing a request—these methods would first perform the necessary changes to the data stored in local storage. After updating the data, the methods would then trigger a refresh of the Angular components that display this data. This ensured that the user interface remained consistent with the current state of the data.
