@@ -192,7 +192,7 @@ const getProfilePicture = async (req, res) => {
   const { username } = req.params;
 
   try {
-    const db = getDB(); 
+    const db = getDB();
     const profilePicturesCollection = db.collection('profilePictures');
 
     const userProfile = await profilePicturesCollection.findOne({ username });
@@ -207,6 +207,7 @@ const getProfilePicture = async (req, res) => {
     res.status(500).send('Error retrieving profile picture.');
   }
 };
+
 
 module.exports = {
   getAllUsers,

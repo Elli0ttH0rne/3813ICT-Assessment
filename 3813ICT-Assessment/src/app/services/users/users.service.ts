@@ -65,16 +65,14 @@ export class UsersService {
 
   // Get the profile picture of the user by username
   getUserProfilePicture(username: string): Observable<{ imageUrl: string }> {
-    // Construct the URL using the username
     const url = `${this.apiUrl}/profile-picture/${username}`;
-    
     return this.http.get<{ imageUrl: string }>(url).pipe(
-      // Catch any errors and provide a fallback URL if the picture is not found
       catchError((error) => {
         console.error(`Failed to retrieve profile picture for ${username}:`, error.message);
         return of({ imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg' });
       })
     );
   }
+
 }
 

@@ -95,9 +95,7 @@
                 
                 <!-- Conditional rendering for user messages -->
                 <ng-container *ngIf="message.sender !== 'System'; else systemMessage">
-                  <img class="avatar" [ngClass]="{'me-2': message.sender !== username, 'ms-2': message.sender === username}" 
-                       [src]="getAvatarImg(message.sender)" alt="avatar">
-              
+                  <img class="avatar" [ngClass]="{'me-2': message.sender !== username, 'ms-2': message.sender === username}" [src]="getAvatarImg(message.sender)" alt="avatar">
                   <div class="message-content">
                     <div class="message-header">
                       <span class="username">{{ message.sender }}</span>

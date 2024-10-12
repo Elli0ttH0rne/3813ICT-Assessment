@@ -10,6 +10,7 @@ import { ChannelsService } from '../../services/channels/channels.service';
 import { SocketService } from '../../services/socket/socket.service'; 
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators'
+import { ChangeDetectorRef } from '@angular/core'; 
 
 interface Message {
   _id?: string;
@@ -104,12 +105,16 @@ export class ChannelComponent implements OnInit {
 
   //******************************Data Loading******************************
   private loadInitialData(): void {
+    console.log('loadInitialData called.');
+  
     // Fetch request count if the user is group admin or super admin
     if (this.isGroupAdminOrSuperAdmin()) {
+      console.log('User is a group admin or super admin. Loading request count...');
       this.loadRequestCount();
     }
   
     // Load users, admins, and creator of the group
+    console.log('Fetching users, admins, super admins, and group creator...');
     forkJoin([
       this.groupsService.getUsersInGroup(this.groupName!),
       this.groupsService.getGroupAdmins(this.groupName!),
@@ -117,34 +122,55 @@ export class ChannelComponent implements OnInit {
       this.groupsService.getGroupCreator(this.groupName!)
     ]).subscribe({
       next: async ([users, admins, superAdmins, creatorId]) => {
-        this.groupCreatorId = creatorId;  
+        console.log('Data fetched successfully.');
+        console.log('Users:', users);
+        console.log('Admins:', admins);
+        console.log('SuperAdmins:', superAdmins);
+        console.log('Creator ID:', creatorId);
+  
+        this.groupCreatorId = creatorId;
         this.isCreator = this.userID === this.groupCreatorId || this.isSuperAdmin;
-        this.isGroupAdmin = this.roles.includes('groupAdmin')
+        this.isGroupAdmin = this.roles.includes('groupAdmin');
   
         // Combine users and admins but keep the types separate
+        console.log('Fetching profile pictures for users...');
         const groupUsers = users.map(user =>
           this.usersService.getUserProfilePicture(user.username).pipe(
-            map(response => ({ ...user, profilePicture: response.imageUrl } as GroupUser))
+            map(response => {
+              console.log(`Profile picture fetched for user ${user.username}:`, response);
+              return { ...user, profilePicture: response.imageUrl } as GroupUser;
+            })
           )
         );
   
+        console.log('Fetching profile pictures for admins...');
         const adminPictureRequests = [...admins, ...superAdmins].map(admin =>
           this.usersService.getUserProfilePicture(admin.username).pipe(
-            map(response => ({ ...admin, profilePicture: response.imageUrl } as Admin))
+            map(response => {
+              console.log(`Profile picture fetched for admin ${admin.username}:`, response);
+              return { ...admin, profilePicture: response.imageUrl } as Admin;
+            })
           )
         );
   
         // Wait for all requests to complete
-        this.usersInGroup = await forkJoin(groupUsers).toPromise();
-        this.groupAdmins = await forkJoin(adminPictureRequests).toPromise();
-  
-        // Now 'usersInGroup' has only GroupUser objects and 'groupAdmins' has only Admin objects
+        try {
+          console.log('Waiting for all profile picture requests to complete...');
+          this.usersInGroup = await forkJoin(groupUsers).toPromise();
+          this.groupAdmins = await forkJoin(adminPictureRequests).toPromise();
+          console.log('Profile pictures loaded successfully.');
+          console.log('Users in group:', this.usersInGroup);
+          console.log('Group admins:', this.groupAdmins);
+        } catch (err) {
+          console.error('Error while fetching profile pictures:', err);
+        }
       },
       error: (error) => {
         console.error('Failed to load initial data:', error);
       }
     });
   }
+  
 
   private loadRequestCount(): void {
     this.requestsService.getRequestCount().subscribe({
@@ -413,13 +439,52 @@ export class ChannelComponent implements OnInit {
   }
 
   getAvatarImg(sender: string): string {
-    const user = this.usersInGroup.find(u => u.username === sender);
+    const user = this.usersInGroup.find(u => u.username === sender) 
+                 || this.groupAdmins.find(admin => admin.username === sender);
     
-    // Return the user's profile picture if available, otherwise return the default image
-    return user && user.profilePicture
-      ? user.profilePicture
-      : 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg';
+    if (user) {
+      console.log(`Displaying avatar for ${sender}:`, user.profilePicture);
+      return user.profilePicture 
+             ? user.profilePicture 
+             : 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg';
+    }
+  
+    // If no user is found, return a placeholder image
+    console.log(`No user found for ${sender}, using default avatar.`);
+    return 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Default_pfp.svg';
   }
+  
+
+    //******************************Promotion Actions******************************
+    promoteToGroupAdmin(username: string): void {
+      const confirmed = window.confirm(`Are you sure you want to promote ${username} to Group Admin?`);
+      if (confirmed && this.groupName) {
+        this.usersService.promoteToGroupAdmin(username).subscribe({
+          next: () => {
+            alert(`${username} has been promoted to Group Admin.`);
+          },
+          error: (err) => {
+            console.error('Failed to promote user to Group Admin:', err);
+            alert('Promotion to Group Admin failed.');
+          }
+        });
+      }
+    }
+  
+    promoteToSuperAdmin(username: string): void {
+      const confirmed = window.confirm(`Are you sure you want to promote ${username} to Super Admin?`);
+      if (confirmed) {
+        this.usersService.promoteToSuperAdmin(username).subscribe({
+          next: () => {
+            alert(`${username} has been promoted to Super Admin.`);
+          },
+          error: (err) => {
+            console.error('Failed to promote user to Super Admin:', err);
+            alert('Promotion to Super Admin failed.');
+          }
+        });
+      }
+    }
 
   //******************************Component Navigation******************************
   navigateToUserGroup(): void {

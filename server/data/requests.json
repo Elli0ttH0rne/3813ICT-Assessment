@@ -1,1 +1,8 @@
-[]
+[
+  {
+    "username": "groupAdmin1",
+    "groupName": "Photography",
+    "typeOfRequest": "promotion",
+    "promotionUser": "user9"
+  }
+]
