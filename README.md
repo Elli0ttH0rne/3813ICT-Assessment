@@ -179,6 +179,6 @@ The server directory is organized to separate concerns and handle different aspe
 - **package.json & package-lock.json**: These files list the project dependencies and manage version control for those dependencies.
 
 
-## How data was changed and how the angular components were updated
+## How Data Was Changed and Updated
 Whenever a user action required data modification—such as updating user roles, adding a new group, or processing a request—these methods would first perform the necessary changes to the data stored in local storage or the database via API calls. After updating the data, the methods would then trigger a refresh of the Angular components to update the views. Additionally, real-time updates, such as new messages in the chat, were handled using Socket.IO to ensure seamless user experience without manual refreshes.
 
